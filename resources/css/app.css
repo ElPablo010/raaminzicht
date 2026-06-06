@@ -1,26 +1,64 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
-
     /*
-     * Merk-primary. Voorlopig een neutraal blauw (#2563eb = 600); pas de hele
-     * schaal aan zodra de definitieve merkkleur vastligt en houd 'm in sync met
-     * de Filament panel-kleur (AdminPanelProvider::colors) en SectionBackground.
+     * Raaminzicht — "Patrijspoort"-palet.
+     * Het logo is een messing scheepspatrijspoort met een blauwgrijze glaskern.
+     * Daar bouwt het palet op voort: een diep petrol/zeeglas-blauw als merkkleur
+     * (de glaskern), messing/goud spaarzaam als accent (de poortring), en warme
+     * steen-neutralen. Modern, premium en toch trouw aan het logo.
      */
-    --color-primary-50: #eff6ff;
-    --color-primary-100: #dbeafe;
-    --color-primary-200: #bfdbfe;
-    --color-primary-300: #93c5fd;
-    --color-primary-400: #60a5fa;
-    --color-primary-500: #3b82f6;
-    --color-primary-600: #2563eb;
-    --color-primary-700: #1d4ed8;
-    --color-primary-800: #1e40af;
-    --color-primary-900: #1e3a8a;
-    --color-primary-950: #172554;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Fraunces', ui-serif, Georgia, Cambria, 'Times New Roman', serif;
+
+    /* Merk-primary — diep petrol / zeeglas. */
+    --color-primary-50: #f0f7f8;
+    --color-primary-100: #d7eced;
+    --color-primary-200: #b2dade;
+    --color-primary-300: #82c1c8;
+    --color-primary-400: #4f9fa9;
+    --color-primary-500: #34818b;
+    --color-primary-600: #286872;
+    --color-primary-700: #245761;
+    --color-primary-800: #234852;
+    --color-primary-900: #213d45;
+    --color-primary-950: #0f262c;
+
+    /* Accent — messing / goud (de patrijspoort-ring). Spaarzaam gebruiken. */
+    --color-accent-50: #faf6ec;
+    --color-accent-100: #f3e8cc;
+    --color-accent-200: #e7d196;
+    --color-accent-300: #d9b85f;
+    --color-accent-400: #cda43c;
+    --color-accent-500: #bb8c2b;
+    --color-accent-600: #9c7022;
+    --color-accent-700: #79551f;
+    --color-accent-800: #5c4119;
+    --color-accent-900: #4a3415;
+
+    /* Warme steen-neutraal voor 'licht'-secties. */
+    --color-sand-50: #f8f6f2;
+    --color-sand-100: #f1ede4;
+    --color-sand-200: #e3dccd;
+}
+
+@layer base {
+    [x-cloak] {
+        display: none !important;
+    }
+
+    body {
+        @apply bg-white text-primary-950 antialiased;
+    }
+
+    h1, h2, h3, h4, .font-display {
+        font-family: var(--font-display);
+        font-optical-sizing: auto;
+        letter-spacing: -0.02em;
+    }
 }

@@ -43,6 +43,12 @@ class PageSectionsBuilder
                     ...SectionCommonFields::make(withBackground: false),
                     ...HeroFields::make(),
                 ]),
+            Block::make('partners')
+                ->label(self::numberedLabel('Partners / logo\'s'))
+                ->schema([
+                    ...SectionCommonFields::make(),
+                    ...PartnersFields::make(),
+                ]),
             Block::make('text_media')
                 ->label(self::numberedLabel('Tekst en media'))
                 ->schema([
@@ -66,6 +72,18 @@ class PageSectionsBuilder
                 ->schema([
                     ...SectionCommonFields::make(),
                     ...GalleryFields::make(),
+                ]),
+            Block::make('reviews')
+                ->label(self::numberedLabel('Reviews'))
+                ->schema([
+                    ...SectionCommonFields::make(),
+                    ...ReviewsFields::make(),
+                ]),
+            Block::make('formulier')
+                ->label(self::numberedLabel('Formulier'))
+                ->schema([
+                    ...SectionCommonFields::make(),
+                    ...FormulierFields::make(),
                 ]),
             Block::make('cta')
                 ->label(self::numberedLabel('Call-to-action'))

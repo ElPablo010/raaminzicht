@@ -35,11 +35,11 @@ class SectionBackground
     public static function classes(?string $key): string
     {
         return match ($key) {
-            'light' => 'bg-gray-50 text-gray-900',
-            'primary' => 'bg-primary-600 text-white',
-            'dark' => 'bg-gray-900 text-white',
-            'transparent' => 'text-gray-900',
-            default => 'bg-white text-gray-900',
+            'light' => 'bg-sand-50 text-primary-950',
+            'primary' => 'bg-primary-900 text-white',
+            'dark' => 'bg-primary-950 text-white',
+            'transparent' => 'text-primary-950',
+            default => 'bg-white text-primary-950',
         };
     }
 

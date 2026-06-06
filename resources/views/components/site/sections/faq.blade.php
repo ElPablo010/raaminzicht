@@ -2,30 +2,40 @@
 
 @php
     $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $items = $content['items'] ?? [];
+    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $items = array_values(array_filter($content['items'] ?? [], fn ($i) => ! empty($i['question'])));
+    $itemBorder = $dark ? 'border-white/10' : 'border-primary-100';
+    $qTone = $dark ? 'text-white' : 'text-primary-950';
+    $aTone = $dark ? 'text-white/70' : 'text-primary-900/65';
 @endphp
 
-{{-- Neutrale placeholder. Per project vrij te herontwerpen. --}}
 <x-site.sections.wrapper :content="$content" class="{{ $bg }}">
-    <div class="mx-auto max-w-3xl px-4 py-20">
-        @if (! empty($content['heading']))
-            <div class="mb-10 text-center">
-                @if (! empty($content['eyebrow']))
-                    <p class="mb-2 text-sm font-medium uppercase tracking-wide opacity-70">{{ $content['eyebrow'] }}</p>
-                @endif
-                <h2 class="text-3xl font-bold">{{ $content['heading'] }}</h2>
-                @if (! empty($content['intro']))
-                    <div class="prose mx-auto mt-3">{!! $content['intro'] !!}</div>
-                @endif
-            </div>
-        @endif
+    <div class="mx-auto max-w-3xl px-6 py-20 lg:py-28">
+        <x-site.section-heading
+            :eyebrow="$content['eyebrow'] ?? null"
+            :heading="$content['heading'] ?? null"
+            :intro="$content['intro'] ?? null"
+            :dark="$dark"
+        />
 
-        <div class="divide-y divide-gray-200">
-            @foreach ($items as $item)
-                <details class="group py-4">
-                    <summary class="cursor-pointer list-none font-medium">{{ $item['question'] ?? '' }}</summary>
-                    <div class="prose mt-2 max-w-none text-sm text-gray-600">{!! $item['answer'] ?? '' !!}</div>
-                </details>
+        <div class="mt-12 divide-y {{ $itemBorder }} border-y {{ $itemBorder }}" x-data="{ open: null }">
+            @foreach ($items as $i => $item)
+                <div>
+                    <button
+                        type="button"
+                        @click="open === {{ $i }} ? open = null : open = {{ $i }}"
+                        class="flex w-full cursor-pointer items-center justify-between gap-4 py-5 text-left"
+                        :aria-expanded="open === {{ $i }}"
+                    >
+                        <span class="text-lg font-medium {{ $qTone }}">{{ $item['question'] }}</span>
+                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full {{ $dark ? 'bg-white/10 text-accent-300' : 'bg-accent-50 text-accent-600' }} transition-transform duration-200" :class="open === {{ $i }} ? 'rotate-45' : ''">
+                            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 4v12M4 10h12"/></svg>
+                        </span>
+                    </button>
+                    <div x-show="open === {{ $i }}" x-collapse x-cloak>
+                        <div class="prose prose-sm max-w-none pb-6 {{ $aTone }} prose-a:text-accent-600 prose-strong:text-current">{!! $item['answer'] ?? '' !!}</div>
+                    </div>
+                </div>
             @endforeach
         </div>
     </div>

@@ -5,6 +5,7 @@ namespace App\Filament\Schemas\Sections;
 use App\Filament\Schemas\Components\MediaPickerField;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 
@@ -42,9 +43,21 @@ class HeroFields
 
             Grid::make(['default' => 1, 'md' => 2])
                 ->schema([
+                    Select::make('height')
+                        ->label('Hoogte')
+                        // Logische volgorde (groot → compact), geen alfabetische.
+                        ->options([
+                            'groot' => 'Groot (homepage)',
+                            'compact' => 'Compact (binnenpagina)',
+                        ])
+                        ->default('groot'),
                     TextInput::make('image.alt')
                         ->label('Achtergrond — alt-tekst')
                         ->maxLength(255),
+                ]),
+
+            Grid::make(['default' => 1, 'md' => 2])
+                ->schema([
                     Select::make('image.position')
                         ->label('Achtergrond — object-position')
                         ->options([
@@ -58,6 +71,11 @@ class HeroFields
                 ]),
 
             CtaLinkSchema::repeater('ctas', 'Knoppen (CTA\'s)'),
+
+            TagsInput::make('highlights')
+                ->label('Trust-punten (chips onder de knoppen)')
+                ->placeholder('Bv. 20+ jaar ervaring')
+                ->helperText('Korte voordelen die onder de hero verschijnen. Leeg = geen.'),
         ];
     }
 }
