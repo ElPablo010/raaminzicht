@@ -47,6 +47,19 @@
 <body class="min-h-screen">
     <x-site.header />
 
+    @auth
+        @if ($page)
+            <a
+                href="{{ route('filament.admin.resources.pages.edit', ['record' => $page, 'tab' => 'sections']) }}"
+                class="fixed right-4 top-20 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-600 text-white shadow-[0_8px_24px_-8px_rgba(40,104,114,0.55)] transition-all duration-300 hover:bg-primary-700 hover:shadow-[0_12px_28px_-8px_rgba(40,104,114,0.65)] lg:top-28"
+                title="Bewerk deze pagina in admin"
+                aria-label="Bewerk pagina"
+            >
+                <x-lucide-pencil class="h-4 w-4" />
+            </a>
+        @endif
+    @endauth
+
     <main>
         {{ $slot }}
     </main>

@@ -47,7 +47,11 @@
 @endphp
 
 @if ($imgSrc || $webpUrl)
-    <picture class="{{ $class }}">
+    {{-- `block` is bewust: een <picture> is van nature display:inline, waardoor
+         overflow-hidden + rounded-* die rechtstreeks op deze class gezet worden
+         (bv. in text-media of de review-avatars) de <img> niet clippen. Als block
+         clipt de afronding wél, net als bij een omhullende <div>. --}}
+    <picture class="block {{ $class }}">
         @if ($webpUrl)
             <source srcset="{{ $webpUrl }}" type="image/webp" @if ($sizes) sizes="{{ $sizes }}" @endif>
         @endif

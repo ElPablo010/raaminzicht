@@ -84,8 +84,13 @@
             @endif
 
             <div class="flex items-center gap-3">
+                {{-- Wrapper stuurt de zichtbaarheid: de btn hardcodet zelf `inline-flex`,
+                     dus `hidden` rechtstreeks op de btn zou door die display-utility
+                     overschreven worden en de knop alsnog (afgebroken) op mobiel tonen. --}}
                 @if (! empty($cta['label']))
-                    <x-site.btn :href="$cta['href'] ?? '/'" :label="$cta['label']" variant="secondary" class="hidden sm:inline-flex" />
+                    <div class="hidden sm:block">
+                        <x-site.btn :href="$cta['href'] ?? '/'" :label="$cta['label']" variant="secondary" />
+                    </div>
                 @endif
 
                 {{-- Mobiele toggle --}}
