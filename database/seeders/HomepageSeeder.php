@@ -391,7 +391,7 @@ class HomepageSeeder extends Seeder
         ];
     }
 
-    private function productPage(string $slug, string $title, string $metaDesc, string $heroImg, string $heroAlt, string $eyebrow, string $heroHeading, string $heroSub, array $textMedia, array $cards, array $faq): array
+    private function productPage(string $slug, string $title, string $metaDesc, string $heroImg, string $heroAlt, string $eyebrow, string $heroHeading, string $heroSub, array $textMedia, array $cards, array $faq, ?string $cardsHeading = null, ?string $heroCtaLabel = null): array
     {
         return [
             'slug' => $slug,
@@ -400,13 +400,13 @@ class HomepageSeeder extends Seeder
             'meta_description' => $metaDesc,
             'sections' => [
                 $this->hero($eyebrow, $heroHeading, '<p>'.$heroSub.'</p>', $heroImg, $heroAlt, [
-                    ['label' => 'Vraag uw offerte', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/offerte'],
+                    ['label' => $heroCtaLabel ?? 'Vraag uw offerte', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/offerte'],
                 ], [], 'compact', 'center 55%'),
                 ['type' => 'text_media', 'content' => $textMedia],
                 ['type' => 'cards', 'content' => [
                     'background' => 'light',
                     'eyebrow' => 'Voordelen',
-                    'heading' => 'Waarom kiezen voor '.strtolower($eyebrow).'?',
+                    'heading' => $cardsHeading ?? 'Waarom kiezen voor '.strtolower($eyebrow).'?',
                     'columns' => '3',
                     'cards' => $cards,
                 ]],
@@ -435,26 +435,31 @@ class HomepageSeeder extends Seeder
             'Moderne ramen en schuiframen in een woning',
             'Ramen & deuren',
             'Ramen en deuren op maat',
-            'PVC, aluminium of hout — voor elke woning en elk budget de juiste keuze, met hoogrendementsbeglazing en strakke afwerking.',
+            'Warmer, stiller en veiliger wonen. Ramen en deuren op maat in PVC, aluminium of hout, vakkundig geplaatst door de zaakvoerder zelf.',
             [
                 'background' => 'white',
                 'eyebrow' => 'PVC · aluminium · hout',
-                'heading' => 'Het juiste materiaal voor uw woning',
-                'intro' => '<p>Elk materiaal heeft zijn sterktes. <strong>PVC</strong> is onderhoudsvriendelijk en voordelig, <strong>aluminium</strong> laat strakke, slanke profielen toe, en <strong>hout</strong> straalt warmte en karakter uit. We adviseren u graag wat het beste past.</p><p>Ook voor schuiframen, voordeuren en vliegenramen bent u bij ons aan het juiste adres.</p>',
+                'heading' => 'Het juiste materiaal voor je woning',
+                'intro' => '<p>Elk materiaal heeft zijn sterktes. We adviseren je graag wat het beste past bij je woning en je budget.</p><ul><li><strong>PVC — de beste prijs voor jarenlang comfort.</strong> Onderhoudsvriendelijk, goed geïsoleerd en voordelig.</li><li><strong>Aluminium — strak design dat je gevel moderner maakt.</strong> Slanke profielen, sterk en tijdloos.</li><li><strong>Hout — warmte en karakter dat je voelt.</strong> Natuurlijke uitstraling voor wie houdt van authentiek.</li></ul><p>Ook voor schuiframen, voordeuren en vliegenramen ben je bij ons aan het juiste adres.</p>',
                 'media_type' => 'image',
                 'media_side' => 'right',
                 'media' => ['src' => $this->img('realisatie-4'), 'alt' => 'Nieuwe ramen in een lichtrijke leefruimte'],
             ],
             [
-                ['title' => 'Hoogrendementsglas', 'media_type' => 'icon', 'icon' => 'thermometer-sun', 'description' => 'Standaard met isolerende beglazing voor lagere energiefacturen.'],
-                ['title' => 'Inbraakvertragend', 'media_type' => 'icon', 'icon' => 'lock', 'description' => 'Stevig hang- en sluitwerk voor extra veiligheid en gemoedsrust.'],
-                ['title' => 'Strakke afwerking', 'media_type' => 'icon', 'icon' => 'sparkles', 'description' => 'Net geplaatst en perfect afgewerkt, binnen én buiten.'],
+                ['title' => 'Een warmer huis, een lagere energiefactuur', 'media_type' => 'icon', 'icon' => 'thermometer-sun', 'description' => 'Standaard hoogrendementsglas houdt de warmte binnen. Je stookt minder en voelt het verschil meteen.'],
+                ['title' => 'Veilig slapen, gerust de deur uit', 'media_type' => 'icon', 'icon' => 'lock', 'description' => 'Stevig inbraakvertragend hang- en sluitwerk. Veiligheid waar je niet meer over nadenkt.'],
+                ['title' => 'Stil binnen, ook aan een drukke straat', 'media_type' => 'icon', 'icon' => 'volume-x', 'description' => 'De juiste beglazing houdt het lawaai buiten. Thuiskomen in alle rust.'],
+                ['title' => 'Jarenlang mooi, zonder onderhoud', 'media_type' => 'icon', 'icon' => 'sparkles', 'description' => 'PVC en aluminium die je nooit moet schilderen. Eén keer goed, voor decennia.'],
+                ['title' => 'Een mooiere woning, meer waarde', 'media_type' => 'icon', 'icon' => 'trending-up', 'description' => 'Strakke profielen die je gevel opwaarderen. Goed voor het woonplezier én de waarde van je huis.'],
+                ['title' => 'Topkwaliteit die jaren meegaat', 'media_type' => 'icon', 'icon' => 'badge-check', 'description' => 'We werken met Drutex en Reynaers, Europese topfabrikanten. Bewezen kwaliteit met garantie, geen verrassingen.'],
             ],
             [
-                ['question' => 'Welk materiaal kies ik best?', 'answer' => '<p>Dat hangt af van uw woning, smaak en budget. We overlopen samen de voor- en nadelen van PVC, aluminium en hout.</p>'],
+                ['question' => 'Welk materiaal kies ik best?', 'answer' => '<p>Dat hangt af van je woning, smaak en budget. We overlopen samen de voor- en nadelen van PVC, aluminium en hout.</p>'],
                 ['question' => 'Plaatsen jullie ook bij renovatie?', 'answer' => '<p>Zeker. We vervangen bestaande ramen en deuren netjes, met aandacht voor de afwerking aan binnen- en buitenzijde.</p>'],
-                ['question' => 'Leveren jullie ook vliegenramen?', 'answer' => '<p>Ja, vliegenramen en -deuren maken deel uit van ons aanbod en passen we perfect op uw schrijnwerk aan.</p>'],
+                ['question' => 'Leveren jullie ook vliegenramen?', 'answer' => '<p>Ja, vliegenramen en -deuren maken deel uit van ons aanbod en passen we perfect op je schrijnwerk aan.</p>'],
             ],
+            'Het verschil dat je elke dag voelt',
+            'Vraag je offerte',
         );
     }
 
@@ -467,27 +472,32 @@ class HomepageSeeder extends Seeder
             $this->img('verandas'),
             'Moderne veranda met glazen wanden',
             "Veranda's",
-            "Uw veranda, een tweede woonkamer",
-            'Geniet het hele jaar door van extra licht en ruimte, met aandacht voor isolatie, ventilatie en zonwering.',
+            'Je veranda, een tweede woonkamer',
+            'Extra leefruimte waar je het hele jaar van geniet. Op maat ontworpen en geplaatst door de zaakvoerder zelf — warm in de winter, koel in de zomer.',
             [
                 'background' => 'white',
                 'eyebrow' => 'Op maat ontworpen',
                 'heading' => 'Comfortabel in elk seizoen',
-                'intro' => '<p>Een veranda van Raaminzicht is meer dan een aanbouw: het is een volwaardige leefruimte. We houden rekening met <strong>isolatie</strong>, <strong>ventilatie</strong> en <strong>zonwering</strong> zodat het er zomer en winter aangenaam vertoeven is.</p>',
+                'intro' => '<p>Een veranda van Raaminzicht is geen kille serre, maar een volwaardige leefruimte die je woning groter en lichter maakt. Modern, landelijk of klassiek, in aluminium of PVC: volledig op maat van je woning en geplaatst door de zaakvoerder zelf. Liever niet meteen een volledige veranda? Ook voor een <strong>terrasoverkapping</strong>, deels open of volledig gesloten, ben je bij ons aan het juiste adres.</p>',
                 'media_type' => 'image',
                 'media_side' => 'left',
                 'media' => ['src' => $this->img('realisatie-2'), 'alt' => 'Veranda met schuiframen en zicht op de tuin'],
             ],
             [
-                ['title' => 'Maximaal lichtcomfort', 'media_type' => 'icon', 'icon' => 'sun', 'description' => 'Grote glaspartijen brengen het hele jaar door licht binnen.'],
-                ['title' => 'Goed geïsoleerd', 'media_type' => 'icon', 'icon' => 'thermometer', 'description' => 'Kwalitatieve profielen en beglazing houden de warmte binnen.'],
-                ['title' => 'Geïntegreerde zonwering', 'media_type' => 'icon', 'icon' => 'blinds', 'description' => 'Optioneel met screens of een zonwerend dak tegen oververhitting.'],
+                ['title' => 'Een tweede woonkamer, het hele jaar door', 'media_type' => 'icon', 'icon' => 'sofa', 'description' => 'Geen kille serre, maar een echte leefruimte. Goed geïsoleerde profielen en beglazing houden de warmte binnen.'],
+                ['title' => 'Baad in natuurlijk licht', 'media_type' => 'icon', 'icon' => 'sun', 'description' => 'Grote glaspartijen brengen het hele jaar licht binnen. Meer ruimte die meteen lichter en groter voelt.'],
+                ['title' => 'Koel in de zomer, geen oververhitting', 'media_type' => 'icon', 'icon' => 'blinds', 'description' => 'Optioneel met screens of een zonwerend dak. Aangenaam vertoeven, ook op de warmste dagen.'],
+                ['title' => 'Dichter bij je tuin, elke dag', 'media_type' => 'icon', 'icon' => 'trees', 'description' => 'Het comfort van binnen met het zicht van buiten. Genieten van je tuin, ook als het regent.'],
+                ['title' => 'Meer ruimte, meer waarde voor je woning', 'media_type' => 'icon', 'icon' => 'trending-up', 'description' => 'Een veranda op maat vergroot je woonoppervlak én de waarde van je huis. Een investering die blijft.'],
+                ['title' => '35+ jaar vakmanschap, geplaatst door de zaakvoerder', 'media_type' => 'icon', 'icon' => 'badge-check', 'description' => 'Elke veranda wordt geplaatst onder toezicht van de zaakvoerder zelf. Persoonlijke service en bewezen kwaliteit.'],
             ],
             [
-                ['question' => 'Kan ik mijn veranda het hele jaar gebruiken?', 'answer' => '<p>Ja. Met de juiste isolatie, verwarming en zonwering is uw veranda zomer en winter comfortabel.</p>'],
-                ['question' => 'Hebben jullie een bouwvergunning nodig?', 'answer' => '<p>Vaak wel. We bekijken samen wat in uw situatie nodig is en adviseren u over de aanvraag.</p>'],
+                ['question' => 'Kan ik mijn veranda het hele jaar gebruiken?', 'answer' => '<p>Ja. Met de juiste isolatie, verwarming en zonwering is je veranda zomer en winter comfortabel.</p>'],
+                ['question' => 'Hebben jullie een bouwvergunning nodig?', 'answer' => '<p>Vaak wel. We bekijken samen wat in jouw situatie nodig is en adviseren je over de aanvraag.</p>'],
                 ['question' => 'Hoe zit het met oververhitting in de zomer?', 'answer' => '<p>Met zonwerend glas, een geïsoleerd dak en screens houden we de temperatuur aangenaam.</p>'],
             ],
+            'Wat je veranda je oplevert',
+            'Vraag je offerte',
         );
     }
 
