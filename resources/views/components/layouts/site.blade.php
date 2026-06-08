@@ -16,6 +16,9 @@
     // Site-brede structured data (LocalBusiness + WebSite) + pagina-specifieke nodes
     // in één @graph.
     $graph = array_merge(\App\Support\Seo::globalGraph(), $schema ?? []);
+
+    // Favicon uit de Header-instellingen; valt terug op de meegeleverde set.
+    $favicon = \App\Support\SiteHeader::current()['favicon'] ?? null;
 @endphp
 
 <!DOCTYPE html>
@@ -23,6 +26,16 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    @if ($favicon)
+        <link rel="icon" href="{{ $favicon }}" sizes="any">
+        <link rel="apple-touch-icon" href="{{ $favicon }}">
+    @else
+        <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16.png') }}">
+        <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    @endif
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

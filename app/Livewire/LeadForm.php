@@ -72,10 +72,10 @@ class LeadForm extends Component
     protected function messages(): array
     {
         return [
-            'name.required' => 'Vul uw naam in.',
-            'email.required' => 'Vul uw e-mailadres in.',
+            'name.required' => 'Vul je naam in.',
+            'email.required' => 'Vul je e-mailadres in.',
             'email.email' => 'Geef een geldig e-mailadres in.',
-            'consent.accepted' => 'Bevestig dat we uw gegevens mogen gebruiken.',
+            'consent.accepted' => 'Bevestig dat we je gegevens mogen gebruiken.',
         ];
     }
 

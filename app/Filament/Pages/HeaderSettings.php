@@ -49,6 +49,7 @@ class HeaderSettings extends Page
                     ->description('Het logo en de tekst die links in de header verschijnen.')
                     ->schema([
                         MediaPickerField::make('logo', 'Logo', required: false, helperText: 'Upload een logo of kies er één uit de mediabibliotheek. Laat leeg om geen logo te tonen.'),
+                        MediaPickerField::make('favicon', 'Favicon', required: false, helperText: 'Het icoontje in het browsertabblad. Gebruik bij voorkeur een vierkante afbeelding (bv. 512×512 PNG of SVG). Laat leeg om de standaard-favicon te gebruiken.'),
                         TextInput::make('name')
                             ->label('Naam')
                             ->maxLength(120)

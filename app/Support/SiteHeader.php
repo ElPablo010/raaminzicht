@@ -25,6 +25,7 @@ class SiteHeader
     {
         return [
             'logo' => null,
+            'favicon' => null,
             'name' => config('app.name'),
             'subtitle' => '',
             'cta' => [
