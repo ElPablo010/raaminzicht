@@ -52,6 +52,13 @@
         display: none !important;
     }
 
+    /* In-page ankers scrollen vloeiend — behalve voor wie reduced-motion vraagt. */
+    @media (prefers-reduced-motion: no-preference) {
+        html {
+            scroll-behavior: smooth;
+        }
+    }
+
     body {
         @apply bg-white text-primary-950 antialiased;
     }

@@ -9,7 +9,7 @@
 
 <section
     @if (! empty($sectionId)) id="{{ $sectionId }}" @endif
-    {{ $attributes->class($class) }}
+    {{ $attributes->class([$class, 'scroll-mt-24' => ! empty($sectionId)]) }}
 >
     {{ $slot }}
 </section>

@@ -26,6 +26,9 @@ class LeadForm extends Component
     /** @var array<int, string> */
     public array $subjects = [];
 
+    /** @var array<string, string> Optionele label-/tekst-overrides uit de sectie. */
+    public array $labels = [];
+
     public ?string $success = null;
 
     public bool $submitted = false;
@@ -39,8 +42,9 @@ class LeadForm extends Component
     #[Validate('nullable|string|max:40')]
     public string $phone = '';
 
-    #[Validate('nullable|string|max:120')]
-    public string $subject = '';
+    /** @var array<int, string> Aangevinkte onderwerpen ("waarover gaat het?"). */
+    #[Validate('nullable|array')]
+    public array $selectedSubjects = [];
 
     #[Validate('nullable|string|max:2000')]
     public string $message = '';
@@ -48,12 +52,21 @@ class LeadForm extends Component
     #[Validate('accepted')]
     public bool $consent = false;
 
-    public function mount(string $type = 'offerte', array $subjects = [], ?string $success = null): void
+    public function mount(string $type = 'offerte', array $subjects = [], ?string $success = null, array $labels = []): void
     {
         $this->type = in_array($type, ['offerte', 'contact', 'beide'], true) ? $type : 'offerte';
         $this->mode = $this->type === 'contact' ? 'contact' : 'offerte';
         $this->subjects = collect($subjects)->filter()->sort()->values()->all();
         $this->success = $success;
+        $this->labels = $labels;
+    }
+
+    /** Label-/tekst-override uit de sectie, of de meegegeven standaardtekst. */
+    public function txt(string $key, string $default): string
+    {
+        $value = $this->labels[$key] ?? null;
+
+        return filled($value) ? $value : $default;
     }
 
     protected function messages(): array
@@ -77,7 +90,7 @@ class LeadForm extends Component
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?: null,
-            'subject' => $resolvedType === 'offerte' ? ($data['subject'] ?: null) : null,
+            'subject' => $resolvedType === 'offerte' ? (implode(', ', $data['selectedSubjects']) ?: null) : null,
             'message' => $data['message'] ?: null,
             'source_url' => url()->previous(),
         ]);
@@ -93,7 +106,7 @@ class LeadForm extends Component
         }
 
         $this->submitted = true;
-        $this->reset(['name', 'email', 'phone', 'subject', 'message', 'consent']);
+        $this->reset(['name', 'email', 'phone', 'selectedSubjects', 'message', 'consent']);
     }
 
     public function render()

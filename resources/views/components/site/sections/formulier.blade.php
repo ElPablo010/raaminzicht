@@ -29,11 +29,26 @@
                     :dark="$dark"
                 />
 
+                @php
+                    // Optionele label-overrides → enkel niet-lege waarden doorgeven,
+                    // de component valt terug op zijn standaardteksten.
+                    $labelKeys = [
+                        'label_name', 'ph_name', 'label_phone', 'ph_phone', 'label_email', 'ph_email',
+                        'label_subjects', 'label_message', 'ph_message', 'label_consent',
+                        'submit_offerte', 'submit_contact', 'footnote', 'success_heading',
+                    ];
+                    $labels = collect($labelKeys)
+                        ->mapWithKeys(fn ($k) => [$k => $content[$k] ?? null])
+                        ->filter(fn ($v) => filled($v))
+                        ->all();
+                @endphp
+
                 <div class="mt-8">
                     @livewire('lead-form', [
                         'type' => $type,
                         'subjects' => $subjects->all(),
                         'success' => $content['success_message'] ?? null,
+                        'labels' => $labels,
                     ], key('lead-form-'.($section?->id ?? $content['section_id'] ?? 'x')))
                 </div>
             </div>
@@ -42,8 +57,8 @@
             @if ($showSidebar)
                 <aside class="lg:col-span-2 lg:pt-4">
                     <div class="rounded-3xl bg-primary-950 p-7 text-white sm:p-8">
-                        <h3 class="text-xl font-semibold text-white">Liever even bellen?</h3>
-                        <p class="mt-2 text-sm leading-relaxed text-white/70">U spreekt rechtstreeks met de zaakvoerder — geen callcenter. Samen bekijken we wat het beste past.</p>
+                        <h3 class="text-xl font-semibold text-white">{{ $content['sidebar_heading'] ?? null ?: 'Liever even bellen?' }}</h3>
+                        <p class="mt-2 text-sm leading-relaxed text-white/70">{{ $content['sidebar_intro'] ?? null ?: 'U spreekt rechtstreeks met de zaakvoerder — geen callcenter. Samen bekijken we wat het beste past.' }}</p>
 
                         <dl class="mt-7 space-y-5 text-sm">
                             @if ($phone)

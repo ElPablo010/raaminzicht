@@ -16,14 +16,15 @@ it('stores a lead and mails it on a valid offerte submission', function () {
         ->set('name', 'Jan Janssen')
         ->set('email', 'jan@example.be')
         ->set('phone', '0470 11 22 33')
-        ->set('subject', 'Ramen & deuren')
+        ->set('selectedSubjects', ['Ramen & deuren', "Veranda's"])
         ->set('message', 'Graag een offerte voor 4 ramen.')
         ->set('consent', true)
         ->call('submit')
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    expect(Lead::where('email', 'jan@example.be')->where('type', 'offerte')->exists())->toBeTrue();
+    expect(Lead::where('email', 'jan@example.be')->where('type', 'offerte')->value('subject'))
+        ->toBe("Ramen & deuren, Veranda's");
     Mail::assertSent(LeadReceived::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
 });
 
