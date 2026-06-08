@@ -28,7 +28,7 @@
     @foreach ($page->sections as $section)
         @php
             $componentName = 'site.sections.' . str_replace('_', '-', $section->section_type);
-            $content = $section->content ?? [];
+            $content = \App\Support\SectionLinks::resolve($section->content ?? []);
             $anchorId = $content['section_id'] ?? null;
 
             if ($section->section_type === 'hero') {

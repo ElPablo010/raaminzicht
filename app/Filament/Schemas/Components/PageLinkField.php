@@ -7,6 +7,7 @@ use App\Support\Url;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 
 class PageLinkField
 {
@@ -57,9 +58,22 @@ class PageLinkField
                     ->columnSpan(['default' => 1, 'md' => 2])
                     ->placeholder('/over-ons of https://...')
                     ->helperText('Interne pagina? Start met "/". Externe site? Plak de volledige URL — zonder https:// wordt die automatisch aangevuld.')
-                    // Een kale domeinnaam (www.example.be) → externe https-link, zodat
-                    // de browser hem niet als relatief pad achter de huidige URL plakt.
-                    ->dehydrateStateUsing(fn (?string $state): ?string => Url::normalize($state)),
+                    // Altijd dehydrateren: bij link_type=page is dit veld onzichtbaar,
+                    // dus zonder dit zou de href die afterStateUpdated zet wegvallen bij
+                    // het opslaan. We leiden de href hier ook af uit page_id zodat een
+                    // gewone her-save (zonder de pagina opnieuw te kiezen) blijft werken.
+                    ->dehydrated(true)
+                    ->dehydrateStateUsing(function (?string $state, Get $get): ?string {
+                        if (($get('link_type') ?? 'page') === 'page') {
+                            $page = Page::find($get('page_id'));
+
+                            return $page === null ? null : ($page->is_homepage ? '/' : '/'.$page->slug);
+                        }
+
+                        // Een kale domeinnaam (www.example.be) → externe https-link, zodat
+                        // de browser hem niet als relatief pad achter de huidige URL plakt.
+                        return Url::normalize($state);
+                    }),
             ]);
     }
 }

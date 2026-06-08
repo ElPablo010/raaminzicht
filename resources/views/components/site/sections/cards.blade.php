@@ -83,7 +83,7 @@
                         @endif
 
                         @if ($isLink)
-                            <span class="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 group-hover:text-accent-600">
+                            <span class="mt-auto pt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 group-hover:text-accent-600">
                                 {{ $card['cta_label'] }}
                                 <svg class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
                             </span>
