@@ -29,7 +29,7 @@
         @endif
 
         @if ($intro)
-            <div class="prose prose-lg mt-5 max-w-none {{ $introCls }} {{ $introTone }} prose-a:text-accent-600 prose-strong:text-current">{!! $intro !!}</div>
+            <div class="prose prose-lg mt-5 max-w-none {{ $introCls }} {{ $introTone }} prose-a:text-accent-600 prose-strong:text-current prose-ul:my-4 prose-li:my-1 [&_li>p]:my-0">{!! $intro !!}</div>
         @endif
     </div>
 @endif
