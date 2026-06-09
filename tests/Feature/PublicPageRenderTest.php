@@ -44,6 +44,13 @@ it('returns 404 for an unknown slug', function () {
     $this->get('/bestaat-niet')->assertNotFound();
 });
 
+it('renders the branded 404 page with a way back home', function () {
+    $this->get('/bestaat-niet')
+        ->assertNotFound()
+        ->assertSee('Pagina niet gevonden')
+        ->assertSee('Terug naar de homepage');
+});
+
 it('does not render an unpublished page', function () {
     $page = Page::create([
         'title' => 'Concept',
