@@ -46,6 +46,10 @@ class SiteFooter
                 'instagram' => '',
                 'youtube' => '',
             ],
+            'legal' => [
+                'privacy_page_id' => null,
+                'cookie_page_id' => null,
+            ],
         ];
     }
 

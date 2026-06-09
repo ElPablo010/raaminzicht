@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\Lead;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -19,7 +20,11 @@ class LeadReceived extends Mailable
 
     public function envelope(): Envelope
     {
-        $label = $this->lead->type === 'contact' ? 'Nieuw contactbericht' : 'Nieuwe offerteaanvraag';
+        $label = match ($this->lead->type) {
+            'contact' => 'Nieuw contactbericht',
+            'afspraak' => 'Nieuwe afspraakaanvraag',
+            default => 'Nieuwe offerteaanvraag',
+        };
 
         return new Envelope(
             subject: $label.' van '.$this->lead->name,
@@ -37,6 +42,9 @@ class LeadReceived extends Mailable
 
     public function attachments(): array
     {
-        return [];
+        return collect($this->lead->attachments ?? [])
+            ->map(fn (array $file) => Attachment::fromStorageDisk('local', $file['path'])
+                ->as($file['name'] ?? basename($file['path'])))
+            ->all();
     }
 }

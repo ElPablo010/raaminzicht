@@ -25,16 +25,29 @@ class FormulierFields
         return [
             ...HeadingFields::make(headingRequired: false),
 
-            Select::make('form_type')
-                ->label('Type formulier')
-                // Logische volgorde: enkelvoudig → enkelvoudig → gecombineerd.
-                ->options([
-                    'offerte' => 'Offerteaanvraag',
-                    'contact' => 'Contactformulier',
-                    'beide' => 'Beide (met keuzeschakelaar)',
-                ])
-                ->default('offerte')
-                ->required(),
+            Grid::make(['default' => 1, 'md' => 2])->schema([
+                Select::make('form_type')
+                    ->label('Type formulier')
+                    // Logische volgorde: enkelvoudig → enkelvoudig → gecombineerd.
+                    ->options([
+                        'offerte' => 'Offerteaanvraag',
+                        'contact' => 'Contactformulier',
+                        'beide' => 'Beide (met keuzeschakelaar)',
+                    ])
+                    ->default('offerte')
+                    ->live()
+                    ->required(),
+
+                Select::make('default_mode')
+                    ->label('Standaard geopend tabblad')
+                    ->helperText('Welk formulier staat actief bij het laden van de pagina.')
+                    ->options([
+                        'contact' => 'Contact opnemen',
+                        'offerte' => 'Offerte aanvragen',
+                    ])
+                    ->default('offerte')
+                    ->visible(fn ($get) => $get('form_type') === 'beide'),
+            ]),
 
             TagsInput::make('subjects')
                 ->label('Keuze-opties "Interesse" (offerte)')
@@ -76,6 +89,7 @@ class FormulierFields
                         TextInput::make('ph_email')->label('Placeholder — E-mail')->placeholder('naam@voorbeeld.be')->maxLength(80),
                         TextInput::make('label_subjects')->label('Label — Waarover gaat het?')->placeholder('Waarover gaat het?')->maxLength(80),
                         TextInput::make('label_message')->label('Label — Bericht')->placeholder('Uw bericht')->maxLength(60),
+                        TextInput::make('label_uploads')->label('Label — Plannen/foto’s (offerte)')->placeholder('Plannen of foto’s')->maxLength(60),
                     ]),
 
                     TextInput::make('ph_message')

@@ -91,7 +91,7 @@ class HomepageSeeder extends Seeder
             'heading' => 'Liever eerst alles met eigen ogen zien?',
             'intro' => '<p>Bezoek onze toonzaal in Booischot (op afspraak) en ontdek de mogelijkheden in PVC, aluminium en hout.</p>',
             'ctas' => [
-                ['label' => 'Maak een afspraak', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/contact'],
+                ['label' => 'Maak een afspraak', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/afspraak'],
                 ['label' => 'Bel 0473 52 43 49', 'variant' => 'ghost', 'link_type' => 'url', 'href' => 'tel:0473524349'],
             ],
         ]];
@@ -195,6 +195,7 @@ class HomepageSeeder extends Seeder
             ]],
             'footer_3' => ['title' => 'Aan de slag', 'items' => [
                 'Offerte aanvragen' => '/offerte',
+                'Afspraak maken' => '/afspraak',
                 'Contact' => '/contact',
             ]],
         ];
@@ -213,6 +214,18 @@ class HomepageSeeder extends Seeder
     private function seedPages(): void
     {
         foreach ($this->pages() as $def) {
+            $existing = Page::where('locale', 'nl')->where('slug', $def['slug'])->first();
+
+            // NIET-DESTRUCTIEF (bewust). Deze seeder is een éénmalige bootstrap,
+            // geen synchronisatie. Bestaat de pagina al én heeft ze secties, dan
+            // laten we haar VOLLEDIG ongemoeid — geen overschrijving van secties,
+            // teksten, volgorde of SEO. Anders wist een herseed (door om het even
+            // welke sessie) de handmatige admin-edits, zoals op 2026-06-09 gebeurde.
+            // Een herseed vult enkel nog-ontbrekende of nog-lege pagina's aan.
+            if ($existing && $existing->sections()->exists()) {
+                continue;
+            }
+
             $page = Page::updateOrCreate(
                 ['locale' => 'nl', 'slug' => $def['slug']],
                 [
@@ -224,6 +237,7 @@ class HomepageSeeder extends Seeder
                 ],
             );
 
+            // Veilig: alleen pagina's zónder secties bereiken dit punt.
             $page->sections()->delete();
             foreach ($def['sections'] as $position => $section) {
                 $page->sections()->create([
@@ -250,6 +264,7 @@ class HomepageSeeder extends Seeder
             $this->overOnsPage(),
             $this->contactPage(),
             $this->offertePage(),
+            $this->afspraakPage(),
         ];
     }
 
@@ -691,6 +706,7 @@ class HomepageSeeder extends Seeder
                     'heading' => 'Hoe kunnen we helpen?',
                     'intro' => '<p>Kies waarover het gaat en we nemen snel contact met u op. Liever bellen of langskomen? Onze gegevens staan ernaast.</p>',
                     'form_type' => 'beide',
+                    'default_mode' => 'contact',
                     'show_sidebar' => true,
                     'subjects' => ['Ramen & deuren', "Veranda's", 'Zonwering', 'Rolluiken & poorten'],
                     'success_message' => 'Bedankt voor uw bericht! We nemen snel contact met u op.',
@@ -715,6 +731,49 @@ class HomepageSeeder extends Seeder
                 $this->offerteForm('Vertel ons over uw project', '<p>Hoe meer we weten, hoe gerichter ons voorstel. Vul in wat u kwijt wil — we contacteren u voor de details en een gratis opmeting.</p>'),
                 $this->reviews('light'),
                 $this->faq($this->homeFaq(), 'white'),
+            ],
+        ];
+    }
+
+    private function afspraakPage(): array
+    {
+        return [
+            'slug' => 'afspraak',
+            'title' => 'Afspraak maken',
+            'meta_title' => 'Toonzaalbezoek inplannen | Raaminzicht Booischot',
+            'meta_description' => 'Plan online je bezoek aan onze toonzaal in Booischot. Kies een dag en uur dat jou past — je spreekt rechtstreeks met de zaakvoerder.',
+            'sections' => [
+                $this->hero('Toonzaalbezoek', 'Plan je bezoek aan onze toonzaal', '<p>Kom de mogelijkheden in PVC, aluminium en hout met eigen ogen bekijken. Kies hieronder een moment dat jou past.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur met grote ramen', [], ['Persoonlijk advies', 'Op afspraak — alle tijd voor jou', 'Rechtstreeks met de zaakvoerder'], 'compact'),
+                ['type' => 'afspraak', 'content' => [
+                    'background' => 'white',
+                    'section_id' => 'afspraak',
+                    'eyebrow' => 'Kies een moment',
+                    'heading' => 'Wanneer komt het jou uit?',
+                    'intro' => '<p>Selecteer een dag en uur. We bevestigen je afspraak binnen één werkdag per e-mail of telefoon.</p>',
+                    'show_sidebar' => true,
+                    'slot_minutes' => 30,
+                    'lead_days' => 1,
+                    'horizon_days' => 30,
+                    // Voorbeeldvensters — pas aan in de admin naar de echte openingsuren.
+                    'windows' => [
+                        ['day' => 1, 'from' => '09:00', 'to' => '12:00'],
+                        ['day' => 1, 'from' => '13:00', 'to' => '17:00'],
+                        ['day' => 2, 'from' => '09:00', 'to' => '12:00'],
+                        ['day' => 2, 'from' => '13:00', 'to' => '17:00'],
+                        ['day' => 3, 'from' => '09:00', 'to' => '12:00'],
+                        ['day' => 3, 'from' => '13:00', 'to' => '17:00'],
+                        ['day' => 4, 'from' => '09:00', 'to' => '12:00'],
+                        ['day' => 4, 'from' => '13:00', 'to' => '17:00'],
+                        ['day' => 5, 'from' => '09:00', 'to' => '12:00'],
+                        ['day' => 5, 'from' => '13:00', 'to' => '17:00'],
+                        ['day' => 6, 'from' => '10:00', 'to' => '13:00'],
+                    ],
+                    'success_message' => 'Bedankt! We bevestigen je afspraak binnen 1 werkdag per e-mail of telefoon.',
+                ]],
+                $this->faq([
+                    ['question' => 'Wat als geen enkel voorgesteld moment past?', 'answer' => '<p>Bel of mail ons gerust — we zoeken samen een moment dat wel lukt, ook ’s avonds of op een ander tijdstip in overleg.</p>'],
+                    ['question' => 'Moet ik iets meebrengen?', 'answer' => '<p>Handig zijn foto’s of (bij benadering) de afmetingen van je ramen of deuren, en eventueel een plan. Maar het hoeft niet — we helpen je ook zonder graag verder.</p>'],
+                ], 'light'),
             ],
         ];
     }

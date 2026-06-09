@@ -4,7 +4,14 @@
     $labelCls = 'text-sm font-medium text-primary-900';
 @endphp
 
-<div>
+<div
+    x-data
+    x-on:lead-submitted.window="
+        const target = $el.closest('section') ?? $el;
+        const top = target.getBoundingClientRect().top + window.scrollY - 96;
+        window.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+    "
+>
     @if ($submitted)
         <div class="rounded-3xl border border-primary-100 bg-white p-8 text-center shadow-xl shadow-primary-950/5 sm:p-10">
             <span class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent-50 text-accent-600 ring-1 ring-accent-200">
@@ -16,9 +23,15 @@
     @else
         <form wire:submit="submit" class="rounded-3xl border border-primary-100 bg-white p-6 shadow-xl shadow-primary-950/5 sm:p-8">
             @if ($type === 'beide')
+                @php
+                    // De standaard-modus staat eerst; de andere als tweede tab.
+                    $tabLabels = ['offerte' => 'Offerte aanvragen', 'contact' => 'Contact opnemen'];
+                    $tabOrder = $defaultMode === 'contact' ? ['contact', 'offerte'] : ['offerte', 'contact'];
+                @endphp
                 <div class="mb-7 grid grid-cols-2 gap-1 rounded-xl bg-sand-100 p-1">
-                    <button type="button" wire:click="$set('mode', 'offerte')" class="cursor-pointer rounded-lg px-4 py-2.5 text-sm font-semibold transition-all {{ $mode === 'offerte' ? 'bg-white text-primary-900 shadow-sm' : 'text-primary-600' }}">Offerte aanvragen</button>
-                    <button type="button" wire:click="$set('mode', 'contact')" class="cursor-pointer rounded-lg px-4 py-2.5 text-sm font-semibold transition-all {{ $mode === 'contact' ? 'bg-white text-primary-900 shadow-sm' : 'text-primary-600' }}">Contact opnemen</button>
+                    @foreach ($tabOrder as $tab)
+                        <button type="button" wire:click="$set('mode', '{{ $tab }}')" class="cursor-pointer rounded-lg px-4 py-2.5 text-sm font-semibold transition-all {{ $mode === $tab ? 'bg-white text-primary-900 shadow-sm' : 'text-primary-600' }}">{{ $tabLabels[$tab] }}</button>
+                    @endforeach
                 </div>
             @endif
 
@@ -59,6 +72,38 @@
                     <label class="{{ $labelCls }}" for="lead-message">{{ $this->txt('label_message', 'Je bericht') }}</label>
                     <textarea id="lead-message" wire:model="message" rows="4" class="{{ $field }}" placeholder="{{ $this->txt('ph_message', 'Vertel ons kort over je project…') }}"></textarea>
                 </div>
+
+                @if ($mode === 'offerte')
+                    <div class="sm:col-span-2" x-data wire:key="attachments">
+                        <span class="{{ $labelCls }}">{{ $this->txt('label_uploads', 'Plannen of foto’s') }} <span class="font-normal text-primary-900/50">(optioneel)</span></span>
+
+                        <label for="lead-attachments" class="mt-1.5 flex cursor-pointer items-center justify-center gap-2.5 rounded-xl border border-dashed border-primary-300 bg-sand-50 px-4 py-5 text-sm text-primary-700 transition-colors hover:border-accent-400 hover:bg-sand-100">
+                            <svg class="h-5 w-5 text-primary-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+                            <span><span class="font-semibold text-primary-800">Kies bestanden</span> of sleep ze hierheen</span>
+                        </label>
+                        <input id="lead-attachments" type="file" wire:model="attachments" multiple accept=".pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.dwg,.dxf" class="sr-only">
+
+                        <p class="mt-2 text-xs text-primary-900/50">PDF, foto (jpg/png/webp/heic) of plan (dwg/dxf) · max. 6 bestanden · 12 MB elk.</p>
+
+                        <div wire:loading wire:target="attachments" class="mt-2 text-xs text-primary-700">Bestanden worden geüpload…</div>
+
+                        @error('attachments.*') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        @error('attachments') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+
+                        @if (! empty($attachments))
+                            <ul class="mt-3 space-y-2">
+                                @foreach ($attachments as $i => $file)
+                                    <li class="flex items-center justify-between gap-3 rounded-lg border border-primary-100 bg-white px-3.5 py-2 text-sm">
+                                        <span class="truncate text-primary-800">{{ $file->getClientOriginalName() }}</span>
+                                        <button type="button" wire:click="removeAttachment({{ $i }})" class="shrink-0 cursor-pointer rounded-md p-1 text-primary-400 transition-colors hover:bg-red-50 hover:text-red-600" aria-label="Verwijder bestand">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                        </button>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                @endif
 
                 <div class="sm:col-span-2">
                     <label class="flex items-start gap-3">

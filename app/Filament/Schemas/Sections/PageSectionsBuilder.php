@@ -55,6 +55,12 @@ class PageSectionsBuilder
                     ...SectionCommonFields::make(),
                     ...TextMediaFields::make(),
                 ]),
+            Block::make('prose')
+                ->label(self::numberedLabel('Tekstblok (prose)'))
+                ->schema([
+                    ...SectionCommonFields::make(),
+                    ...ProseFields::make(),
+                ]),
             Block::make('cards')
                 ->label(self::numberedLabel('Cards'))
                 ->schema([
@@ -84,6 +90,12 @@ class PageSectionsBuilder
                 ->schema([
                     ...SectionCommonFields::make(),
                     ...FormulierFields::make(),
+                ]),
+            Block::make('afspraak')
+                ->label(self::numberedLabel('Afspraak (toonzaalbezoek)'))
+                ->schema([
+                    ...SectionCommonFields::make(),
+                    ...AfspraakFields::make(),
                 ]),
             Block::make('cta')
                 ->label(self::numberedLabel('Call-to-action'))
