@@ -41,7 +41,11 @@ return [
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            // Domein-onafhankelijke, root-relatieve URL ('/storage/...') zodat
+            // media-URL's in de DB/content meeverhuizen tussen omgevingen zonder
+            // het domein mee te bakken (dev → live kopiëren werkt zo zonder
+            // find/replace). Zie WebsiteMediaService waar deze URL wordt opgeslagen.
+            'url' => '/storage',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
