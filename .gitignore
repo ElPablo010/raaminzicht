@@ -14,10 +14,7 @@
 /.zed
 /auth.json
 /node_modules
-# /public/build wordt bewust WEL gecommit: de productieserver (Combell shared
-# hosting) heeft een te oude Node om Vite te draaien. We bouwen lokaal en pushen
-# het resultaat mee, zodat `git pull` op de server code + assets in één keer
-# binnenhaalt. Vóór elke deploy: `npm run build` draaien en de build mee committen.
+/public/build
 /public/fonts-manifest.dev.json
 /public/hot
 /public/storage
