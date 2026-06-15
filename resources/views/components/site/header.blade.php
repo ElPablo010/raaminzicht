@@ -10,35 +10,44 @@
     $phoneHref = $phone ? 'tel:'.preg_replace('/[^0-9+]/', '', $phone) : null;
 @endphp
 
-<header x-data="{ open: false }">
-    {{-- Slim info-balkje: telefoon (klik-om-te-bellen) + USP's. Scrollt mee weg. --}}
-    <div class="hidden bg-primary-950 text-white/80 md:block">
-        <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-2 text-xs">
-            <div class="flex items-center gap-6">
-                @if ($phone)
-                    <a href="{{ $phoneHref }}" class="group flex items-center gap-2 transition-colors hover:text-white">
-                        <svg class="h-3.5 w-3.5 text-accent-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 014.5 2h1.6a1 1 0 01.96.73l.86 3a1 1 0 01-.27 1L6.2 8.4a12 12 0 005.4 5.4l1.67-1.4a1 1 0 011-.27l3 .86a1 1 0 01.73.96V16a2.5 2.5 0 01-2.5 2.5C8.6 18.5 1.5 11.4 1.5 4.5z"/></svg>
-                        <span class="font-medium">{{ $phone }}</span>
-                    </a>
-                @endif
-                <span class="flex items-center gap-2">
-                    <svg class="h-3.5 w-3.5 text-accent-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 1l7 3v5c0 4.4-3 8.5-7 9.9C6 17.5 3 13.4 3 9V4l7-3z" clip-rule="evenodd"/></svg>
-                    Erkend schrijnwerk &middot; PVC, alu &amp; hout
-                </span>
-            </div>
-            <div class="flex items-center gap-6">
-                <span class="text-accent-200">Toonzaal op afspraak</span>
-                <span>Gratis &amp; vrijblijvende offerte</span>
-            </div>
+{{-- Slim info-balkje: telefoon (klik-om-te-bellen) + USP's. Staat bewust BUITEN de
+     sticky header, zodat het bij het scrollen netjes mee weg schuift. --}}
+<div class="hidden bg-primary-950 text-white/80 md:block">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-2 text-xs">
+        <div class="flex items-center gap-6">
+            @if ($phone)
+                <a href="{{ $phoneHref }}" class="group flex items-center gap-2 transition-colors hover:text-white">
+                    <svg class="h-3.5 w-3.5 text-accent-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 014.5 2h1.6a1 1 0 01.96.73l.86 3a1 1 0 01-.27 1L6.2 8.4a12 12 0 005.4 5.4l1.67-1.4a1 1 0 011-.27l3 .86a1 1 0 01.73.96V16a2.5 2.5 0 01-2.5 2.5C8.6 18.5 1.5 11.4 1.5 4.5z"/></svg>
+                    <span class="font-medium">{{ $phone }}</span>
+                </a>
+            @endif
+            <span class="flex items-center gap-2">
+                <svg class="h-3.5 w-3.5 text-accent-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 1l7 3v5c0 4.4-3 8.5-7 9.9C6 17.5 3 13.4 3 9V4l7-3z" clip-rule="evenodd"/></svg>
+                Erkend schrijnwerk &middot; PVC, alu &amp; hout
+            </span>
+        </div>
+        <div class="flex items-center gap-6">
+            <span class="text-accent-200">Toonzaal op afspraak</span>
+            <span>Gratis &amp; vrijblijvende offerte</span>
         </div>
     </div>
+</div>
 
-    {{-- Hoofdnavigatie: sticky, wit. --}}
+{{-- Hoofdnavigatie: sticky-wit. De <header> zélf is het sticky element, met <body> als
+     containing block — zo is er genoeg "loopruimte" zodat de balk écht blijft plakken bij
+     het scrollen. (Stond `sticky` op de witte balk-div binnen <header>, dan was die even
+     hoog als z'n ouder en bleef het plakken in de praktijk uit.) De `backdrop-blur` houden
+     we op de binnenste div: een filter op <header> zou het `fixed` mobiele menu breken. --}}
+<header
+    x-data="{ open: false }"
+    x-effect="document.body.classList.toggle('overflow-hidden', open)"
+    class="sticky top-0 z-50"
+>
     <div
         x-data="{ scrolled: false }"
         @scroll.window="scrolled = window.scrollY > 8"
         :class="scrolled ? 'shadow-lg shadow-primary-950/5' : ''"
-        class="sticky top-0 z-50 border-b border-primary-100/70 bg-white/95 backdrop-blur transition-shadow"
+        class="border-b border-primary-100/70 bg-white/95 backdrop-blur transition-shadow"
     >
         <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3.5">
             <a href="/" class="flex shrink-0 items-center" aria-label="{{ $header['name'] }} — naar home">
