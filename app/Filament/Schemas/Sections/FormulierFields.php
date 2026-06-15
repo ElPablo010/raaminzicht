@@ -127,7 +127,7 @@ class FormulierFields
                     Textarea::make('success_message')
                         ->label('Bevestiging — boodschap')
                         ->rows(2)
-                        ->placeholder('We nemen binnen 2 werkdagen contact met u op.')
+                        ->placeholder('We nemen binnen 2 werkdagen contact met je op.')
                         ->maxLength(300),
                 ]),
         ];

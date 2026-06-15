@@ -79,7 +79,7 @@ class HomepageSeeder extends Seeder
             'form_type' => 'offerte',
             'show_sidebar' => true,
             'subjects' => ['Ramen & deuren', "Veranda's", 'Zonwering', 'Rolluiken & poorten'],
-            'success_message' => 'Bedankt! We nemen binnen 2 werkdagen contact met u op.',
+            'success_message' => 'We nemen binnen 2 werkdagen contact met je op.',
         ]];
     }
 
