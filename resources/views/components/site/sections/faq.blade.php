@@ -33,7 +33,7 @@
                         </span>
                     </button>
                     <div x-show="open === {{ $i }}" x-collapse x-cloak>
-                        <div class="prose prose-sm max-w-none pb-6 {{ $aTone }} prose-a:text-accent-600 prose-strong:text-current">{!! $item['answer'] ?? '' !!}</div>
+                        <div class="prose prose-sm max-w-none pb-6 {{ $aTone }} prose-a:text-accent-600 prose-strong:text-current prose-li:my-1! [&_li>p]:my-0!">{!! $item['answer'] ?? '' !!}</div>
                     </div>
                 </div>
             @endforeach
