@@ -43,7 +43,7 @@
                 </div>
                 <div>
                     <label class="{{ $labelCls }}" for="lead-phone">{{ $this->txt('label_phone', 'Telefoon') }}</label>
-                    <input id="lead-phone" type="tel" wire:model="phone" autocomplete="tel" class="{{ $field }} @error('phone') {{ $fieldError }} @enderror" placeholder="{{ $this->txt('ph_phone', '0473 …') }}">
+                    <input id="lead-phone" type="tel" wire:model="phone" autocomplete="tel" class="{{ $field }} @error('phone') {{ $fieldError }} @enderror" placeholder="{{ $this->txt('ph_phone', '04xx xx xx xx') }}">
                     @error('phone') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
                 <div class="sm:col-span-2">

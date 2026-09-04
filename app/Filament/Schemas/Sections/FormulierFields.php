@@ -59,6 +59,12 @@ class FormulierFields
                 ->live()
                 ->default(true),
 
+            Toggle::make('show_all_contacts')
+                ->label('Alle contactpersonen tonen')
+                ->helperText('Toont ook het tweede telefoonnummer uit de Footer-instellingen, met de namen erbij. Bedoeld voor de contactpagina.')
+                ->default(false)
+                ->visible(fn ($get) => $get('show_sidebar')),
+
             TextInput::make('sidebar_heading')
                 ->label('Zijbalk — kop')
                 ->placeholder('Liever even bellen?')
@@ -68,7 +74,7 @@ class FormulierFields
 
             Textarea::make('sidebar_intro')
                 ->label('Zijbalk — introtekst')
-                ->placeholder('U spreekt rechtstreeks met de zaakvoerder — geen callcenter. Samen bekijken we wat het beste past.')
+                ->placeholder('Persoonlijk contact, geen callcenter. Samen bekijken we wat het beste past.')
                 ->rows(2)
                 ->maxLength(300)
                 ->visible(fn ($get) => $get('show_sidebar')),
@@ -84,7 +90,7 @@ class FormulierFields
                         TextInput::make('label_name')->label('Label — Naam')->placeholder('Naam')->maxLength(60),
                         TextInput::make('ph_name')->label('Placeholder — Naam')->placeholder('Uw naam')->maxLength(80),
                         TextInput::make('label_phone')->label('Label — Telefoon')->placeholder('Telefoon')->maxLength(60),
-                        TextInput::make('ph_phone')->label('Placeholder — Telefoon')->placeholder('0473 …')->maxLength(80),
+                        TextInput::make('ph_phone')->label('Placeholder — Telefoon')->placeholder('04xx xx xx xx')->maxLength(80),
                         TextInput::make('label_email')->label('Label — E-mail')->placeholder('E-mail')->maxLength(60),
                         TextInput::make('ph_email')->label('Placeholder — E-mail')->placeholder('naam@voorbeeld.be')->maxLength(80),
                         TextInput::make('label_subjects')->label('Label — Waarover gaat het?')->placeholder('Waarover gaat het?')->maxLength(80),

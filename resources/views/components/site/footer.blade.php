@@ -11,6 +11,7 @@
         ->keyBy('location');
 
     $phone = $contact['phone'] ?? null;
+    $phoneName = $contact['phone_name'] ?? null;
     $phoneHref = $phone ? 'tel:'.preg_replace('/[^0-9+]/', '', $phone) : null;
     $email = $contact['email'] ?? null;
     $socialIcons = [
@@ -40,7 +41,7 @@
                     @if ($phone)
                         <div class="flex items-center gap-3">
                             <svg class="h-4 w-4 shrink-0 text-accent-300" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 014.5 2h1.6a1 1 0 01.96.73l.86 3a1 1 0 01-.27 1L6.2 8.4a12 12 0 005.4 5.4l1.67-1.4a1 1 0 011-.27l3 .86a1 1 0 01.73.96V16a2.5 2.5 0 01-2.5 2.5C8.6 18.5 1.5 11.4 1.5 4.5z"/></svg>
-                            <a href="{{ $phoneHref }}" class="font-medium text-white transition-colors hover:text-accent-300">{{ $phone }}</a>
+                            <span>@if ($phoneName)<span class="text-white/70">{{ $phoneName }}</span> @endif<a href="{{ $phoneHref }}" class="font-medium text-white transition-colors hover:text-accent-300">{{ $phone }}</a></span>
                         </div>
                     @endif
                     @if ($email)

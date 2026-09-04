@@ -29,9 +29,6 @@ class PagesTable
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
-                IconColumn::make('is_homepage')
-                    ->label('Homepage')
-                    ->boolean(),
                 IconColumn::make('published')
                     ->label('Gepubliceerd')
                     ->boolean(),
@@ -49,8 +46,6 @@ class PagesTable
             ->filters([
                 TernaryFilter::make('published')
                     ->label('Gepubliceerd'),
-                TernaryFilter::make('is_homepage')
-                    ->label('Homepage'),
             ])
             ->recordActions([
                 Action::make('view')

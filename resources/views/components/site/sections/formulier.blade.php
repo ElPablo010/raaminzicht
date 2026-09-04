@@ -9,8 +9,14 @@
 
     $footer = \App\Support\SiteFooter::current();
     $contact = $footer['contact'] ?? [];
-    $phone = $contact['phone'] ?? null;
-    $phoneHref = $phone ? 'tel:'.preg_replace('/[^0-9+]/', '', $phone) : null;
+    $tel = fn (?string $p) => $p ? 'tel:'.preg_replace('/[^0-9+]/', '', $p) : null;
+    // Contactpersonen uit de Footer-instellingen. Standaard enkel het hoofdnummer;
+    // met 'show_all_contacts' (contactpagina) ook de tweede persoon, met namen erbij.
+    $persons = collect([
+        ['name' => $contact['phone_name'] ?? null, 'phone' => $contact['phone'] ?? null],
+        ['name' => $contact['phone_2_name'] ?? null, 'phone' => $contact['phone_2'] ?? null],
+    ])->filter(fn ($p) => filled($p['phone']))->take(($content['show_all_contacts'] ?? false) ? 2 : 1)->values();
+    $showNames = $persons->count() > 1;
 
     $field = 'mt-1.5 block w-full rounded-xl border border-primary-200 bg-white px-4 py-3 text-sm text-primary-950 placeholder:text-primary-400 transition-colors focus:border-accent-400 focus:outline-none focus:ring-4 focus:ring-accent-400/15';
     $labelCls = 'text-sm font-medium text-primary-900';
@@ -59,15 +65,15 @@
                 <aside class="lg:col-span-2 lg:pt-4">
                     <div class="rounded-3xl bg-primary-950 p-7 text-white sm:p-8">
                         <h3 class="text-xl font-semibold text-white">{{ $content['sidebar_heading'] ?? null ?: 'Liever even bellen?' }}</h3>
-                        <p class="mt-2 text-sm leading-relaxed text-white/70">{{ $content['sidebar_intro'] ?? null ?: 'Je spreekt rechtstreeks met de zaakvoerder — geen callcenter. Samen bekijken we wat het beste past.' }}</p>
+                        <p class="mt-2 text-sm leading-relaxed text-white/70">{{ $content['sidebar_intro'] ?? null ?: 'Persoonlijk contact, geen callcenter. Samen bekijken we wat het beste past.' }}</p>
 
                         <dl class="mt-7 space-y-5 text-sm">
-                            @if ($phone)
+                            @foreach ($persons as $person)
                                 <div class="flex items-center gap-4">
                                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-accent-300"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2 4.5A2.5 2.5 0 014.5 2h1.6a1 1 0 01.96.73l.86 3a1 1 0 01-.27 1L6.2 8.4a12 12 0 005.4 5.4l1.67-1.4a1 1 0 011-.27l3 .86a1 1 0 01.73.96V16a2.5 2.5 0 01-2.5 2.5C8.6 18.5 1.5 11.4 1.5 4.5z"/></svg></span>
-                                    <div><dt class="text-white/50">Bel ons</dt><dd><a href="{{ $phoneHref }}" class="font-semibold text-white hover:text-accent-300">{{ $phone }}</a></dd></div>
+                                    <div><dt class="text-white/50">{{ $showNames && $person['name'] ? $person['name'] : 'Bel ons' }}</dt><dd><a href="{{ $tel($person['phone']) }}" class="font-semibold text-white hover:text-accent-300">{{ $person['phone'] }}</a></dd></div>
                                 </div>
-                            @endif
+                            @endforeach
                             @if (! empty($contact['email']))
                                 <div class="flex items-center gap-4">
                                     <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10 text-accent-300"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3 4h14a1 1 0 011 1v10a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm0 2.2V15h14V6.2l-7 4.4-7-4.4z"/></svg></span>

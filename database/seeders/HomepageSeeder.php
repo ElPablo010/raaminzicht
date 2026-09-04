@@ -6,6 +6,7 @@ use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Support\Realisaties;
 use App\Support\SiteFooter;
 use App\Support\SiteHeader;
 use Illuminate\Database\Seeder;
@@ -63,7 +64,7 @@ class HomepageSeeder extends Seeder
             'reviews' => [
                 ['name' => 'Familie Vermeulen', 'location' => 'Booischot — nieuwe ramen', 'rating' => '5', 'quote' => 'Van advies tot plaatsing alles tot in de puntjes verzorgd. De ramen zijn prachtig en het verschil in comfort is enorm. Echt een aanrader!'],
                 ['name' => 'Kris D.', 'location' => 'Heist-op-den-Berg — veranda', 'rating' => '5', 'quote' => 'Onze veranda is een tweede woonkamer geworden. Correcte prijs, nette werkmensen en perfect nagekomen afspraken.'],
-                ['name' => 'Sofie & Tom', 'location' => 'Putte — voordeur & rolluiken', 'rating' => '5', 'quote' => 'Persoonlijke aanpak die je tegenwoordig zelden nog ziet. Je merkt dat de zaakvoerder zelf meedenkt. Heel tevreden.'],
+                ['name' => 'Sofie & Tom', 'location' => 'Putte — voordeur & rolluiken', 'rating' => '5', 'quote' => 'Persoonlijke aanpak die je tegenwoordig zelden nog ziet. Je merkt dat ze zelf meedenken. Heel tevreden.'],
             ],
         ]];
     }
@@ -92,7 +93,7 @@ class HomepageSeeder extends Seeder
             'intro' => '<p>Bezoek onze toonzaal in Booischot (op afspraak) en ontdek de mogelijkheden in PVC, aluminium en hout.</p>',
             'ctas' => [
                 ['label' => 'Maak een afspraak', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/afspraak'],
-                ['label' => 'Bel 0473 52 43 49', 'variant' => 'ghost', 'link_type' => 'url', 'href' => 'tel:0473524349'],
+                ['label' => 'Bel 0469 79 22 40', 'variant' => 'ghost', 'link_type' => 'url', 'href' => 'tel:0469792240'],
             ],
         ]];
     }
@@ -129,7 +130,10 @@ class HomepageSeeder extends Seeder
                 'visit_label' => 'Bezoek onze toonzaal',
                 'address' => "Liersesteenweg 42\n2221 Heist-op-den-Berg (Booischot)",
                 'reservations_label' => 'Bel ons',
-                'phone' => '0473 52 43 49',
+                'phone' => '0469 79 22 40',
+                'phone_name' => 'Tim',
+                'phone_2' => '0473 52 43 49',
+                'phone_2_name' => 'Werner',
                 'phone_hours' => '',
                 'mail_label' => 'Mail',
                 'email' => 'info@raaminzicht.be',
@@ -140,7 +144,7 @@ class HomepageSeeder extends Seeder
                 'logo' => '/images/brand/raaminzicht-logo.png',
                 'name' => 'Raaminzicht',
                 'subtitle' => '',
-                'tagline' => "Ramen, deuren, veranda's en zonwering op maat — vakwerk uit Booischot, met persoonlijk advies van de zaakvoerder zelf.",
+                'tagline' => "Ramen, deuren, veranda's en zonwering op maat — vakwerk uit Booischot, met persoonlijk advies en een eigen plaatsingsteam.",
             ],
             'social' => [
                 'facebook' => 'https://www.facebook.com',
@@ -286,7 +290,7 @@ class HomepageSeeder extends Seeder
                         ['label' => 'Vraag uw gratis offerte', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/offerte'],
                         ['label' => 'Bekijk realisaties', 'variant' => 'ghost', 'link_type' => 'url', 'href' => '/realisaties'],
                     ],
-                    ['25+ jaar ervaring', 'PVC · aluminium · hout', 'Gratis opmeting aan huis', 'Rechtstreeks met de zaakvoerder'],
+                    ['25+ jaar ervaring', 'PVC · aluminium · hout', 'Gratis opmeting aan huis', 'Eén vast aanspreekpunt'],
                     'groot',
                     'center 55%',
                 ),
@@ -294,18 +298,20 @@ class HomepageSeeder extends Seeder
                     'background' => 'white',
                     'title' => 'Wij plaatsen toonaangevende A-merken',
                     'logos' => [
-                        ['image' => $this->logo('reynaers'), 'name' => 'Reynaers Aluminium'],
+                        ['image' => $this->logo('aluprof'), 'name' => 'Aluprof'],
+                        ['image' => $this->logo('drutex'), 'name' => 'Drutex'],
+                        ['image' => $this->logo('frager'), 'name' => 'Frager'],
                         ['image' => $this->logo('renson'), 'name' => 'Renson'],
-                        ['image' => $this->logo('schuco'), 'name' => 'Schüco'],
-                        ['image' => $this->logo('velux'), 'name' => 'Velux'],
-                        ['image' => $this->logo('aliplast'), 'name' => 'Aliplast'],
+                        ['image' => $this->logo('somfy'), 'name' => 'Somfy'],
+                        ['image' => $this->logo('soprofen'), 'name' => 'Soprofen'],
+                        ['image' => $this->logo('wilms'), 'name' => 'Wilms'],
                     ],
                 ]],
                 ['type' => 'text_media', 'content' => [
                     'background' => 'white',
                     'eyebrow' => 'Welkom bij Raaminzicht',
                     'heading' => 'Vakmanschap met zicht op detail',
-                    'intro' => '<p>Raaminzicht is een familiaal schrijnwerkbedrijf uit Booischot. Als <strong>zelfwerkende zaakvoerder</strong> volgen we elk project persoonlijk op — van het eerste advies tot de laatste afwerking.</p><p>Geen verkooppraatjes, maar eerlijk advies over wat écht past bij uw woning en budget.</p>',
+                    'intro' => '<p>Raaminzicht is een familiaal schrijnwerkbedrijf uit Booischot. Als <strong>familiebedrijf</strong> volgen we elk project persoonlijk op — van het eerste advies tot de laatste afwerking.</p><p>Geen verkooppraatjes, maar eerlijk advies over wat écht past bij uw woning en budget.</p>',
                     'media_type' => 'image',
                     'media_side' => 'right',
                     'media' => ['src' => $this->img('over-ons'), 'alt' => 'Lichtrijk interieur met groot raam'],
@@ -318,7 +324,7 @@ class HomepageSeeder extends Seeder
                     'columns' => '3',
                     'cards' => [
                         ['title' => 'Echt maatwerk', 'media_type' => 'icon', 'icon' => 'ruler', 'description' => 'Elk raam, elke deur en elke veranda wordt op maat ontworpen en gemaakt — perfect passend bij uw woning.'],
-                        ['title' => 'Persoonlijke opvolging', 'media_type' => 'icon', 'icon' => 'handshake', 'description' => 'U spreekt rechtstreeks met de zaakvoerder. Eén aanspreekpunt van eerste contact tot plaatsing.'],
+                        ['title' => 'Persoonlijke opvolging', 'media_type' => 'icon', 'icon' => 'handshake', 'description' => 'Persoonlijk contact, geen callcenter. Eén vast aanspreekpunt van eerste contact tot plaatsing.'],
                         ['title' => 'A-merken & garantie', 'media_type' => 'icon', 'icon' => 'shield-check', 'description' => 'We werken met gerenommeerde merken en geven duidelijke garantie op materiaal én plaatsing.'],
                         ['title' => 'Hulp met premies', 'media_type' => 'icon', 'icon' => 'badge-euro', 'description' => 'We helpen u graag op weg met de beschikbare premies en subsidies voor energiezuinig schrijnwerk.'],
                         ['title' => 'Gratis opmeting aan huis', 'media_type' => 'icon', 'icon' => 'house', 'description' => 'We komen ter plaatse opmeten en adviseren — vrijblijvend en zonder verrassingen achteraf.'],
@@ -344,26 +350,13 @@ class HomepageSeeder extends Seeder
                     'heading' => 'Recent werk uit de buurt',
                     'intro' => '<p>Een greep uit onze projecten in Heist-op-den-Berg en omstreken.</p>',
                     'columns' => '3',
-                    'items' => $this->galleryItems(),
+                    'items' => Realisaties::galleryItems('home'),
                 ]],
                 $this->reviews('white'),
                 $this->faq($this->homeFaq(), 'light'),
                 $this->offerteForm('Klaar voor uw project?'),
                 $this->showroomCta(),
             ],
-        ];
-    }
-
-    /** @return array<int, array{image: string, alt: string}> */
-    private function galleryItems(): array
-    {
-        return [
-            ['image' => $this->img('realisatie-1'), 'alt' => 'Moderne villa met grote raampartijen'],
-            ['image' => $this->img('realisatie-2'), 'alt' => 'Schuiframen met zicht op het terras'],
-            ['image' => $this->img('realisatie-3'), 'alt' => 'Woning met sectionaalpoorten'],
-            ['image' => $this->img('realisatie-4'), 'alt' => 'Nieuwe ramen in de leefruimte'],
-            ['image' => $this->img('realisatie-5'), 'alt' => 'Open leefruimte met schuifdeuren'],
-            ['image' => $this->img('realisatie-6'), 'alt' => 'Lichtrijk interieur na renovatie'],
         ];
     }
 
@@ -430,7 +423,7 @@ class HomepageSeeder extends Seeder
                     'eyebrow' => 'Realisaties',
                     'heading' => 'Een greep uit ons werk',
                     'columns' => '3',
-                    'items' => $this->galleryItems(),
+                    'items' => Realisaties::galleryItems(Realisaties::setForPage($slug) ?? 'all'),
                 ]],
                 $this->reviews('light'),
                 $this->faq($faq, 'white'),
@@ -450,7 +443,7 @@ class HomepageSeeder extends Seeder
             'Moderne ramen en schuiframen in een woning',
             'Ramen & deuren',
             'Ramen en deuren op maat',
-            'Warmer, stiller en veiliger wonen. Ramen en deuren op maat in PVC, aluminium of hout, vakkundig geplaatst door de zaakvoerder zelf.',
+            'Warmer, stiller en veiliger wonen. Ramen en deuren op maat in PVC, aluminium of hout, vakkundig geplaatst door ons eigen team.',
             [
                 'background' => 'white',
                 'eyebrow' => 'PVC · aluminium · hout',
@@ -488,12 +481,12 @@ class HomepageSeeder extends Seeder
             'Moderne veranda met glazen wanden',
             "Veranda's",
             'Je veranda, een tweede woonkamer',
-            'Extra leefruimte waar je het hele jaar van geniet. Op maat ontworpen en geplaatst door de zaakvoerder zelf — warm in de winter, koel in de zomer.',
+            'Extra leefruimte waar je het hele jaar van geniet. Op maat ontworpen en geplaatst door ons eigen team — warm in de winter, koel in de zomer.',
             [
                 'background' => 'white',
                 'eyebrow' => 'Op maat ontworpen',
                 'heading' => 'Comfortabel in elk seizoen',
-                'intro' => '<p>Een veranda van Raaminzicht is geen kille serre, maar een volwaardige leefruimte die je woning groter en lichter maakt. Modern, landelijk of klassiek, in aluminium of PVC: volledig op maat van je woning en geplaatst door de zaakvoerder zelf. Liever niet meteen een volledige veranda? Ook voor een <strong>terrasoverkapping</strong>, deels open of volledig gesloten, ben je bij ons aan het juiste adres.</p>',
+                'intro' => '<p>Een veranda van Raaminzicht is geen kille serre, maar een volwaardige leefruimte die je woning groter en lichter maakt. Modern, landelijk of klassiek, in aluminium of PVC: volledig op maat van je woning en geplaatst door ons eigen team. Liever niet meteen een volledige veranda? Ook voor een <strong>terrasoverkapping</strong>, deels open of volledig gesloten, ben je bij ons aan het juiste adres.</p>',
                 'media_type' => 'image',
                 'media_side' => 'left',
                 'media' => ['src' => $this->img('realisatie-2'), 'alt' => 'Veranda met schuiframen en zicht op de tuin'],
@@ -504,7 +497,7 @@ class HomepageSeeder extends Seeder
                 ['title' => 'Koel in de zomer, geen oververhitting', 'media_type' => 'icon', 'icon' => 'blinds', 'description' => 'Optioneel met screens of een zonwerend dak. Aangenaam vertoeven, ook op de warmste dagen.'],
                 ['title' => 'Dichter bij je tuin, elke dag', 'media_type' => 'icon', 'icon' => 'trees', 'description' => 'Het comfort van binnen met het zicht van buiten. Genieten van je tuin, ook als het regent.'],
                 ['title' => 'Meer ruimte, meer waarde voor je woning', 'media_type' => 'icon', 'icon' => 'trending-up', 'description' => 'Een veranda op maat vergroot je woonoppervlak én de waarde van je huis. Een investering die blijft.'],
-                ['title' => '35+ jaar vakmanschap, geplaatst door de zaakvoerder', 'media_type' => 'icon', 'icon' => 'badge-check', 'description' => 'Elke veranda wordt geplaatst onder toezicht van de zaakvoerder zelf. Persoonlijke service en bewezen kwaliteit.'],
+                ['title' => '35+ jaar vakmanschap, eigen plaatsingsteam', 'media_type' => 'icon', 'icon' => 'badge-check', 'description' => 'Elke veranda wordt geplaatst onder toezicht van de zaakvoerder zelf. Persoonlijke service en bewezen kwaliteit.'],
             ],
             [
                 ['question' => 'Kan ik mijn veranda het hele jaar gebruiken?', 'answer' => '<p>Ja. Met de juiste isolatie, verwarming en zonwering is je veranda zomer en winter comfortabel.</p>'],
@@ -590,14 +583,14 @@ class HomepageSeeder extends Seeder
             'meta_title' => 'Realisaties — ons werk in beeld | Raaminzicht',
             'meta_description' => "Bekijk onze realisaties van ramen, deuren, veranda's en zonwering in Heist-op-den-Berg en omstreken.",
             'sections' => [
-                $this->hero('Realisaties', 'Ons werk in beeld', '<p>Projecten van ramen, deuren, veranda’s en zonwering uit de regio.</p>', $this->img('realisatie-1'), 'Moderne villa met grote raampartijen', [], [], 'compact', 'center 60%'),
+                $this->hero('Realisaties', 'Ons werk in beeld', '<p>Projecten van ramen, deuren, veranda’s en zonwering uit de regio.</p>', Realisaties::heroImage()['src'], Realisaties::heroImage()['alt'], [], [], 'compact', Realisaties::heroImage()['position']),
                 ['type' => 'gallery', 'content' => [
                     'background' => 'white',
                     'eyebrow' => 'Portfolio',
                     'heading' => 'Recente projecten',
                     'intro' => '<p>Elk project is maatwerk. Laat u inspireren door een selectie van ons werk.</p>',
                     'columns' => '3',
-                    'items' => $this->galleryItems(),
+                    'items' => Realisaties::galleryItems('all'),
                 ]],
                 $this->reviews('light'),
                 $this->offerteForm('Ook zo’n resultaat in huis?'),
@@ -651,14 +644,14 @@ class HomepageSeeder extends Seeder
             'slug' => 'over-ons',
             'title' => 'Over ons',
             'meta_title' => 'Over Raaminzicht — uw schrijnwerker uit Booischot',
-            'meta_description' => 'Raaminzicht is een familiaal schrijnwerkbedrijf uit Booischot. Persoonlijk advies van de zaakvoerder, eigen plaatsing en een toonzaal op afspraak.',
+            'meta_description' => 'Raaminzicht is een familiaal schrijnwerkbedrijf uit Booischot. Persoonlijk advies, eigen plaatsingsteam en een toonzaal op afspraak.',
             'sections' => [
                 $this->hero('Over Raaminzicht', 'De mensen achter uw ramen', '<p>Een familiaal schrijnwerkbedrijf uit Booischot, met persoonlijke aanpak en oog voor detail.</p>', $this->img('over-ons'), 'Lichtrijk interieur', [], [], 'compact'),
                 ['type' => 'text_media', 'content' => [
                     'background' => 'white',
                     'eyebrow' => 'Ons verhaal',
                     'heading' => 'Vakmanschap met een gezicht',
-                    'intro' => '<p>Bij Raaminzicht spreekt u rechtstreeks met de <strong>zaakvoerder</strong>. Geen tussenpersonen, geen verkooppraatjes — wel eerlijk advies en werk waar we onze naam aan verbinden.</p><p>Met jarenlange ervaring in PVC, aluminium en hout begeleiden we u van het eerste idee tot de afgewerkte plaatsing.</p>',
+                    'intro' => '<p>Bij Raaminzicht heeft u <strong>één vast aanspreekpunt</strong>, van het eerste gesprek tot de plaatsing. Geen callcenter, geen verkooppraatjes — wel eerlijk advies en werk waar we onze naam aan verbinden.</p><p>Met jarenlange ervaring in PVC, aluminium en hout begeleiden we u van het eerste idee tot de afgewerkte plaatsing.</p>',
                     'media_type' => 'image',
                     'media_side' => 'right',
                     'media' => ['src' => $this->img('realisatie-2'), 'alt' => 'Afgewerkt project met schuiframen'],
@@ -696,7 +689,7 @@ class HomepageSeeder extends Seeder
             'slug' => 'contact',
             'title' => 'Contact',
             'meta_title' => 'Contact & toonzaal | Raaminzicht Booischot',
-            'meta_description' => 'Contacteer Raaminzicht in Heist-op-den-Berg (Booischot). Bel 0473 52 43 49, mail info@raaminzicht.be of bezoek onze toonzaal op afspraak.',
+            'meta_description' => 'Contacteer Raaminzicht in Heist-op-den-Berg (Booischot). Bel 0469 79 22 40, mail info@raaminzicht.be of bezoek onze toonzaal op afspraak.',
             'sections' => [
                 $this->hero('Contact', 'Laten we kennismaken', '<p>Een vraag, een idee of meteen een offerte? We helpen u graag verder.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur', [], [], 'compact'),
                 ['type' => 'formulier', 'content' => [
@@ -708,6 +701,7 @@ class HomepageSeeder extends Seeder
                     'form_type' => 'beide',
                     'default_mode' => 'contact',
                     'show_sidebar' => true,
+                    'show_all_contacts' => true,
                     'subjects' => ['Ramen & deuren', "Veranda's", 'Zonwering', 'Rolluiken & poorten'],
                     'success_message' => 'Bedankt voor uw bericht! We nemen snel contact met u op.',
                 ]],
@@ -741,9 +735,9 @@ class HomepageSeeder extends Seeder
             'slug' => 'afspraak',
             'title' => 'Afspraak maken',
             'meta_title' => 'Toonzaalbezoek inplannen | Raaminzicht Booischot',
-            'meta_description' => 'Plan online je bezoek aan onze toonzaal in Booischot. Kies een dag en uur dat jou past — je spreekt rechtstreeks met de zaakvoerder.',
+            'meta_description' => 'Plan online je bezoek aan onze toonzaal in Booischot. Kies een dag en uur dat jou past — je krijgt alle tijd voor persoonlijk advies.',
             'sections' => [
-                $this->hero('Toonzaalbezoek', 'Plan je bezoek aan onze toonzaal', '<p>Kom de mogelijkheden in PVC, aluminium en hout met eigen ogen bekijken. Kies hieronder een moment dat jou past.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur met grote ramen', [], ['Persoonlijk advies', 'Op afspraak — alle tijd voor jou', 'Rechtstreeks met de zaakvoerder'], 'compact'),
+                $this->hero('Toonzaalbezoek', 'Plan je bezoek aan onze toonzaal', '<p>Kom de mogelijkheden in PVC, aluminium en hout met eigen ogen bekijken. Kies hieronder een moment dat jou past.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur met grote ramen', [], ['Persoonlijk advies', 'Op afspraak — alle tijd voor jou', 'Eén vast aanspreekpunt'], 'compact'),
                 ['type' => 'afspraak', 'content' => [
                     'background' => 'white',
                     'section_id' => 'afspraak',

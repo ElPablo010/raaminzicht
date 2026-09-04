@@ -79,6 +79,20 @@ class FooterSettings extends Page
                                             ->label('Openingsuren')
                                             ->maxLength(80)
                                             ->helperText('Tekst onder het nummer. Laat leeg om te verbergen.'),
+                                        TextInput::make('phone_name')
+                                            ->label('Naam bij het nummer')
+                                            ->maxLength(40)
+                                            ->helperText('Wordt vóór het nummer getoond in de footer en op de contactpagina (bv. "Tim").'),
+                                    ]),
+                                Group::make()
+                                    ->schema([
+                                        TextInput::make('phone_2')
+                                            ->label('Tweede telefoonnummer')
+                                            ->maxLength(40)
+                                            ->helperText('Enkel getoond in formulier-zijbalken met "Alle contactpersonen tonen" aan (de contactpagina).'),
+                                        TextInput::make('phone_2_name')
+                                            ->label('Naam bij het tweede nummer')
+                                            ->maxLength(40),
                                     ]),
                                 Group::make()
                                     ->schema([

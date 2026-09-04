@@ -52,7 +52,7 @@
                 <aside class="lg:col-span-2 lg:pt-4">
                     <div class="rounded-3xl bg-primary-950 p-7 text-white sm:p-8">
                         <h3 class="text-xl font-semibold text-white">{{ $content['sidebar_heading'] ?? null ?: 'Welkom in onze toonzaal' }}</h3>
-                        <p class="mt-2 text-sm leading-relaxed text-white/70">{{ $content['sidebar_intro'] ?? null ?: 'Liever eerst telefonisch overleggen? Je spreekt rechtstreeks met de zaakvoerder — geen callcenter.' }}</p>
+                        <p class="mt-2 text-sm leading-relaxed text-white/70">{{ $content['sidebar_intro'] ?? null ?: 'Liever eerst telefonisch overleggen? Bel ons gerust, je krijgt meteen iemand van het team aan de lijn.' }}</p>
 
                         <dl class="mt-7 space-y-5 text-sm">
                             @if ($contact['address'] ?? null)

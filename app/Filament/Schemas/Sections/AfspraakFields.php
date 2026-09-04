@@ -104,7 +104,7 @@ class AfspraakFields
 
             Textarea::make('sidebar_intro')
                 ->label('Zijbalk — introtekst')
-                ->placeholder('Liever eerst telefonisch overleggen? Je spreekt rechtstreeks met de zaakvoerder.')
+                ->placeholder('Liever eerst telefonisch overleggen? Bel ons gerust, je krijgt meteen iemand van het team aan de lijn.')
                 ->rows(2)
                 ->maxLength(300)
                 ->visible(fn ($get) => $get('show_sidebar')),
@@ -119,7 +119,7 @@ class AfspraakFields
                         TextInput::make('label_name')->label('Label — Naam')->placeholder('Naam')->maxLength(60),
                         TextInput::make('ph_name')->label('Placeholder — Naam')->placeholder('Je naam')->maxLength(80),
                         TextInput::make('label_phone')->label('Label — Telefoon')->placeholder('Telefoon')->maxLength(60),
-                        TextInput::make('ph_phone')->label('Placeholder — Telefoon')->placeholder('0473 …')->maxLength(80),
+                        TextInput::make('ph_phone')->label('Placeholder — Telefoon')->placeholder('04xx xx xx xx')->maxLength(80),
                         TextInput::make('label_email')->label('Label — E-mail')->placeholder('E-mail')->maxLength(60),
                         TextInput::make('ph_email')->label('Placeholder — E-mail')->placeholder('naam@voorbeeld.be')->maxLength(80),
                         TextInput::make('label_date')->label('Label — Datum')->placeholder('Kies een dag')->maxLength(60),
