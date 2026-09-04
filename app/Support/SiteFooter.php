@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\Page;
 use App\Models\Setting;
 
 /**
@@ -73,5 +74,36 @@ class SiteFooter
         }
 
         return $merged;
+    }
+
+    /**
+     * De gepubliceerde juridische pagina's uit de groep `legal`, als
+     * label => Page. Niet-gekoppelde of niet-gepubliceerde pagina's vallen weg,
+     * zodat de footer nooit naar een 404 linkt.
+     *
+     * @return array<string, Page>
+     */
+    public static function legalPages(): array
+    {
+        $legal = self::current()['legal'] ?? [];
+        $ids = array_filter([
+            'Privacyverklaring' => $legal['privacy_page_id'] ?? null,
+            'Cookiebeleid' => $legal['cookie_page_id'] ?? null,
+        ]);
+
+        if ($ids === []) {
+            return [];
+        }
+
+        $pages = Page::query()->whereKey(array_values($ids))->where('published', true)->get()->keyBy('id');
+
+        $result = [];
+        foreach ($ids as $label => $id) {
+            if ($page = $pages->get($id)) {
+                $result[$label] = $page;
+            }
+        }
+
+        return $result;
     }
 }

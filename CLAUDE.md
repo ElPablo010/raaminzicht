@@ -158,12 +158,34 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
 1. `APP_URL=https://www.raaminzicht.be` in de server-`.env` (nu nog
    `raaminzicht.dewebgoeroe.be`, waardoor canonical/og:url naar een dood
    subdomein wijzen) + `php artisan optimize`.
-2. Privacy- en cookiebeleid **publiceren** (staan nog als concept; de redirect
-   `/privacy-beleid` → `/privacy-policy` landt anders op een 404).
+2. `php artisan db:seed --class=LegalPagesSeeder --force` op prod: vult en
+   **publiceert** privacyverklaring + cookiebeleid en koppelt ze aan de footer
+   (zie "Juridische pagina's" hieronder).
 3. `RedirectsSeeder` draaien op prod (zie hierboven) en steekproef nemen.
 4. SSL-certificaat voor www.raaminzicht.be activeren in Combell (anders 403).
 5. Later, op basis van Search Console-data: eventueel enkele échte regiopagina's
    (gemeenten met realisaties) en die als exacte redirect boven het patroon zetten.
+
+## Juridische pagina's & cookies
+
+- **Privacyverklaring** (`/privacy-policy`) en **cookiebeleid** (`/cookie-policy`)
+  worden gevuld door `database/seeders/LegalPagesSeeder.php` (één `prose`-sectie
+  per pagina, tekst op maat van wat de site echt doet). Slug-tolerant (kandidaat-
+  slugs per pagina) en edit-veilig: een pagina die al secties heeft wordt enkel
+  gepubliceerd, de tekst blijft staan. Bedrijfsgegevens komen uit de Footer-
+  instellingen op het moment van seeden; de rechtsvorm staat hard als
+  "Raaminzicht BV" (oude site zei "bvba"; nakijken in de KBO).
+- **Footer → Juridische pagina's** (Setting `footer.legal.privacy_page_id` /
+  `cookie_page_id`): de onderste footerbalk en de consent-regel onder de
+  formulieren linken ernaar via `SiteFooter::legalPages()` (enkel gepubliceerde
+  pagina's, anders geen link).
+- **Geen cookiebanner, bewust.** De site plaatst enkel functionele cookies
+  (sessie + XSRF), geen analytics- of marketing-cookies; het cookiebeleid zegt dat
+  ook letterlijk. Komt er Google Analytics of een Meta-pixel (`meta-tracking`-
+  skill), dan eerst de consent-banner uit de `new-website`-skill
+  (`components/site/cookie-consent.blade.php`) toevoegen én sectie 3 van het
+  cookiebeleid herschrijven.
+- Test: `tests/Feature/LegalPagesTest.php`.
 
 ## Eerste admin-user
 

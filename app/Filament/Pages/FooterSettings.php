@@ -3,10 +3,12 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Schemas\Components\MediaPickerField;
+use App\Models\Page as WebsitePage;
 use App\Models\Setting;
 use App\Support\SiteFooter;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
@@ -157,8 +159,40 @@ class FooterSettings extends Page
                                     ->maxLength(255),
                             ]),
                     ]),
+
+                Section::make('Juridische pagina\'s')
+                    ->description('Deze pagina\'s worden gelinkt in de onderste footerbalk en onder de formulieren. Enkel gepubliceerde pagina\'s zijn kiesbaar.')
+                    ->schema([
+                        Group::make()
+                            ->statePath('legal')
+                            ->columns(2)
+                            ->schema([
+                                Select::make('privacy_page_id')
+                                    ->label('Privacyverklaring')
+                                    ->options(fn () => self::publishedPageOptions())
+                                    ->searchable()
+                                    ->placeholder('Geen'),
+                                Select::make('cookie_page_id')
+                                    ->label('Cookiebeleid')
+                                    ->options(fn () => self::publishedPageOptions())
+                                    ->searchable()
+                                    ->placeholder('Geen'),
+                            ]),
+                    ]),
             ])
             ->statePath('data');
+    }
+
+    /**
+     * @return array<int, string> id => titel, alfabetisch
+     */
+    private static function publishedPageOptions(): array
+    {
+        return WebsitePage::query()
+            ->where('published', true)
+            ->orderBy('title')
+            ->pluck('title', 'id')
+            ->all();
     }
 
     /**

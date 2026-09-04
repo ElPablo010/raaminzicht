@@ -108,7 +108,7 @@
                 <div class="sm:col-span-2">
                     <label class="flex items-start gap-3">
                         <input type="checkbox" wire:model="consent" class="mt-0.5 h-4.5 w-4.5 rounded border-primary-300 text-primary-700 focus:ring-accent-400">
-                        <span class="text-xs leading-relaxed text-primary-900/60">{{ $this->txt('label_consent', 'Ik ga akkoord dat mijn gegevens gebruikt worden om mijn aanvraag te beantwoorden. We delen ze nooit met derden.') }}</span>
+                        <span class="text-xs leading-relaxed text-primary-900/60">{{ $this->txt('label_consent', 'Ik ga akkoord dat mijn gegevens gebruikt worden om mijn aanvraag te beantwoorden. We delen ze nooit met derden.') }}@if ($privacyPage = \App\Support\SiteFooter::legalPages()['Privacyverklaring'] ?? null) <a href="{{ $privacyPage->publicUrl() }}" target="_blank" rel="noopener" class="underline decoration-primary-900/30 underline-offset-2 transition-colors hover:text-primary-900">Lees onze privacyverklaring.</a>@endif</span>
                     </label>
                     @error('consent') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
