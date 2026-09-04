@@ -95,3 +95,27 @@ it('renders the admin redirects page with the pattern badge', function () {
         ->assertSee('Exact')
         ->assertSee('jokerteken');
 });
+
+it('resolves the destination to whichever candidate slug actually exists on this environment', function () {
+    // Zoals op prod op 04/09/2026: ramen-en-deuren staat niet onder /producten.
+    Page::create(['title' => 'Ramen & deuren', 'slug' => 'ramen-en-deuren', 'locale' => 'nl', 'published' => true]);
+    Page::create(['title' => 'Zonwering', 'slug' => 'producten/zonwering', 'locale' => 'nl', 'published' => true]);
+
+    $this->seed(RedirectsSeeder::class);
+
+    expect(Redirect::where('from', '/ramen-en-deuren-*')->value('to'))->toBe('/ramen-en-deuren')
+        ->and(Redirect::where('from', '/zonwering-*')->value('to'))->toBe('/producten/zonwering');
+
+    $this->get('/ramen-en-deuren-lier/')->assertRedirect('/ramen-en-deuren');
+});
+
+it('never redirects a live page away, and removes a stale seeded rule that would', function () {
+    // Situatie na een slug-wijziging op prod: de regel bestaat al en wijst een levende pagina weg.
+    Redirect::create(['from' => '/ramen-en-deuren', 'to' => '/producten/ramen-en-deuren', 'status_code' => 301]);
+    Page::create(['title' => 'Ramen & deuren', 'slug' => 'ramen-en-deuren', 'locale' => 'nl', 'published' => true]);
+
+    $this->seed(RedirectsSeeder::class);
+
+    expect(Redirect::where('from', '/ramen-en-deuren')->exists())->toBeFalse();
+    $this->get('/ramen-en-deuren')->assertOk();
+});

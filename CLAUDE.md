@@ -142,6 +142,14 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   patronen, niet-destructief, herhaalbaar). Op prod na deploy:
   `php artisan db:seed --class=RedirectsSeeder --force`. Slugs die gelijk bleven
   (contact, over-ons, premies, realisaties) hebben geen regel nodig.
+- **Slug-drift prod ↔ lokaal.** Pagina's worden op de server in de admin
+  hernoemd; op 04/09/2026 stond ramen-en-deuren daar op `/ramen-en-deuren` en
+  poorten op `/producten/poorten` (lokaal: `/producten/ramen-en-deuren` en
+  `/producten/rolluiken-en-poorten`). Daarom werkt de seeder met kandidaat-
+  bestemmingen (eerste gepubliceerde slug wint) en slaat hij een `from` over dat
+  zelf een gepubliceerde pagina is. Let op: `App\Support\Realisaties::PAGE_SETS`
+  is óók op slug gebaseerd en kent de prod-slugs nog niet → op prod krijgen die
+  twee productpagina's geen echte foto's van de RealisatiesSeeder.
 - Tests: `tests/Feature/RedirectsTest.php`. Controle van alle 891 oude URL's door
   de kernel: 886 × 301, 5 × 200, 0 × 404 (04/09/2026).
 
