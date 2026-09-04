@@ -9,6 +9,14 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
+// Queue-worker zonder daemon (Combell shared hosting): de scheduler start elke
+// minuut een worker die de wachtrij leegwerkt en stopt (--stop-when-empty).
+// Vereist dat de paneel-cron elke minuut `php artisan schedule:run` draait.
+// Lokaal: `php artisan schedule:work` of rechtstreeks `php artisan queue:work`.
+Schedule::command('queue:work --stop-when-empty --queue=default --tries=3')
+    ->everyMinute()
+    ->withoutOverlapping();
+
 // Groei-meetlaag: gemeten Google-verkeer uit Search Console (gratis, geen credits).
 Schedule::command('seo:sync-search-console')->dailyAt('6:00')->withoutOverlapping();
 
