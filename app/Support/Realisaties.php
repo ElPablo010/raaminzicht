@@ -21,11 +21,11 @@ class Realisaties
         'home' => 'home',
         'realisaties' => 'all',
         'producten' => 'all',
-        'producten/ramen-en-deuren' => 'ramen-deuren',
-        'producten/verandas' => 'verandas',
-        'producten/zonwering' => 'zonwering',
-        'producten/zonweringen' => 'zonwering',
-        'producten/rolluiken-en-poorten' => 'rolluiken-poorten',
+        // Productpagina's staan op de root (ProductSlugsSeeder, 04/09/2026).
+        'ramen-en-deuren' => 'ramen-deuren',
+        'verandas' => 'verandas',
+        'zonwering' => 'zonwering',
+        'poorten' => 'rolluiken-poorten',
     ];
 
     /** @var array<string, array<int, string|array{0: string, 1: int}>> */

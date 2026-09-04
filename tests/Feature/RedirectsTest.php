@@ -13,22 +13,22 @@ beforeEach(function () {
 });
 
 it('redirects an exact old path, with or without trailing slash', function () {
-    Redirect::create(['from' => '/zonweringen', 'to' => '/producten/zonwering', 'status_code' => 301]);
+    Redirect::create(['from' => '/zonweringen', 'to' => '/zonwering', 'status_code' => 301]);
 
-    $this->get('/zonweringen')->assertRedirect('/producten/zonwering')->assertStatus(301);
-    $this->get('/zonweringen/')->assertRedirect('/producten/zonwering')->assertStatus(301);
+    $this->get('/zonweringen')->assertRedirect('/zonwering')->assertStatus(301);
+    $this->get('/zonweringen/')->assertRedirect('/zonwering')->assertStatus(301);
 });
 
 it('redirects every location page through a wildcard pattern', function () {
-    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/producten/ramen-en-deuren', 'status_code' => 301]);
+    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/ramen-en-deuren', 'status_code' => 301]);
 
-    $this->get('/ramen-en-deuren-aarschot')->assertRedirect('/producten/ramen-en-deuren');
-    $this->get('/ramen-en-deuren-heist-op-den-berg/')->assertRedirect('/producten/ramen-en-deuren');
-    $this->get('/Ramen-En-Deuren-Affligem')->assertRedirect('/producten/ramen-en-deuren');
+    $this->get('/ramen-en-deuren-aarschot')->assertRedirect('/ramen-en-deuren');
+    $this->get('/ramen-en-deuren-heist-op-den-berg/')->assertRedirect('/ramen-en-deuren');
+    $this->get('/Ramen-En-Deuren-Affligem')->assertRedirect('/ramen-en-deuren');
 });
 
 it('does not let a pattern swallow the bare prefix or unrelated paths', function () {
-    Redirect::create(['from' => '/zonwering-*', 'to' => '/producten/zonwering', 'status_code' => 301]);
+    Redirect::create(['from' => '/zonwering-*', 'to' => '/zonwering', 'status_code' => 301]);
 
     // `/zonweringen` begint niet met `/zonwering-` → geen match.
     $this->get('/zonweringen')->assertStatus(404);
@@ -38,13 +38,13 @@ it('does not let a pattern swallow the bare prefix or unrelated paths', function
 });
 
 it('prefers an exact rule over a pattern, and the longest pattern over a shorter one', function () {
-    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/producten/ramen-en-deuren', 'status_code' => 301]);
+    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/ramen-en-deuren', 'status_code' => 301]);
     Redirect::create(['from' => '/ramen-en-deuren-aarschot', 'to' => '/regio/aarschot', 'status_code' => 301]);
     Redirect::create(['from' => '/ramen-en-deuren-heist-*', 'to' => '/regio/heist', 'status_code' => 301]);
 
     $this->get('/ramen-en-deuren-aarschot')->assertRedirect('/regio/aarschot');
     $this->get('/ramen-en-deuren-heist-op-den-berg')->assertRedirect('/regio/heist');
-    $this->get('/ramen-en-deuren-lier')->assertRedirect('/producten/ramen-en-deuren');
+    $this->get('/ramen-en-deuren-lier')->assertRedirect('/ramen-en-deuren');
 });
 
 it('supports a temporary 302 redirect', function () {
@@ -76,17 +76,17 @@ it('seeds the old-site mapping idempotently and non-destructively', function () 
         ->and(Redirect::where('from', '/handmatig')->exists())->toBeTrue();
 
     // Steekproef uit de oude sitemap.
-    $this->get('/zonweringen/')->assertRedirect('/producten/zonwering');
-    $this->get('/verandabouw/')->assertRedirect('/producten/verandas');
+    $this->get('/zonweringen/')->assertRedirect('/zonwering');
+    $this->get('/verandabouw/')->assertRedirect('/verandas');
     $this->get('/offerte-aanvragen/')->assertRedirect('/offerte');
-    $this->get('/terrasoverkapping-booischot/')->assertRedirect('/producten/verandas');
-    $this->get('/zonwering-aarschot/')->assertRedirect('/producten/zonwering');
+    $this->get('/terrasoverkapping-booischot/')->assertRedirect('/verandas');
+    $this->get('/zonwering-aarschot/')->assertRedirect('/zonwering');
     $this->get('/reviews/')->assertRedirect('/over-ons');
 });
 
 it('renders the admin redirects page with the pattern badge', function () {
-    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/producten/ramen-en-deuren', 'status_code' => 301]);
-    Redirect::create(['from' => '/zonweringen', 'to' => '/producten/zonwering', 'status_code' => 301]);
+    Redirect::create(['from' => '/ramen-en-deuren-*', 'to' => '/ramen-en-deuren', 'status_code' => 301]);
+    Redirect::create(['from' => '/zonweringen', 'to' => '/zonwering', 'status_code' => 301]);
 
     $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
         ->get('/admin/redirects')
@@ -97,14 +97,14 @@ it('renders the admin redirects page with the pattern badge', function () {
 });
 
 it('resolves the destination to whichever candidate slug actually exists on this environment', function () {
-    // Zoals op prod op 04/09/2026: ramen-en-deuren staat niet onder /producten.
+    // Slugs op de root (zoals op prod); de eerste kandidaat die bestaat wint.
     Page::create(['title' => 'Ramen & deuren', 'slug' => 'ramen-en-deuren', 'locale' => 'nl', 'published' => true]);
-    Page::create(['title' => 'Zonwering', 'slug' => 'producten/zonwering', 'locale' => 'nl', 'published' => true]);
+    Page::create(['title' => 'Zonwering', 'slug' => 'zonwering', 'locale' => 'nl', 'published' => true]);
 
     $this->seed(RedirectsSeeder::class);
 
     expect(Redirect::where('from', '/ramen-en-deuren-*')->value('to'))->toBe('/ramen-en-deuren')
-        ->and(Redirect::where('from', '/zonwering-*')->value('to'))->toBe('/producten/zonwering');
+        ->and(Redirect::where('from', '/zonwering-*')->value('to'))->toBe('/zonwering');
 
     $this->get('/ramen-en-deuren-lier/')->assertRedirect('/ramen-en-deuren');
 });

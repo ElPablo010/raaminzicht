@@ -175,10 +175,10 @@ class HomepageSeeder extends Seeder
 
         $producten = $main->items()->create(['label' => 'Producten', 'url' => '/producten', 'position' => 0]);
         $children = [
-            'Ramen & deuren' => '/producten/ramen-en-deuren',
-            "Veranda's" => '/producten/verandas',
-            'Zonwering' => '/producten/zonwering',
-            'Rolluiken & poorten' => '/producten/rolluiken-en-poorten',
+            'Ramen & deuren' => '/ramen-en-deuren',
+            "Veranda's" => '/verandas',
+            'Zonwering' => '/zonwering',
+            'Rolluiken & poorten' => '/poorten',
         ];
         $pos = 0;
         foreach ($children as $label => $url) {
@@ -338,10 +338,10 @@ class HomepageSeeder extends Seeder
                     'intro' => '<p>Van nieuwbouw tot renovatie — één partner voor het volledige plaatje.</p>',
                     'columns' => '4',
                     'cards' => [
-                        ['title' => 'Ramen & deuren', 'media_type' => 'image', 'image' => $this->img('ramen-deuren'), 'description' => 'PVC, aluminium of hout. Inclusief schuif- en vliegenramen.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/producten/ramen-en-deuren'],
-                        ['title' => "Veranda's", 'media_type' => 'image', 'image' => $this->img('verandas'), 'description' => 'Een lichtrijke leefruimte die het hele jaar door comfortabel is.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/producten/verandas'],
-                        ['title' => 'Zonwering', 'media_type' => 'image', 'image' => $this->img('zonwering'), 'description' => 'Screens, zonneschermen en plissé tegen hitte en inkijk.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/producten/zonwering'],
-                        ['title' => 'Rolluiken & poorten', 'media_type' => 'image', 'image' => $this->img('rolluiken-poorten'), 'description' => 'Rolluiken en sectionaalpoorten voor veiligheid en comfort.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/producten/rolluiken-en-poorten'],
+                        ['title' => 'Ramen & deuren', 'media_type' => 'image', 'image' => $this->img('ramen-deuren'), 'description' => 'PVC, aluminium of hout. Inclusief schuif- en vliegenramen.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/ramen-en-deuren'],
+                        ['title' => "Veranda's", 'media_type' => 'image', 'image' => $this->img('verandas'), 'description' => 'Een lichtrijke leefruimte die het hele jaar door comfortabel is.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/verandas'],
+                        ['title' => 'Zonwering', 'media_type' => 'image', 'image' => $this->img('zonwering'), 'description' => 'Screens, zonneschermen en plissé tegen hitte en inkijk.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/zonwering'],
+                        ['title' => 'Rolluiken & poorten', 'media_type' => 'image', 'image' => $this->img('rolluiken-poorten'), 'description' => 'Rolluiken en sectionaalpoorten voor veiligheid en comfort.', 'cta_label' => 'Ontdek meer', 'link_type' => 'url', 'href' => '/poorten'],
                     ],
                 ]],
                 ['type' => 'gallery', 'content' => [
@@ -386,10 +386,10 @@ class HomepageSeeder extends Seeder
                     'heading' => 'Kies uw categorie',
                     'columns' => '2',
                     'cards' => [
-                        ['title' => 'Ramen & deuren', 'media_type' => 'image', 'image' => $this->img('ramen-deuren'), 'description' => 'Ramen, voordeuren, schuiframen en vliegenramen in PVC, aluminium of hout.', 'cta_label' => 'Ontdek ramen & deuren', 'link_type' => 'url', 'href' => '/producten/ramen-en-deuren'],
-                        ['title' => "Veranda's", 'media_type' => 'image', 'image' => $this->img('verandas'), 'description' => 'Een lichtrijke uitbreiding van uw woning, het hele jaar door bruikbaar.', 'cta_label' => "Ontdek veranda's", 'link_type' => 'url', 'href' => '/producten/verandas'],
-                        ['title' => 'Zonwering', 'media_type' => 'image', 'image' => $this->img('zonwering'), 'description' => 'Screens, zonneschermen en plissé tegen oververhitting en inkijk.', 'cta_label' => 'Ontdek zonwering', 'link_type' => 'url', 'href' => '/producten/zonwering'],
-                        ['title' => 'Rolluiken & poorten', 'media_type' => 'image', 'image' => $this->img('rolluiken-poorten'), 'description' => 'Rolluiken en sectionaalpoorten voor extra comfort en veiligheid.', 'cta_label' => 'Ontdek rolluiken & poorten', 'link_type' => 'url', 'href' => '/producten/rolluiken-en-poorten'],
+                        ['title' => 'Ramen & deuren', 'media_type' => 'image', 'image' => $this->img('ramen-deuren'), 'description' => 'Ramen, voordeuren, schuiframen en vliegenramen in PVC, aluminium of hout.', 'cta_label' => 'Ontdek ramen & deuren', 'link_type' => 'url', 'href' => '/ramen-en-deuren'],
+                        ['title' => "Veranda's", 'media_type' => 'image', 'image' => $this->img('verandas'), 'description' => 'Een lichtrijke uitbreiding van uw woning, het hele jaar door bruikbaar.', 'cta_label' => "Ontdek veranda's", 'link_type' => 'url', 'href' => '/verandas'],
+                        ['title' => 'Zonwering', 'media_type' => 'image', 'image' => $this->img('zonwering'), 'description' => 'Screens, zonneschermen en plissé tegen oververhitting en inkijk.', 'cta_label' => 'Ontdek zonwering', 'link_type' => 'url', 'href' => '/zonwering'],
+                        ['title' => 'Rolluiken & poorten', 'media_type' => 'image', 'image' => $this->img('rolluiken-poorten'), 'description' => 'Rolluiken en sectionaalpoorten voor extra comfort en veiligheid.', 'cta_label' => 'Ontdek rolluiken & poorten', 'link_type' => 'url', 'href' => '/poorten'],
                     ],
                 ]],
                 $this->reviews('light'),
@@ -436,7 +436,7 @@ class HomepageSeeder extends Seeder
     private function ramenDeurenPage(): array
     {
         return $this->productPage(
-            'producten/ramen-en-deuren',
+            'ramen-en-deuren',
             'Ramen & deuren',
             'Ramen en deuren op maat in PVC, aluminium en hout. Voordeuren, schuiframen en vliegenramen — vakkundig geplaatst in Heist-op-den-Berg en omstreken.',
             $this->img('ramen-deuren'),
@@ -474,7 +474,7 @@ class HomepageSeeder extends Seeder
     private function verandasPage(): array
     {
         return $this->productPage(
-            'producten/verandas',
+            'verandas',
             "Veranda's",
             "Veranda's op maat in Heist-op-den-Berg. Een lichtrijke leefruimte die het hele jaar door comfortabel is — vakkundig ontworpen en geplaatst.",
             $this->img('verandas'),
@@ -512,7 +512,7 @@ class HomepageSeeder extends Seeder
     private function zonweringPage(): array
     {
         return $this->productPage(
-            'producten/zonwering',
+            'zonwering',
             'Zonwering',
             'Zonwering op maat: screens, zonneschermen en plissé tegen hitte en inkijk. Geplaatst in Heist-op-den-Berg en omstreken.',
             $this->img('zonwering'),
@@ -545,7 +545,7 @@ class HomepageSeeder extends Seeder
     private function rolluikenPage(): array
     {
         return $this->productPage(
-            'producten/rolluiken-en-poorten',
+            'poorten',
             'Rolluiken & poorten',
             'Rolluiken en sectionaalpoorten op maat voor meer comfort, isolatie en veiligheid. Geplaatst in Heist-op-den-Berg en omstreken.',
             $this->img('rolluiken-poorten'),

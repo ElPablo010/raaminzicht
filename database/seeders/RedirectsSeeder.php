@@ -33,11 +33,11 @@ use Illuminate\Support\Facades\Cache;
 class RedirectsSeeder extends Seeder
 {
     /** Bestemmingskandidaten per product, in volgorde van voorkeur. */
-    private const RAMEN = ['/producten/ramen-en-deuren', '/ramen-en-deuren'];
+    private const RAMEN = ['/ramen-en-deuren', '/producten/ramen-en-deuren'];
 
-    private const ZONWERING = ['/producten/zonwering', '/zonwering', '/producten/zonweringen'];
+    private const ZONWERING = ['/zonwering', '/producten/zonwering', '/producten/zonweringen'];
 
-    private const VERANDAS = ['/producten/verandas', '/verandas'];
+    private const VERANDAS = ['/verandas', '/producten/verandas'];
 
     /** @var array<string, list<string>> oud pad => kandidaat-bestemmingen */
     private const EXACT = [

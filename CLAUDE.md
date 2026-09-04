@@ -142,16 +142,23 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   patronen, niet-destructief, herhaalbaar). Op prod na deploy:
   `php artisan db:seed --class=RedirectsSeeder --force`. Slugs die gelijk bleven
   (contact, over-ons, premies, realisaties) hebben geen regel nodig.
-- **Slug-drift prod ↔ lokaal.** Pagina's worden op de server in de admin
-  hernoemd; op 04/09/2026 stond ramen-en-deuren daar op `/ramen-en-deuren` en
-  poorten op `/producten/poorten` (lokaal: `/producten/ramen-en-deuren` en
-  `/producten/rolluiken-en-poorten`). Daarom werkt de seeder met kandidaat-
-  bestemmingen (eerste gepubliceerde slug wint) en slaat hij een `from` over dat
-  zelf een gepubliceerde pagina is. Let op: `App\Support\Realisaties::PAGE_SETS`
-  is óók op slug gebaseerd en kent de prod-slugs nog niet → op prod krijgen die
-  twee productpagina's geen echte foto's van de RealisatiesSeeder.
-- Tests: `tests/Feature/RedirectsTest.php`. Controle van alle 891 oude URL's door
-  de kernel: 886 × 301, 5 × 200, 0 × 404 (04/09/2026).
+- **Productslugs op de root** (beslissing 04/09/2026): `/ramen-en-deuren`,
+  `/verandas`, `/zonwering`, `/poorten`; het overzicht `/producten` blijft.
+  `database/seeders/ProductSlugsSeeder.php` voert dat herhaalbaar door
+  (pagina's hernoemen, hard-gecodeerde hrefs en menu-URL's herschrijven, dode
+  `page_id`-links herstellen op titel, 301's van `/producten/<x>`) en roept op
+  het einde de RedirectsSeeder aan zodat de oude-site-redirects meteen naar de
+  nieuwe slugs wijzen. `App\Support\Realisaties::PAGE_SETS` en de HomepageSeeder
+  gebruiken dezelfde root-slugs.
+- **Content leeft op de server.** Slugs, teksten en menu's worden in de admin op
+  de preview-server bewerkt; de lokale DB is een kopie (laatst gesynct
+  04/09/2026 via mysqldump + rsync van `storage/app/public/website-media`).
+  Slug-afhankelijke code (seeders, `Realisaties`) daarom tolerant houden en
+  na een deploy op de preview-URL controleren, niet enkel lokaal.
+- **SSH vanuit Claude** is toegestaan via `.claude/settings.local.json`
+  (buiten git): deploys, dumps en seeders op de server hoeven niet meer via de
+  gebruiker. Commando's moeten letterlijk met `ssh raaminzichtbe@176.62.165.220`
+  beginnen om de permissieregel te matchen.
 
 ### Livegang-checklist (DNS www.raaminzicht.be → Combell)
 
@@ -161,7 +168,7 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
 2. `php artisan db:seed --class=LegalPagesSeeder --force` op prod: vult en
    **publiceert** privacyverklaring + cookiebeleid en koppelt ze aan de footer
    (zie "Juridische pagina's" hieronder).
-3. `RedirectsSeeder` draaien op prod (zie hierboven) en steekproef nemen.
+3. `ProductSlugsSeeder` (roept RedirectsSeeder aan) draaien op prod en steekproef nemen.
 4. SSL-certificaat voor www.raaminzicht.be activeren in Combell (anders 403).
 5. Later, op basis van Search Console-data: eventueel enkele échte regiopagina's
    (gemeenten met realisaties) en die als exacte redirect boven het patroon zetten.
