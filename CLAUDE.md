@@ -122,6 +122,38 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
 - Tests: `SeoModuleTest`, `LeadAttributionTest`, `SeoLeadsPageTest`,
   `SearchConsoleTest`, `SeoKeywordSuggestTest` in `tests/Feature/`.
 
+## Redirects van de oude site
+
+De oude WordPress-site (www.raaminzicht.be bij one.com, Yoast-sitemap gescand op
+04/09/2026) telt 891 URL's: 15 vaste pagina's en 4 × 219 gegenereerde
+locatie-landingspagina's (`/ramen-en-deuren-<gemeente>/`, `/zonwering-…`,
+`/verandabouw-…`, `/terrasoverkapping-…`; near-duplicate doorway pages, 8 woorden
+verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpagina.
+
+- **Patroon-redirects:** een `from` met `*` is een patroon ("alles wat volgt",
+  minstens één teken, hoofdletter-ongevoelig). `HandleRedirects` checkt eerst
+  exact (O(1) uit cache), dan patronen op aflopende lengte van `from`. Een exacte
+  regel voor één gemeente wint dus altijd van `/ramen-en-deuren-*`. Geen extra
+  kolom: `Redirect::isPattern()` kijkt naar het jokerteken.
+- **Mapping** staat in `database/seeders/RedirectsSeeder.php` (10 exact + 4
+  patronen, niet-destructief, herhaalbaar). Op prod na deploy:
+  `php artisan db:seed --class=RedirectsSeeder --force`. Slugs die gelijk bleven
+  (contact, over-ons, premies, realisaties) hebben geen regel nodig.
+- Tests: `tests/Feature/RedirectsTest.php`. Controle van alle 891 oude URL's door
+  de kernel: 886 × 301, 5 × 200, 0 × 404 (04/09/2026).
+
+### Livegang-checklist (DNS www.raaminzicht.be → Combell)
+
+1. `APP_URL=https://www.raaminzicht.be` in de server-`.env` (nu nog
+   `raaminzicht.dewebgoeroe.be`, waardoor canonical/og:url naar een dood
+   subdomein wijzen) + `php artisan optimize`.
+2. Privacy- en cookiebeleid **publiceren** (staan nog als concept; de redirect
+   `/privacy-beleid` → `/privacy-policy` landt anders op een 404).
+3. `RedirectsSeeder` draaien op prod (zie hierboven) en steekproef nemen.
+4. SSL-certificaat voor www.raaminzicht.be activeren in Combell (anders 403).
+5. Later, op basis van Search Console-data: eventueel enkele échte regiopagina's
+   (gemeenten met realisaties) en die als exacte redirect boven het patroon zetten.
+
 ## Eerste admin-user
 
 - E-mail: `pieter@dewebgoeroe.be` — rol **Admin**. Tijdelijk wachtwoord is bij
@@ -131,6 +163,7 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
 
 - Placeholders vervangen (zie hierboven: foto's, partnerlogo's, mail/SMTP).
 - Optioneel: kaart-embed op de contactpagina, echte Google-reviews koppelen.
+- Livegang: zie de checklist onder "Redirects van de oude site".
 
 ## Lokaal draaien
 

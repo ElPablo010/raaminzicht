@@ -70,13 +70,16 @@ class Redirects extends Page implements HasTable
             TextInput::make('from')
                 ->label('Van (oud pad)')
                 ->placeholder('/oud-pad')
+                ->helperText('Gebruik * als jokerteken voor "alles wat volgt", bv. /ramen-en-deuren-*. Exacte regels gaan altijd vóór patronen.')
                 ->required()
                 ->maxLength(500),
             TextInput::make('to')
                 ->label('Naar (nieuw pad of URL)')
                 ->placeholder('/nieuw-pad')
                 ->required()
-                ->maxLength(500),
+                ->maxLength(500)
+                ->rule('not_regex:/\\*/')
+                ->validationMessages(['not_regex' => 'De bestemming mag geen jokerteken (*) bevatten.']),
             // Logische volgorde (301 vóór 302) is hier sterker dan alfabetisch:
             // permanent is de standaard- en meest gebruikte keuze.
             Select::make('status_code')
@@ -126,6 +129,11 @@ class Redirects extends Page implements HasTable
                     ->label('Naar')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('kind')
+                    ->label('Soort')
+                    ->badge()
+                    ->state(fn (Redirect $record): string => $record->isPattern() ? 'Patroon' : 'Exact')
+                    ->color(fn (string $state): string => $state === 'Patroon' ? 'warning' : 'gray'),
                 TextColumn::make('status_code')
                     ->label('Type')
                     ->badge()
@@ -169,10 +177,11 @@ class Redirects extends Page implements HasTable
 
     /**
      * Normaliseer een oud pad: altijd één leidende slash, geen trailing slash.
+     * Het jokerteken (*) blijft staan — dat maakt de regel een patroon.
      */
     protected static function normalizeFrom(string $from): string
     {
-        return '/'.trim($from, '/');
+        return Redirect::normalizePath($from);
     }
 
     protected static function flushCache(): void
