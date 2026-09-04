@@ -18,7 +18,20 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   Filament panel-kleur (`AdminPanelProvider::colors`) staat op `#286872`.
   Koppen in **Fraunces** (serif), tekst in **Inter** (via Google Fonts in
   `layouts/site.blade.php`). `SectionBackground` is op deze schaal afgestemd.
-- **Hosting / deploy-target:** nog niet bepaald (geen automatische deploy).
+- **Hosting / deploy:** Combell shared hosting, SSH `raaminzichtbe@176.62.165.220`
+  (níet ssh.raaminzicht.be, dat is de oude one.com-server). App staat in
+  `~/raaminzicht` (= `/data/sites/web/raaminzichtbe/raaminzicht`), docroot `~/www`
+  is een echte map met symlinks naar `public/*`. Het deploy-script staat buiten
+  git in `~/deploy.sh` (git pull, composer, npm ci + build via NVM, migrate,
+  optimize). Preview-URL: https://raaminzichtbe.webhosting.be (het subdomein
+  raaminzicht.dewebgoeroe.be geeft 404/403 en is niet meer gekoppeld); het echte
+  domein www.raaminzicht.be wijst nog naar de oude WordPress-site bij one.com.
+  Deploy-stap voor "klaar en deploy" (SSH vanuit Claude wordt geblokkeerd, dus de
+  gebruiker draait dit zelf met `!`-prefix):
+  `ssh raaminzichtbe@176.62.165.220 'bash ~/deploy.sh'` — en na content-
+  migraties de bijhorende seeder(s) met `--force` (zie hieronder).
+  Let op: de server heeft ooit gerebasede commits gehad; bij "diverged" eerst
+  `git diff --stat` tussen de equivalente commits, dan `git reset --hard origin/main`.
 
 ### Placeholders nog te vervangen door echt materiaal
 - **Projectfoto's (echt):** de galerijen (realisaties, home, productpagina's) en de
@@ -78,7 +91,6 @@ globale website-context; hieronder enkel wat projectspecifiek is.
 ## Volgende stappen
 
 - Placeholders vervangen (zie hierboven: foto's, partnerlogo's, mail/SMTP).
-- Hosting/deploy-target bepalen (deploy-stap komt ná stap 9 van de "klaar"-flow).
 - Optioneel: kaart-embed op de contactpagina, echte Google-reviews koppelen.
 
 ## Lokaal draaien
