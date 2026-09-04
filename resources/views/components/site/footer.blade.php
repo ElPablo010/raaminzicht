@@ -95,13 +95,12 @@
     <div class="border-t border-white/10">
         <div class="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-6 py-5 text-xs text-white/40 sm:flex-row">
             <span>&copy; {{ now()->year }} {{ $brand['name'] ?? config('app.name') }}@if (! empty($contact['vat'])) &middot; {{ $contact['vat'] }} @endif</span>
-            @if ($legalPages !== [])
-                <nav aria-label="Juridisch" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-                    @foreach ($legalPages as $label => $legalPage)
-                        <a href="{{ $legalPage->publicUrl() }}" class="transition-colors hover:text-accent-300">{{ $label }}</a>
-                    @endforeach
-                </nav>
-            @endif
+            <nav aria-label="Juridisch" class="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+                @foreach ($legalPages as $label => $legalPage)
+                    <a href="{{ $legalPage->publicUrl() }}" class="transition-colors hover:text-accent-300">{{ $label }}</a>
+                @endforeach
+                <button type="button" class="cursor-pointer transition-colors hover:text-accent-300" @click="$dispatch('open-cookie-preferences')" x-data>Cookie-instellingen</button>
+            </nav>
             <span>Website door <a href="https://dewebgoeroe.be" target="_blank" rel="noopener" class="transition-colors hover:text-accent-300">De Webgoeroe</a></span>
         </div>
     </div>

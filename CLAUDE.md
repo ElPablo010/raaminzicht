@@ -179,13 +179,24 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   `cookie_page_id`): de onderste footerbalk en de consent-regel onder de
   formulieren linken ernaar via `SiteFooter::legalPages()` (enkel gepubliceerde
   pagina's, anders geen link).
-- **Geen cookiebanner, bewust.** De site plaatst enkel functionele cookies
-  (sessie + XSRF), geen analytics- of marketing-cookies; het cookiebeleid zegt dat
-  ook letterlijk. Komt er Google Analytics of een Meta-pixel (`meta-tracking`-
-  skill), dan eerst de consent-banner uit de `new-website`-skill
-  (`components/site/cookie-consent.blade.php`) toevoegen én sectie 3 van het
-  cookiebeleid herschrijven.
-- Test: `tests/Feature/LegalPagesTest.php`.
+- **Teksten versioneren.** `LegalPagesSeeder::TEXT_VERSION` verhogen bij elke
+  inhoudelijke tekstwijziging; de seeder overschrijft dan enkel tekst die nog
+  exact de zijne is (md5-hash in Setting `legal_pages_seeded`), klant-edits in de
+  admin blijven staan (met waarschuwing). Huidige tekst = v2 (met Google
+  Analytics).
+- **Cookiebanner** (`components/site/cookie-consent.blade.php`, in de layout):
+  functioneel altijd aan, analytics + marketing met toestemming; keuze in cookie
+  `cookie_consent` (180 dagen). Gedragscontract voor tracking-scripts:
+  `window.cookieConsent.has('analytics'|'marketing')`, window-events
+  `cookie-consent-changed` en `open-cookie-preferences` (de "Cookie-instellingen"-
+  knop in de footer). Niet hernoemen.
+- **Google Analytics 4** (`components/site/analytics.blade.php`, in `<head>`):
+  measurement-ID op Instellingen → Algemeen (Setting `google_analytics_id`, leeg =
+  niets). gtag.js wordt pas van Google opgehaald ná analytics-toestemming; bij
+  intrekken wordt `ga-disable-<ID>` gezet en worden de `_ga*`-cookies gewist.
+  Een Meta-pixel later: zelfde patroon, categorie `marketing` (`meta-tracking`-
+  skill), en sectie 2 van het cookiebeleid aanvullen (+ TEXT_VERSION).
+- Tests: `tests/Feature/LegalPagesTest.php`, `tests/Feature/CookieConsentTest.php`.
 
 ## Eerste admin-user
 

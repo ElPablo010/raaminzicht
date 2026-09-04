@@ -56,6 +56,8 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+
+    <x-site.analytics />
 </head>
 <body class="min-h-screen">
     <x-site.header />
@@ -78,6 +80,8 @@
     </main>
 
     <x-site.footer />
+
+    <x-site.cookie-consent />
 
     @livewireScripts
 </body>

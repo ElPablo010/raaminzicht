@@ -46,6 +46,7 @@ class GeneralSettings extends Page
         'business_description',
         'anthropic_api_key',
         'ai_facts',
+        'google_analytics_id',
     ];
 
     public function mount(): void
@@ -73,6 +74,18 @@ class GeneralSettings extends Page
                             ->helperText('bv. "een specialist in ramen, deuren en zonwering in de regio Antwerpen". Geeft AI-functies context.'),
                     ])
                     ->columns(2),
+
+                Section::make('Statistieken')
+                    ->description('Google Analytics wordt pas geladen nadat de bezoeker analytische cookies aanvaardt in de cookiebanner.')
+                    ->schema([
+                        TextInput::make('google_analytics_id')
+                            ->label('Google Analytics measurement-ID')
+                            ->placeholder('G-XXXXXXXXXX')
+                            ->regex('/^G-[A-Z0-9]{4,20}$/')
+                            ->validationMessages(['regex' => 'Een GA4 measurement-ID begint met "G-", gevolgd door hoofdletters en cijfers.'])
+                            ->maxLength(30)
+                            ->helperText('Te vinden in Google Analytics onder Beheer → Gegevensstreams → de webstream. Leeg = geen Analytics.'),
+                    ]),
 
                 Section::make('AI')
                     ->description('Gedeelde AI-configuratie voor alle features die op Claude draaien (SEO-advies, later de chatbot).')

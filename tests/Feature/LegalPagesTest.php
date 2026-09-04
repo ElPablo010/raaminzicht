@@ -27,7 +27,55 @@ it('creates, fills and publishes both legal pages', function () {
         ->assertOk()
         ->assertSee('Cookiebeleid')
         ->assertSee('raaminzicht-session')
+        ->assertSee('Google Analytics')
+        ->assertSee('Cookie-instellingen')
         ->assertSee('href="/privacy-policy"', false);
+
+    $seeded = Setting::get(LegalPagesSeeder::SEEDED_KEY);
+    expect($seeded['privacy']['version'])->toBe(LegalPagesSeeder::TEXT_VERSION)
+        ->and($seeded['cookie']['hash'])->toBe(md5($cookie->sections()->first()->content['body']));
+});
+
+it('rewrites its own earlier text when the text version is bumped, but keeps client edits', function () {
+    $this->seed(LegalPagesSeeder::class);
+
+    $cookie = Page::where('slug', 'cookie-policy')->firstOrFail();
+    $privacy = Page::where('slug', 'privacy-policy')->firstOrFail();
+
+    // Simuleer een oudere seed-ronde: versie terug naar 1, en één pagina door de klant bewerkt.
+    Setting::set(LegalPagesSeeder::SEEDED_KEY, [
+        'privacy' => ['version' => 1, 'hash' => md5($privacy->sections()->first()->content['body'])],
+        'cookie' => ['version' => 1, 'hash' => md5($cookie->sections()->first()->content['body'])],
+    ]);
+    $cookie->sections()->first()->update(['content' => ['heading' => 'Cookies', 'body' => '<p>Eigen tekst van de klant.</p>']]);
+    $privacy->sections()->first()->update(['content' => ['heading' => 'Privacy', 'body' => '<p>oude seeder-tekst</p>']]);
+    Setting::set(LegalPagesSeeder::SEEDED_KEY, [
+        'privacy' => ['version' => 1, 'hash' => md5('<p>oude seeder-tekst</p>')],
+        'cookie' => ['version' => 1, 'hash' => md5('<p>iets anders dan wat er nu staat</p>')],
+    ]);
+
+    $this->seed(LegalPagesSeeder::class);
+
+    expect($privacy->sections()->first()->fresh()->content['body'])->toContain('Gegevensbeschermingsautoriteit')
+        ->and($cookie->sections()->first()->fresh()->content['body'])->toBe('<p>Eigen tekst van de klant.</p>');
+
+    $seeded = Setting::get(LegalPagesSeeder::SEEDED_KEY);
+    expect($seeded['privacy']['version'])->toBe(LegalPagesSeeder::TEXT_VERSION)
+        ->and($seeded['cookie']['version'])->toBe(1);
+});
+
+it('upgrades a version-1 seed that predates hash tracking', function () {
+    $page = Page::create(['title' => 'Cookie policy', 'slug' => 'cookie-policy', 'published' => false]);
+    $page->sections()->create([
+        'section_type' => 'prose',
+        'position' => 0,
+        'content' => ['eyebrow' => 'Juridisch', 'heading' => 'Cookiebeleid', 'body' => '<p><em>Laatst bijgewerkt op 04/09/2026.</em></p><p>We gebruiken momenteel geen analytische cookies.</p>'],
+    ]);
+
+    $this->seed(LegalPagesSeeder::class);
+
+    expect($page->sections()->first()->fresh()->content['body'])->toContain('_ga')
+        ->and($page->fresh()->published)->toBeTrue();
 });
 
 it('publishes existing draft pages under their own slug without overwriting edited content', function () {

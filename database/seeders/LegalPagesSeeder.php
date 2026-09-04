@@ -20,15 +20,27 @@ use Illuminate\Database\Seeder;
  * (zie CLAUDE.md, "Slug-drift"). Per pagina wordt de eerste bestaande kandidaat
  * gebruikt; bestaat er geen, dan wordt de pagina aangemaakt op de eerste slug.
  *
- * Edit-veilig: de tekst-sectie wordt enkel geseed als de pagina nog geen secties
- * heeft. Publiceren en de footer-koppeling gebeuren wél altijd. Herhaalbaar:
+ * Edit-veilig, met versies: de tekst wordt geschreven als de pagina nog geen
+ * sectie heeft, én opnieuw wanneer TEXT_VERSION verhoogd is en de bestaande tekst
+ * nog exact de tekst is die deze seeder eerder schreef (hash in Setting
+ * `legal_pages_seeded`). Heeft de klant de tekst intussen in de admin aangepast,
+ * dan blijft die staan en waarschuwt de seeder. Publiceren en de footer-
+ * koppeling gebeuren altijd. Herhaalbaar:
  *   php artisan db:seed --class=LegalPagesSeeder --force
+ *
+ * Tekst wijzigen? Pas de body aan én verhoog TEXT_VERSION, anders blijft de oude
+ * tekst op prod staan.
  */
 class LegalPagesSeeder extends Seeder
 {
     private const PRIVACY_SLUGS = ['privacy-policy', 'privacybeleid', 'privacy-beleid', 'privacyverklaring', 'privacy'];
 
     private const COOKIE_SLUGS = ['cookie-policy', 'cookiebeleid', 'cookie-beleid', 'cookies'];
+
+    /** Verhogen bij elke inhoudelijke tekstwijziging (zie docblock). */
+    public const TEXT_VERSION = 2;
+
+    public const SEEDED_KEY = 'legal_pages_seeded';
 
     public function run(): void
     {
@@ -40,6 +52,7 @@ class LegalPagesSeeder extends Seeder
         $cookie = $this->resolvePage(self::COOKIE_SLUGS);
 
         $this->fillPage(
+            'privacy',
             $privacy,
             'Privacyverklaring',
             'Hoe Raaminzicht omgaat met uw persoonsgegevens: welke gegevens we verzamelen via de website, waarvoor, hoe lang we ze bewaren en welke rechten u hebt.',
@@ -47,6 +60,7 @@ class LegalPagesSeeder extends Seeder
         );
 
         $this->fillPage(
+            'cookie',
             $cookie,
             'Cookiebeleid',
             'Welke cookies de website van Raaminzicht plaatst, waarvoor ze dienen en hoe u ze kunt verwijderen.',
@@ -76,7 +90,7 @@ class LegalPagesSeeder extends Seeder
         return $page ?? new Page(['slug' => $slugs[0], 'locale' => 'nl', 'is_homepage' => false]);
     }
 
-    private function fillPage(Page $page, string $title, string $metaDescription, string $body): void
+    private function fillPage(string $key, Page $page, string $title, string $metaDescription, string $body): void
     {
         $page->fill([
             'title' => $page->title ?: $title,
@@ -85,7 +99,10 @@ class LegalPagesSeeder extends Seeder
             'meta_description' => $page->meta_description ?: $metaDescription,
         ])->save();
 
-        if ($page->sections()->doesntExist()) {
+        $seeded = (array) Setting::get(self::SEEDED_KEY, []);
+        $section = $page->sections()->orderBy('position')->first();
+
+        if ($section === null) {
             $page->sections()->create([
                 'section_type' => 'prose',
                 'position' => 0,
@@ -97,7 +114,28 @@ class LegalPagesSeeder extends Seeder
                     'body' => $body,
                 ],
             ]);
+        } elseif (($seeded[$key]['version'] ?? 1) < self::TEXT_VERSION) {
+            // Versie verhoogd: enkel overschrijven als de tekst nog de onze is.
+            // Vóór het hash-mechanisme (v1) is er geen hash; herken onze v1-tekst
+            // dan aan de datumregel waarmee ze begint (klant-eigen tekst heeft die niet).
+            $currentBody = (string) ($section->content['body'] ?? '');
+            $untouched = isset($seeded[$key]['hash'])
+                ? $seeded[$key]['hash'] === md5($currentBody)
+                : str_contains($currentBody, 'Laatst bijgewerkt op 04/09/2026');
+
+            if ($untouched) {
+                $section->update(['content' => [...$section->content, 'body' => $body]]);
+            } else {
+                $this->command?->warn("/{$page->slug}: tekst is in de admin aangepast, niet overschreven met versie ".self::TEXT_VERSION.'. Werk de tekst handmatig bij.');
+
+                return;
+            }
+        } else {
+            return;
         }
+
+        $seeded[$key] = ['version' => self::TEXT_VERSION, 'hash' => md5($body)];
+        Setting::set(self::SEEDED_KEY, $seeded);
     }
 
     /**
@@ -183,7 +221,8 @@ class LegalPagesSeeder extends Seeder
                 <li><strong>Fabrikanten en leveranciers</strong> van ramen, deuren, veranda's, zonwering en poorten, enkel voor zover dat nodig is om uw bestelling te produceren of te leveren (bijvoorbeeld het leveradres).</li>
             </ul>
             <p>Met deze partijen maken we afspraken over de beveiliging en het vertrouwelijk gebruik van uw gegevens. Daarnaast kunnen we gegevens doorgeven wanneer de wet ons daartoe verplicht, bijvoorbeeld op vraag van een bevoegde overheid.</p>
-            <p>Onze website laadt lettertypes via <strong>Google Fonts</strong>. Daarbij wordt uw IP-adres doorgegeven aan Google, dat gegevens ook buiten de Europese Economische Ruimte kan verwerken. Google plaatst hierbij geen cookies. Meer informatie vindt u in het <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacybeleid van Google</a>.</p>
+            <p><strong>Google Analytics.</strong> Enkel wanneer u analytische cookies aanvaardt in de cookiebanner, meten we met Google Analytics hoe onze website gebruikt wordt: welke pagina's bezocht worden, hoe lang, vanaf welk type toestel en via welke weg bezoekers bij ons terechtkomen. Google verwerkt die gegevens in onze opdracht, ook op servers buiten de Europese Economische Ruimte, op basis van de standaardcontractbepalingen van de Europese Commissie. IP-adressen worden door Google Analytics niet opgeslagen en we delen geen gegevens met Google voor advertentiedoeleinden. Zonder uw toestemming wordt Google Analytics niet geladen.</p>
+            <p><strong>Google Fonts.</strong> Onze website laadt lettertypes via Google Fonts. Daarbij wordt uw IP-adres doorgegeven aan Google, dat gegevens ook buiten de Europese Economische Ruimte kan verwerken. Google plaatst hierbij geen cookies. Meer informatie vindt u in het <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">privacybeleid van Google</a>.</p>
 
             <h2>5. Hoe lang bewaren we uw gegevens?</h2>
             <ul>
@@ -209,7 +248,7 @@ class LegalPagesSeeder extends Seeder
             <p>Bent u niet tevreden over de manier waarop we met uw gegevens omgaan, dan kunt u een klacht indienen bij de <a href="https://www.gegevensbeschermingsautoriteit.be" target="_blank" rel="noopener">Gegevensbeschermingsautoriteit</a>, Drukpersstraat 35, 1000 Brussel, <a href="mailto:contact@apd-gba.be">contact@apd-gba.be</a>.</p>
 
             <h2>8. Cookies</h2>
-            <p>Onze website gebruikt enkel cookies die noodzakelijk zijn voor de werking ervan. Welke dat zijn en hoe u ze kunt verwijderen, leest u in ons <a href="{$cookieHref}">cookiebeleid</a>.</p>
+            <p>Onze website gebruikt cookies die noodzakelijk zijn voor de werking ervan en, enkel met uw toestemming, analytische cookies van Google Analytics. Bij uw eerste bezoek vragen we uw keuze via een cookiebanner; u kunt ze op elk moment aanpassen via de link "Cookie-instellingen" onderaan elke pagina. Welke cookies dat zijn en hoe u ze kunt verwijderen, leest u in ons <a href="{$cookieHref}">cookiebeleid</a>.</p>
 
             <h2>9. Minderjarigen</h2>
             <p>Onze diensten richten zich tot volwassenen. We verzamelen niet bewust gegevens van personen jonger dan 16 jaar. Merkt u dat een minderjarige ons toch gegevens bezorgde, laat het ons dan weten, dan verwijderen we die.</p>
@@ -230,23 +269,30 @@ class LegalPagesSeeder extends Seeder
 
         return <<<HTML
             <p><em>Laatst bijgewerkt op 04/09/2026.</em></p>
-            <p>Deze website van {$name} maakt gebruik van een beperkt aantal cookies. Hieronder leest u wat cookies zijn, welke cookies we plaatsen, waarvoor ze dienen en hoe u ze kunt verwijderen.</p>
+            <p>Deze website van {$name} maakt gebruik van cookies. Hieronder leest u wat cookies zijn, welke cookies we plaatsen, waarvoor ze dienen, hoe we uw toestemming vragen en hoe u uw keuze kunt aanpassen.</p>
 
             <h2>1. Wat zijn cookies?</h2>
             <p>Cookies zijn kleine tekstbestanden die een website bij uw bezoek op uw computer, tablet of smartphone bewaart. Ze laten de website toe om u tijdens uw bezoek te herkennen, bijvoorbeeld om een ingevuld formulier veilig te kunnen verzenden. Cookies bevatten geen virussen en kunnen uw toestel niet beschadigen.</p>
 
             <h2>2. Welke cookies plaatsen we?</h2>
-            <p>We plaatsen op dit moment <strong>enkel strikt noodzakelijke (functionele) cookies</strong>. Die zijn nodig om de website correct en veilig te laten werken. Voor het plaatsen van deze cookies is volgens de wet geen toestemming vereist.</p>
+            <p><strong>Functionele (strikt noodzakelijke) cookies.</strong> Die zijn nodig om de website correct en veilig te laten werken. Voor het plaatsen ervan is volgens de wet geen toestemming vereist.</p>
             <ul>
-                <li><strong>raaminzicht-session</strong> (functioneel, vervalt 2 uur na uw laatste activiteit): houdt uw bezoek bij als één sessie, zodat de formulieren (offerte, contact, afspraak) correct werken en foutmeldingen getoond kunnen worden. Onthoudt tijdens uw bezoek ook via welke weg u op de site kwam, zodat we bij een aanvraag weten welk kanaal voor ons werkt.</li>
-                <li><strong>XSRF-TOKEN</strong> (functioneel, vervalt 2 uur na uw laatste activiteit): beveiligt de formulieren tegen misbruik door andere websites (CSRF-bescherming).</li>
+                <li><strong>raaminzicht-session</strong> (vervalt 2 uur na uw laatste activiteit): houdt uw bezoek bij als één sessie, zodat de formulieren (offerte, contact, afspraak) correct werken en foutmeldingen getoond kunnen worden. Onthoudt tijdens uw bezoek ook via welke weg u op de site kwam, zodat we bij een aanvraag weten welk kanaal voor ons werkt.</li>
+                <li><strong>XSRF-TOKEN</strong> (vervalt 2 uur na uw laatste activiteit): beveiligt de formulieren tegen misbruik door andere websites (CSRF-bescherming).</li>
+                <li><strong>cookie_consent</strong> (180 dagen): bewaart uw cookiekeuze, zodat we de cookiebanner niet bij elk bezoek opnieuw tonen.</li>
             </ul>
-            <p>De inhoud van deze cookies is niet leesbaar voor derden en wordt niet gebruikt om u over verschillende websites heen te volgen.</p>
+            <p><strong>Analytische cookies (Google Analytics), enkel met uw toestemming.</strong> Hiermee meten we anoniem hoe de website gebruikt wordt (bezochte pagina's, duur van het bezoek, type toestel, herkomst van het bezoek), zodat we de site kunnen verbeteren. Google Analytics wordt pas geladen nadat u analytische cookies aanvaardt; tot dan gaat er geen enkel gegeven naar Google.</p>
+            <ul>
+                <li><strong>_ga</strong> (2 jaar): onderscheidt bezoekers van elkaar aan de hand van een willekeurig nummer.</li>
+                <li><strong>_ga_&lt;ID&gt;</strong> (2 jaar): houdt de sessiestatus bij voor Google Analytics.</li>
+            </ul>
+            <p>Deze cookies bevatten geen naam, e-mailadres of andere rechtstreeks identificeerbare gegevens. Meer over hoe Google gegevens verwerkt leest u in het <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">beleid van Google</a>.</p>
+            <p><strong>Marketingcookies.</strong> Die gebruiken we momenteel niet. Zetten we ze in de toekomst in (bijvoorbeeld voor advertenties op sociale media), dan vragen we daarvoor eerst apart uw toestemming en passen we dit cookiebeleid aan.</p>
 
-            <h2>3. Analytische en marketingcookies</h2>
-            <p>We gebruiken momenteel <strong>geen analytische cookies</strong> (zoals Google Analytics) en <strong>geen marketing- of trackingcookies</strong> (zoals de Meta-pixel). Daarom tonen we ook geen cookiebanner: er is niets waarvoor we uw toestemming moeten vragen.</p>
-            <p>Om te weten hoe bezoekers ons via Google vinden, gebruiken we Google Search Console. Die dienst werkt op basis van geanonimiseerde zoekgegevens die Google ons bezorgt en plaatst geen cookies op uw toestel.</p>
-            <p>Beslissen we in de toekomst om wél analytische of marketingcookies te gebruiken, dan vragen we u daarvoor eerst uitdrukkelijk toestemming via een cookiebanner. Zulke cookies worden dan pas geplaatst nadat u ze aanvaardt, en we passen dit cookiebeleid aan.</p>
+            <h2>3. Uw toestemming en hoe u ze aanpast</h2>
+            <p>Bij uw eerste bezoek tonen we een cookiebanner. Daar kiest u of u analytische cookies aanvaardt of weigert; via "Voorkeuren aanpassen" kiest u per categorie. Functionele cookies staan altijd aan. Zolang u geen keuze maakt, worden enkel de functionele cookies geplaatst.</p>
+            <p>U kunt uw keuze op elk moment aanpassen of intrekken via de link <strong>"Cookie-instellingen"</strong> onderaan elke pagina. Trekt u uw toestemming voor analytische cookies in, dan wordt Google Analytics uitgeschakeld en verwijderen we de bijhorende cookies.</p>
+            <p>Om te weten hoe bezoekers ons via Google vinden, gebruiken we daarnaast Google Search Console. Die dienst werkt op basis van geanonimiseerde zoekgegevens die Google ons bezorgt en plaatst geen cookies op uw toestel.</p>
 
             <h2>4. Diensten van derden</h2>
             <p>Onze website laadt lettertypes via <strong>Google Fonts</strong>. Daarbij plaatst Google geen cookies, maar wordt uw IP-adres wel doorgegeven aan Google. Meer daarover leest u in onze <a href="{$privacyHref}">privacyverklaring</a>.</p>
