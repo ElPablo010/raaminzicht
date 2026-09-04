@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
             \App\Http\Middleware\HandleRedirects::class,
+            \App\Http\Middleware\CaptureFirstTouch::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

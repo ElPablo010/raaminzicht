@@ -83,6 +83,45 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   beide + onderwerpen + zijbalk) die de Livewire-component `App\Livewire\LeadForm`
   rendert (validatie NL, opslaan in `leads`, mailen via `LeadReceived`).
 
+## Groei-module (seo-analytics)
+
+Sidebar-groep **Groei**: Overzicht (`SeoDashboard`), Verkeer (`SearchConsole`,
+gemeten Google-verkeer via OAuth), Leads (`SeoLeads`, first-party conversies +
+nulmeting), Keywords (`SeoKeywordResource`, incl. "Stel keywords voor"), Acties
+(`SeoActions`, goedkeuringsdashboard) en Instellingen (`SeoSettings`). De
+app-brede AI-config (Anthropic-key, merknaam, omschrijving, "Feiten voor AI")
+staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
+`ANTHROPIC_API_KEY` via `config('services.anthropic.api_key')`.
+
+- **Wekelijkse AI-briefing staat bewust UIT.** De code (`seo:weekly-report`,
+  mail, actie-generatie) is voorzien, maar de cron in `routes/console.php` draait
+  enkel als de schakelaar *Wekelijkse AI-briefing actief* op Groei → Instellingen
+  aan staat (Setting `seo_weekly_report_enabled`). Manueel blijft alles werken:
+  "Ververs cijfers", "Genereer acties nu", "Stel keywords voor".
+- **Search Console**: `seo:sync-search-console` dagelijks 6:00 (eerste run =
+  16 maanden backfill). Koppelen op Groei → Verkeer (Google Cloud OAuth-client,
+  redirect-URI staat op die pagina; app op "In productie" zetten). Routes
+  `/admin/search-console/oauth/{redirect,callback}` staan in `routes/web.php`
+  vóór de catch-all.
+- **Leads-meting**: de bestaande `leads`-tabel ís het conversie-grootboek. De
+  migratie `2026_09_04_180000_add_attribution_to_leads_table` voegt kanaal,
+  landingspagina, referrer en utm's toe; `Lead::booted()` vult die automatisch
+  uit de sessie-first-touch (`Attribution` + middleware `CaptureFirstTouch` in
+  de `web`-groep). Formulieren hoeven niets te doen; nieuwe conversiepunten ook
+  niet zolang ze een `Lead` aanmaken. Type-labels in `Lead::TYPE_LABELS`.
+  Nulmeting-velden (`seo_live_since`, `seo_goal_leads_month`,
+  `seo_leads_baseline`) op het Leads-scherm.
+- **Sectie-contract** van de actie-applier is afgestemd op dit project:
+  `hero` → `prose` (heading + body) → `faq` → `cta`. De gekloonde CTA-knop volgt
+  het `CtaLinkSchema`-contract (`link_type` + `page_id` + `href`).
+- **Queue-worker vereist** (`QUEUE_CONNECTION=database`): verversen, acties en
+  keyword-onderzoek zijn jobs. Op Combell dus een cron voor `schedule:run` (elke
+  minuut) én `queue:work --stop-when-empty` (of `queue:work` onder supervisor).
+- Migraties: `2026_06_01_1200xx_create_seo_*` + `create_gsc_*` (9 tabellen) en
+  de leads-attributie-migratie — `php artisan migrate` lokaal en op prod.
+- Tests: `SeoModuleTest`, `LeadAttributionTest`, `SeoLeadsPageTest`,
+  `SearchConsoleTest`, `SeoKeywordSuggestTest` in `tests/Feature/`.
+
 ## Eerste admin-user
 
 - E-mail: `pieter@dewebgoeroe.be` — rol **Admin**. Tijdelijk wachtwoord is bij

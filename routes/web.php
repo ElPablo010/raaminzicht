@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\SearchConsoleOAuthController;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,6 +13,16 @@ Route::redirect('/login', '/admin/login')->name('login');
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
 Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
+
+// Google Search Console OAuth (Groei → Verkeer). Google stuurt naar een gewone
+// GET-URL terug, daarom buiten Filament — en vóór de catch-all.
+Route::middleware('auth')
+    ->prefix('admin/search-console/oauth')
+    ->controller(SearchConsoleOAuthController::class)
+    ->group(function () {
+        Route::get('/redirect', 'redirect')->name('seo.gsc.oauth.redirect');
+        Route::get('/callback', 'callback')->name('seo.gsc.oauth.callback');
+    });
 
 // Design-previews voor pagina's die nog niet via de Filament-builder bestaan.
 // Bereikbaar voor ingelogde users als referentie naast de live versie.
