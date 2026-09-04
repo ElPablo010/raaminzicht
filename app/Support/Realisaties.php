@@ -2,6 +2,9 @@
 
 namespace App\Support;
 
+use App\Models\Realisatie;
+use App\Models\RealisatieCategory;
+
 /**
  * Echte projectfoto's (database/data/realisaties.php) vertaald naar galerij-
  * items voor de page-builder. Eén bron voor de HomepageSeeder (verse installs)
@@ -26,6 +29,19 @@ class Realisaties
         'verandas' => 'verandas',
         'zonwering' => 'zonwering',
         'poorten' => 'rolluiken-poorten',
+    ];
+
+    /**
+     * De categorieën van het realisaties-post-type. Sleutel = set-naam hierboven,
+     * zodat één project via zijn sets meteen zijn categorieën krijgt.
+     *
+     * @var array<string, string>
+     */
+    public const CATEGORIES = [
+        'ramen-deuren' => 'Ramen en deuren',
+        'verandas' => "Veranda's en overkappingen",
+        'zonwering' => 'Zonwering',
+        'rolluiken-poorten' => 'Rolluiken en poorten',
     ];
 
     /** @var array<string, array<int, string|array{0: string, 1: int}>> */
@@ -67,32 +83,66 @@ class Realisaties
     }
 
     /**
-     * Galerij-items in het formaat van de gallery-sectie (multi-foto per project).
+     * De content-sleutels van een gallery-sectie die haar projecten uit het
+     * realisaties-post-type haalt. Wordt gebruikt door de seeders; de admin zet
+     * dezelfde sleutels via GalleryFields.
      *
-     * @return array<int, array{title: string, images: array<int, array{src: string, alt: string}>}>
+     * Een productset wordt een categoriefilter (nieuwe realisaties in die
+     * categorie verschijnen dan vanzelf mee), 'all' toont alles en een vrije
+     * selectie (home) wordt een expliciete lijst.
+     *
+     * @return array<string, mixed>
      */
-    public static function galleryItems(string $set): array
+    public static function gallerySource(string $set): array
     {
-        $projects = self::projects();
-        $items = [];
+        if ($set === 'all') {
+            return ['source' => 'realisaties', 'realisatie_selection' => 'all', 'realisatie_categories' => []];
+        }
 
-        foreach (self::SETS[$set] ?? [] as $entry) {
-            [$key, $cover] = is_array($entry) ? $entry : [$entry, 1];
-            $project = $projects[$key];
-            $photos = $project['photos'];
+        if (isset(self::CATEGORIES[$set])) {
+            $id = RealisatieCategory::query()->where('slug', $set)->value('id');
 
-            if ($cover > 1 && isset($photos[$cover - 1])) {
-                $first = $photos[$cover - 1];
-                unset($photos[$cover - 1]);
-                $photos = [$first, ...array_values($photos)];
-            }
-
-            $items[] = [
-                'title' => $project['title'],
-                'images' => array_map(fn (array $p) => ['src' => $p[0], 'alt' => $p[1]], $photos),
+            return [
+                'source' => 'realisaties',
+                'realisatie_selection' => 'all',
+                'realisatie_categories' => $id ? [$id] : [],
             ];
         }
 
-        return $items;
+        return [
+            'source' => 'realisaties',
+            'realisatie_selection' => 'pick',
+            'realisatie_ids' => Realisatie::query()
+                ->whereIn('slug', self::projectKeys($set))
+                ->ordered()
+                ->pluck('id')
+                ->all(),
+        ];
+    }
+
+    /**
+     * De project-sleutels van een set, zonder de cover-index.
+     *
+     * @return array<int, string>
+     */
+    public static function projectKeys(string $set): array
+    {
+        return array_map(
+            fn ($entry) => is_array($entry) ? $entry[0] : $entry,
+            self::SETS[$set] ?? [],
+        );
+    }
+
+    /**
+     * De categorie-slugs waar een project in thuishoort, afgeleid uit de sets.
+     *
+     * @return array<int, string>
+     */
+    public static function categoriesForProject(string $key): array
+    {
+        return array_values(array_filter(
+            array_keys(self::CATEGORIES),
+            fn (string $set): bool => in_array($key, self::projectKeys($set), true),
+        ));
     }
 }

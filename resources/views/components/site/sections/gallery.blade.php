@@ -6,28 +6,14 @@
     $columns = (int) ($content['columns'] ?? 3);
     $colClass = [2 => 'sm:grid-cols-2', 3 => 'sm:grid-cols-2 lg:grid-cols-3', 4 => 'sm:grid-cols-2 lg:grid-cols-4'][$columns] ?? 'sm:grid-cols-2 lg:grid-cols-3';
 
-    // Normaliseer elk item naar een project met een fotolijst. Backward-compat:
-    // een oud item met enkele `image`/`alt` (vóór de multi-foto-builder) wordt een
-    // project met precies één foto, zodat bestaande content blijft werken zonder
-    // DB-migratie. De eerste foto is telkens de cover in het grid.
-    $items = collect($content['items'] ?? [])
-        ->map(function (array $item): array {
-            $photos = collect($item['images'] ?? [])
-                ->filter(fn ($im) => ! empty($im['src']))
-                ->map(fn ($im) => ['src' => $im['src'], 'alt' => $im['alt'] ?? ''])
-                ->values();
-
-            if ($photos->isEmpty() && ! empty($item['image'])) {
-                $photos = collect([['src' => $item['image'], 'alt' => $item['alt'] ?? '']]);
-            }
-
-            return [
-                'title' => $item['title'] ?? null,
-                'photos' => $photos,
-            ];
-        })
-        ->filter(fn (array $item) => $item['photos']->isNotEmpty())
-        ->values();
+    // Items komen ofwel uit het realisaties-post-type ofwel uit de repeater in
+    // deze sectie; GalleryItems maakt daar één vorm van (en houdt oude content
+    // met een enkel `image`-veld werkend).
+    $items = collect(\App\Support\GalleryItems::forSection($content))
+        ->map(fn (array $item): array => [
+            'title' => $item['title'],
+            'photos' => collect($item['photos']),
+        ]);
 
     // Platte JS-structuur voor de Alpine-lightbox: per project een lijst {src, alt}.
     $projects = $items->map(fn (array $item) => $item['photos']->values())->values();

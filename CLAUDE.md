@@ -34,14 +34,12 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   `git diff --stat` tussen de equivalente commits, dan `git reset --hard origin/main`.
 
 ### Placeholders nog te vervangen door echt materiaal
-- **Projectfoto's (echt):** de galerijen (realisaties, home, productpagina's) en de
-  hero van /realisaties tonen echte foto's uit `public/images/realisaties/<project>/`
-  (per gemeente, 1440px WebP+JPG, EXIF/GPS gestript). Titels, alt-teksten en
-  fotovolgorde staan in `database/data/realisaties.php`; de selectie per pagina
-  in `App\Support\Realisaties`. Bestaande pagina's bijwerken (ook op productie
-  na een deploy, want de HomepageSeeder is niet-destructief):
-  `php artisan db:seed --class=RealisatiesSeeder --force`. Nieuwe projecten:
-  foto's toevoegen in die map, entry in de datafile, seeder opnieuw draaien.
+- **Projectfoto's (echt):** de echte foto's staan in
+  `public/images/realisaties/<project>/` (per gemeente, 1440px WebP+JPG, EXIF/GPS
+  gestript) en leven sinds 04/09/2026 in het **realisaties-post-type** (zie
+  hieronder), niet meer in de galerij-secties zelf. Nieuwe projecten voegt de
+  klant toe via Website → Realisaties (upload of media-library); de datafile
+  `database/data/realisaties.php` is enkel nog de eenmalige import-bron.
 - **Overige foto's** in `public/images/placeholders/` (rechtenvrij: hero home,
   productkaarten, over-ons) → nog te vervangen door eigen beeldmateriaal.
 - **Partnerlogo's** in `public/images/placeholders/logos/*.svg` zijn tekst-
@@ -62,6 +60,39 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   een echte `MAIL_MAILER` (nu `smtp` met dummy-from); mailfouten worden enkel
   gelogd, de lead gaat nooit verloren.
 
+## Realisaties (eigen post-type)
+
+Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zodat
+één project op meerdere pagina's kan verschijnen en de klant het op één plek beheert.
+
+- **Website → Realisaties** (`RealisatieResource`): titel, plaats, categorieën,
+  optionele omschrijving, zichtbaarheid en de foto's (repeater met
+  `MediaPickerField`; de eerste foto is de cover). De rijen zijn sleepbaar
+  (`position`) — díe volgorde is meteen de volgorde op de site.
+- **Website → Realisatie-categorieën** (`RealisatieCategoryResource`): vrij aan te
+  maken (Ramen en deuren, Veranda's en overkappingen, Zonwering, Rolluiken en
+  poorten). Many-to-many, dus een project mag in meerdere categorieën. Nieuwe
+  categorieën kunnen ook rechtstreeks vanuit het realisatie-formulier.
+- **Tabellen:** `realisaties` (foto's als JSON `[{src, alt}]`),
+  `realisatie_categories`, pivot `category_realisatie`.
+- **Galerij-sectie** heeft een veld **Bron**: "Mijn realisaties" (standaard) of
+  "Losse foto's in deze sectie" (het oude gedrag; secties zonder `source` staan
+  automatisch op handmatig, dus bestaande content blijft werken). Bij realisaties
+  kies je *Alle* (optioneel gefilterd op categorie) of *Zelf kiezen*, met een
+  optioneel maximum. `App\Support\GalleryItems::forSection()` zet beide bronnen om
+  naar dezelfde itemlijst voor de blade.
+- **Productpagina's filteren op categorie**, niet op een vaste lijst: een nieuwe
+  realisatie in "Veranda's" verschijnt vanzelf op /verandas.
+- **Import/koppeling** (idempotent, ook op prod na een deploy):
+  `php artisan db:seed --class=RealisatiesSeeder --force`. Die maakt de categorieën,
+  importeert de projecten uit `database/data/realisaties.php` (enkel wat nog niet
+  bestaat — admin-bewerkingen worden nooit overschreven), zet de galerij-secties op
+  de gemapte pagina's op bron "realisaties" en vervangt de placeholder-hero van
+  /realisaties. De pagina→set-mapping staat in `App\Support\Realisaties`.
+- Let op: de oude "andere cover per pagina"-truc (`['knokke', 2]`) is weg — de
+  cover is nu gewoon de eerste foto van de realisatie, herordenbaar in de admin.
+- Tests: `tests/Feature/RealisatiesTest.php`, `tests/Feature/AdminSmokeTest.php`.
+
 ## Stack & structuur
 
 - Admin op `/admin` (Filament), sidebar-groep **Website**: Pagina's, Media,
@@ -75,7 +106,7 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   3. een `Block::make('<type_snake_case>')` in `PageSectionsBuilder::blocks()`
 - **Sectietypes:** hero (met `height` groot/compact + `highlights`-chips),
   partners (logo-strip), text_media, cards (icon óf image), gallery (met
-  Alpine-lightbox), reviews (testimonials + score), faq, formulier, cta.
+  Alpine-lightbox; put uit de realisaties of uit losse foto's), reviews (testimonials + score), faq, formulier, cta.
 - **Gedeelde frontend-primitives:** `<x-site.picture>` (WebP+JPG via
   `WebsiteMedia` of lokale sibling-detectie), `<x-site.btn>` (primary/secondary/
   ghost), `<x-site.section-heading>` (eyebrow/titel/intro).

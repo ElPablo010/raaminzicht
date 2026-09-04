@@ -23,6 +23,10 @@ class HomepageSeeder extends Seeder
 {
     public function run(): void
     {
+        // De galerijen putten uit het realisaties-post-type, dus die records
+        // moeten er eerst zijn.
+        $this->call(RealisatiesSeeder::class);
+
         $this->seedSettings();
         $this->seedMenus();
         $this->seedPages();
@@ -350,7 +354,7 @@ class HomepageSeeder extends Seeder
                     'heading' => 'Recent werk uit de buurt',
                     'intro' => '<p>Een greep uit onze projecten in Heist-op-den-Berg en omstreken.</p>',
                     'columns' => '3',
-                    'items' => Realisaties::galleryItems('home'),
+                    ...Realisaties::gallerySource('home'),
                 ]],
                 $this->reviews('white'),
                 $this->faq($this->homeFaq(), 'light'),
@@ -423,7 +427,7 @@ class HomepageSeeder extends Seeder
                     'eyebrow' => 'Realisaties',
                     'heading' => 'Een greep uit ons werk',
                     'columns' => '3',
-                    'items' => Realisaties::galleryItems(Realisaties::setForPage($slug) ?? 'all'),
+                    ...Realisaties::gallerySource(Realisaties::setForPage($slug) ?? 'all'),
                 ]],
                 $this->reviews('light'),
                 $this->faq($faq, 'white'),
@@ -590,7 +594,7 @@ class HomepageSeeder extends Seeder
                     'heading' => 'Recente projecten',
                     'intro' => '<p>Elk project is maatwerk. Laat u inspireren door een selectie van ons werk.</p>',
                     'columns' => '3',
-                    'items' => Realisaties::galleryItems('all'),
+                    ...Realisaties::gallerySource('all'),
                 ]],
                 $this->reviews('light'),
                 $this->offerteForm('Ook zo’n resultaat in huis?'),
