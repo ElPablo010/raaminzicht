@@ -114,9 +114,12 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
 - **Sectie-contract** van de actie-applier is afgestemd op dit project:
   `hero` → `prose` (heading + body) → `faq` → `cta`. De gekloonde CTA-knop volgt
   het `CtaLinkSchema`-contract (`link_type` + `page_id` + `href`).
-- **Queue-worker vereist** (`QUEUE_CONNECTION=database`): verversen, acties en
-  keyword-onderzoek zijn jobs. Op Combell dus een cron voor `schedule:run` (elke
-  minuut) én `queue:work --stop-when-empty` (of `queue:work` onder supervisor).
+- **Queue via de scheduler** (`QUEUE_CONNECTION=database`): verversen, acties en
+  keyword-onderzoek zijn jobs. `routes/console.php` plant elke minuut een
+  `queue:work --stop-when-empty`; op Combell staat sinds 04/09/2026 in `~/.crontab`
+  een per-minuut-cron voor `schedule:run` (geverifieerd met `QueueHealthCheckJob`:
+  dispatch → `Cache::get('queue_health_check')` binnen een minuut). Lokaal:
+  `php artisan schedule:work` of `queue:work`.
 - Migraties: `2026_06_01_1200xx_create_seo_*` + `create_gsc_*` (9 tabellen) en
   de leads-attributie-migratie — `php artisan migrate` lokaal en op prod.
 - Tests: `SeoModuleTest`, `LeadAttributionTest`, `SeoLeadsPageTest`,
