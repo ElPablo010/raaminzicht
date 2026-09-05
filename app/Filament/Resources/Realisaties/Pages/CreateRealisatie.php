@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Realisaties\Pages;
 
+use App\Filament\Concerns\ManagesRealisatiePhotos;
 use App\Filament\Resources\Realisaties\RealisatieResource;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateRealisatie extends CreateRecord
 {
+    use ManagesRealisatiePhotos;
+
     protected static string $resource = RealisatieResource::class;
 
     public function getTitle(): string

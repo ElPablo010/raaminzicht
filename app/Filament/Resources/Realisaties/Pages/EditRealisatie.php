@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Realisaties\Pages;
 
+use App\Filament\Concerns\ManagesRealisatiePhotos;
 use App\Filament\Resources\Realisaties\RealisatieResource;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -10,6 +11,8 @@ use Filament\Support\Icons\Heroicon;
 
 class EditRealisatie extends EditRecord
 {
+    use ManagesRealisatiePhotos;
+
     protected static string $resource = RealisatieResource::class;
 
     protected function getHeaderActions(): array

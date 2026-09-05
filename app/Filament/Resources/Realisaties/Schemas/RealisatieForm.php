@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\Realisaties\Schemas;
 
-use App\Filament\Schemas\Components\MediaPickerField;
-use App\Filament\Schemas\Sections\RepeaterToggleStyle;
+use App\Filament\Schemas\Components\GalleryUploadField;
 use App\Models\Realisatie;
 use App\Models\RealisatieCategory;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -61,24 +59,7 @@ class RealisatieForm
                 ->default(fn (): int => (int) Realisatie::max('position') + 1)
                 ->helperText('Laag getal = eerst. Makkelijker: sleep de rijen in de lijst.'),
 
-            Repeater::make('photos')
-                ->label("Foto's")
-                ->helperText('De eerste foto is de cover in het grid. Sleep om te herordenen.')
-                ->collapsible()
-                ->collapseAllAction(RepeaterToggleStyle::make())
-                ->expandAllAction(RepeaterToggleStyle::make())
-                ->schema([
-                    MediaPickerField::make('src', 'Foto', required: false),
-                    TextInput::make('alt')
-                        ->label('Alt-tekst')
-                        ->maxLength(255),
-                ])
-                ->columns(1)
-                ->defaultItems(1)
-                ->reorderable()
-                ->itemLabel(fn (array $state): ?string => $state['alt'] ?? null)
-                ->addActionLabel('Foto toevoegen')
-                ->columnSpanFull(),
+            GalleryUploadField::make('photo_files', "Foto's"),
         ]);
     }
 }

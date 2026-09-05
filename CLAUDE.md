@@ -66,9 +66,21 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
 één project op meerdere pagina's kan verschijnen en de klant het op één plek beheert.
 
 - **Website → Realisaties** (`RealisatieResource`): titel, plaats, categorieën,
-  optionele omschrijving, zichtbaarheid en de foto's (repeater met
-  `MediaPickerField`; de eerste foto is de cover). De rijen zijn sleepbaar
-  (`position`) — díe volgorde is meteen de volgorde op de site.
+  optionele omschrijving, zichtbaarheid en de foto's. De rijen in de lijst zijn
+  sleepbaar (`position`) — díe volgorde is meteen de volgorde op de site.
+- **Foto's = één drag-and-drop galerij-veld** (`GalleryUploadField`), geen rij
+  per foto: sleep een hele reeks in één keer naar binnen, herorden de miniaturen,
+  eerste = cover. Elke upload gaat door `WebsiteMediaService` (WebP + JPG, max
+  2400px, in de media-library); de veld-state is een platte lijst URL's.
+  Let op bij wijzigen: `fetchFileInformation(false)` is nodig omdat de waarden
+  URL's zijn en geen paden op de Filament-disk — zonder dat gooit Filament bij het
+  laden alles weg wat hij op die disk niet vindt.
+- **Alt-teksten worden niet per foto ingetypt** (dat was net het klikwerk dat
+  weg moest). `ManagesRealisatiePhotos` vertaalt tussen het veld en de opslag
+  `[{src, alt}]`: een foto die al een alt had houdt die (de handgeschreven
+  teksten uit de import blijven dus staan), een nieuwe foto krijgt
+  "Plaats — Titel". Nooit een lege alt. Wil de klant alt-teksten per foto kunnen
+  bewerken, dan is daar een apart veld voor nodig.
 - **Website → Realisatie-categorieën** (`RealisatieCategoryResource`): vrij aan te
   maken (Ramen en deuren, Veranda's en overkappingen, Zonwering, Rolluiken en
   poorten). Many-to-many, dus een project mag in meerdere categorieën. Nieuwe
