@@ -53,6 +53,13 @@ class RealisatiesSeeder extends Seeder
 
     private function seedRealisaties(): void
     {
+        // Eenmalige import: enkel in een lege tabel. Zodra de klant realisaties
+        // beheert (verwijdert, hernoemt, zelf aanmaakt met andere slugs) zou een
+        // slug-check per project de datafile er opnieuw naast importeren.
+        if (Realisatie::query()->exists()) {
+            return;
+        }
+
         $position = 0;
 
         foreach (Realisaties::projects() as $key => $project) {
@@ -110,9 +117,12 @@ class RealisatiesSeeder extends Seeder
 
             $source = Realisaties::gallerySource($set);
 
-            $page->sections()->where('section_type', 'gallery')->get()->each(
-                fn (PageSection $section) => $section->update(['content' => $source + $section->content]),
-            );
+            // Enkel galerijen die nog niet uit de realisaties putten. Een sectie
+            // die al op 'realisaties' staat is van de klant (eigen selectie,
+            // categorieën) en wordt niet meer overschreven.
+            $page->sections()->where('section_type', 'gallery')->get()
+                ->reject(fn (PageSection $section): bool => ($section->content['source'] ?? null) === 'realisaties')
+                ->each(fn (PageSection $section) => $section->update(['content' => $source + $section->content]));
 
             if ($page->slug === 'realisaties') {
                 $this->replacePlaceholderHero($page);

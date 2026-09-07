@@ -95,12 +95,18 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
   naar dezelfde itemlijst voor de blade.
 - **Productpagina's filteren op categorie**, niet op een vaste lijst: een nieuwe
   realisatie in "Veranda's" verschijnt vanzelf op /verandas.
-- **Import/koppeling** (idempotent, ook op prod na een deploy):
+- **Import/koppeling** (herhaalbaar, ook op prod na een deploy):
   `php artisan db:seed --class=RealisatiesSeeder --force`. Die maakt de categorieën,
-  importeert de projecten uit `database/data/realisaties.php` (enkel wat nog niet
-  bestaat — admin-bewerkingen worden nooit overschreven), zet de galerij-secties op
-  de gemapte pagina's op bron "realisaties" en vervangt de placeholder-hero van
-  /realisaties. De pagina→set-mapping staat in `App\Support\Realisaties`.
+  importeert de projecten uit `database/data/realisaties.php` **enkel in een lege
+  tabel** (de klant heeft op 07/09/2026 alle geseede projecten verwijderd en zelf
+  opnieuw ingevoerd met eigen slugs en geüploade foto's; een slug-check zou de
+  datafile er dan opnieuw naast zetten), zet galerij-secties die nog níet uit de
+  realisaties putten op bron "realisaties" (secties die al op realisaties staan
+  blijven van de klant) en vervangt de placeholder-hero van /realisaties. De
+  pagina→set-mapping staat in `App\Support\Realisaties`.
+- **Verdwenen realisaties in een selectie** (galerij op "Zelf kiezen") worden bij
+  het laden van het pagina-formulier stilletjes weggelaten (`GalleryFields`),
+  anders blokkeert Filament het opslaan met "Realisaties is ongeldig".
 - Let op: de oude "andere cover per pagina"-truc (`['knokke', 2]`) is weg — de
   cover is nu gewoon de eerste foto van de realisatie, herordenbaar in de admin.
 - Tests: `tests/Feature/RealisatiesTest.php`, `tests/Feature/AdminSmokeTest.php`.

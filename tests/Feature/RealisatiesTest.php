@@ -177,3 +177,50 @@ it('koppelt een productpagina aan de juiste categorie', function () {
     expect($content['realisatie_selection'])->toBe('all')
         ->and($content['realisatie_categories'])->toBe([$categoryId]);
 });
+
+it('laat verdwenen realisaties uit een selectie vallen zodat de pagina opslaat', function () {
+    $this->actingAs(\App\Models\User::factory()->create(['role' => \App\Enums\UserRole::Admin]));
+
+    $kept = Realisatie::create(['title' => 'A', 'location' => 'Retie', 'photos' => []]);
+
+    $page = Page::create(['title' => 'Home', 'slug' => 'home', 'locale' => 'nl', 'published' => true]);
+    $page->sections()->create([
+        'section_type' => 'gallery',
+        'position' => 0,
+        'content' => [
+            'columns' => '3',
+            'source' => 'realisaties',
+            'realisatie_selection' => 'pick',
+            // 999 bestaat niet (meer): de klant verwijderde en hermaakte projecten.
+            'realisatie_ids' => [999, $kept->id],
+        ],
+    ]);
+
+    \Livewire\Livewire::test(\App\Filament\Resources\Pages\Pages\EditPage::class, ['record' => $page->getKey()])
+        ->assertOk()
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($page->sections()->first()->content['realisatie_ids'])->toBe([$kept->id]);
+});
+
+it('importeert de datafile niet meer zodra de klant eigen realisaties heeft', function () {
+    Realisatie::create(['title' => 'Eigen project', 'location' => 'Lier', 'photos' => []]);
+
+    (new RealisatiesSeeder)->run();
+
+    expect(Realisatie::count())->toBe(1);
+});
+
+it('overschrijft een galerij die al uit de realisaties put niet', function () {
+    $page = Page::create(['title' => 'Home', 'slug' => 'home', 'locale' => 'nl', 'published' => true]);
+    $page->sections()->create([
+        'section_type' => 'gallery',
+        'position' => 0,
+        'content' => ['columns' => '3', 'source' => 'realisaties', 'realisatie_selection' => 'pick', 'realisatie_ids' => [42]],
+    ]);
+
+    (new RealisatiesSeeder)->run();
+
+    expect($page->sections()->first()->content['realisatie_ids'])->toBe([42]);
+});

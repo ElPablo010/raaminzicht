@@ -131,6 +131,23 @@ class GalleryFields
                     ->mapWithKeys(fn (Realisatie $r): array => [$r->id => $r->displayTitle()])
                     ->all())
                 ->helperText('De volgorde volgt de lijst op Website → Realisaties (daar kun je slepen).')
+                // Een realisatie die intussen verwijderd is mag het opslaan van de
+                // pagina niet blokkeren ("Realisaties is ongeldig"): laat verdwenen
+                // ID's stilletjes vallen bij het laden van het formulier.
+                ->afterStateHydrated(function (Select $component, mixed $state): void {
+                    $ids = array_values(array_filter((array) $state));
+
+                    if ($ids === []) {
+                        return;
+                    }
+
+                    $existing = Realisatie::query()->whereKey($ids)->pluck('id')->all();
+
+                    $component->state(array_values(array_filter(
+                        $ids,
+                        fn ($id): bool => in_array((int) $id, $existing, true),
+                    )));
+                })
                 ->visible(fn (Get $get): bool => ! self::isManual($get)
                     && ($get('realisatie_selection') ?? 'all') === 'pick'),
 
