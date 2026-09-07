@@ -37,6 +37,8 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Dashboard::class,
             ])
+            // Vaste volgorde van de zijbalk-groepen; Instellingen altijd onderaan.
+            ->navigationGroups(['Website', 'Groei', 'Instellingen'])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
@@ -58,6 +60,16 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
                 fn (): string => View::make('filament.admin.customizations')->render(),
+            )
+            // Oogje in de topbalk, net vóór het account-menu: één klik naar de site.
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => View::make('filament.admin.topbar-site-link')->render(),
+            )
+            // Uitloggen helemaal onderaan de zijbalk (onder de navigatie).
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): string => View::make('filament.admin.sidebar-logout')->render(),
             );
     }
 }

@@ -7,11 +7,14 @@ use App\Filament\Resources\RealisatieCategories\Pages\ListRealisatieCategories;
 use App\Filament\Resources\Realisaties\Pages\CreateRealisatie;
 use App\Filament\Resources\Realisaties\Pages\EditRealisatie;
 use App\Filament\Resources\Realisaties\Pages\ListRealisaties;
+use App\Filament\Resources\Realisaties\RealisatieResource;
+use App\Filament\Resources\WebsiteMedia\Pages\ListWebsiteMedia;
 use App\Models\Page;
 use App\Models\Realisatie;
 use App\Models\RealisatieCategory;
 use App\Models\User;
 use App\Models\WebsiteMedia;
+use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Livewire;
@@ -108,4 +111,56 @@ it('zet een gesleepte upload door de media-service om naar WebP + JPG', function
         ->and($media->width)->toBe(800)
         ->and(Storage::disk('public')->exists($media->path))->toBeTrue()
         ->and(Storage::disk('public')->exists($media->fallback_path))->toBeTrue();
+});
+
+it('linkt vanuit een realisatie rechtstreeks naar een nieuwe realisatie', function () {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+
+    $realisatie = Realisatie::create(['title' => 'Veranda', 'location' => 'Retie', 'photos' => []]);
+
+    Livewire::test(EditRealisatie::class, ['record' => $realisatie->getKey()])
+        ->assertOk()
+        ->assertActionExists('create')
+        ->assertSee('Nieuwe realisatie')
+        ->assertSee(RealisatieResource::getUrl('create'));
+});
+
+it('toont media-thumbnails met een absolute URL', function () {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+
+    // Root-relatieve URL zoals WebsiteMediaService die bewaart; Filament's
+    // ImageColumn zou die anders als disk-pad opzoeken en niets tonen.
+    WebsiteMedia::create([
+        'disk' => 'public',
+        'path' => 'website-media/thumb.webp',
+        'url' => '/storage/website-media/thumb.webp',
+        'mime' => 'image/webp',
+        'size_bytes' => 1024,
+        'width' => 800,
+        'height' => 600,
+        'original_filename' => 'thumb.jpg',
+    ]);
+
+    Livewire::test(ListWebsiteMedia::class)
+        ->assertOk()
+        ->assertSeeHtml('src="'.url('/storage/website-media/thumb.webp').'"');
+});
+
+it('zet Instellingen onderaan de zijbalk en toont uitloggen en het oogje naar de site', function () {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+
+    $response = $this->get('/admin')->assertOk();
+
+    // Groepsvolgorde uit de navigatie zelf (die woorden staan ook elders in de HTML).
+    $groups = array_values(array_filter(array_map(
+        fn (NavigationGroup $group): ?string => $group->getLabel(),
+        filament()->getNavigation(),
+    )));
+
+    expect($groups)->toBe(['Website', 'Groei', 'Instellingen']);
+
+    $response
+        ->assertSee('Uitloggen')
+        ->assertSee('Bekijk website')
+        ->assertSee(filament()->getLogoutUrl());
 });

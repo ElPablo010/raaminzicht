@@ -108,7 +108,15 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
 ## Stack & structuur
 
 - Admin op `/admin` (Filament), sidebar-groep **Website**: Pagina's, Media,
-  Menu's, Redirects, Header, Footer.
+  Menu's, Redirects, Realisaties, Realisatie-categorieën, Header, Footer.
+  Groepsvolgorde staat vast in `AdminPanelProvider::navigationGroups()`
+  (Website → Groei → Instellingen). Admin-chrome via render hooks in dezelfde
+  provider: oogje naar de site vóór het account-menu
+  (`filament/admin/topbar-site-link`) en een uitlogknop onderaan de zijbalk
+  (`filament/admin/sidebar-logout`).
+- **Media-URL's in Filament-kolommen altijd absoluut maken** (`url($record->url)`):
+  de opgeslagen URL's zijn root-relatief (`/storage/…`) en `ImageColumn` ziet
+  zo'n string als disk-pad, vindt het niet en rendert een lege `src`.
 - Publieke site: Blade + Livewire + Alpine, server-side gerenderd, catch-all
   route → `PublicPageController`.
 - Pagina-builder: secties als herordenbare blokken. Een **nieuw sectietype** =

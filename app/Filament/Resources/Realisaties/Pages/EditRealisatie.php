@@ -18,6 +18,14 @@ class EditRealisatie extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            // Rechtstreeks door naar een volgende realisatie zonder eerst via
+            // het overzicht te moeten — wie foto's van meerdere projecten
+            // ingeeft, doet dat na elkaar.
+            Action::make('create')
+                ->label('Nieuwe realisatie')
+                ->icon(Heroicon::OutlinedPlus)
+                ->color('gray')
+                ->url(RealisatieResource::getUrl('create')),
             Action::make('save')
                 ->label('Opslaan')
                 ->icon(Heroicon::OutlinedCheck)

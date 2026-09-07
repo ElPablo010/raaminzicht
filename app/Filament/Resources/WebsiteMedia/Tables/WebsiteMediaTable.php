@@ -27,7 +27,11 @@ class WebsiteMediaTable
             ->columns([
                 Stack::make([
                     ImageColumn::make('thumbnail')
-                        ->getStateUsing(fn (WebsiteMedia $record): string => $record->url)
+                        // Media-URL's zijn root-relatief ('/storage/…'). Filament's
+                        // ImageColumn ziet zo'n string niet als URL maar als pad op
+                        // de disk, vindt het daar niet en rendert een lege src.
+                        // Absoluut maken met url() omzeilt die disk-lookup.
+                        ->getStateUsing(fn (WebsiteMedia $record): string => url($record->url))
                         ->imageHeight('10rem')
                         ->imageWidth('100%')
                         // Inline style i.p.v. Tailwind-classes: Filament laadt de

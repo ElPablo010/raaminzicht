@@ -24,7 +24,9 @@ class RealisatiesTable
             ->columns([
                 ImageColumn::make('cover')
                     ->label('Cover')
-                    ->state(fn (Realisatie $record): ?string => $record->photoList()[0]['src'] ?? null)
+                    // Absolute URL, anders zoekt ImageColumn het root-relatieve pad
+                    // op de Filament-disk en toont hij niets (zie WebsiteMediaTable).
+                    ->state(fn (Realisatie $record): ?string => ($src = $record->photoList()[0]['src'] ?? null) ? url($src) : null)
                     ->height(48),
                 TextColumn::make('title')
                     ->label('Titel')
