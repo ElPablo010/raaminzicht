@@ -160,6 +160,38 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
   redirect-URI staat op die pagina; app op "In productie" zetten). Routes
   `/admin/search-console/oauth/{redirect,callback}` staan in `routes/web.php`
   vóór de catch-all.
+- **Analytics op hetzelfde scherm** (sinds 14/09/2026). Verkeer heeft nu twee
+  tabbladen met de kerncijfers van allebei erbóven, zodat je in één oogopslag
+  ziet of meer bezoek ook meer gedrag opleverde. *Uit Google Zoeken* houdt de
+  zoektermen, pagina's en kansen; *Op de site* toont de meest bekeken pagina's
+  en de kanalen. `$tab` is Livewire-state en `tables()` haalt enkel op wat het
+  actieve tabblad toont. Sync: `seo:sync-analytics` dagelijks 6:15
+  (`Ga4Collector`, tabellen `ga4_daily_metrics` + `ga4_dimension_metrics`).
+  - Property-ID in `ga4_property_id` — het **getal** uit Beheer →
+    Property-instellingen, niet het `G-XXXX` meet-ID uit de meetcode (dat staat
+    op Instellingen → Algemeen en voedt `components/site/analytics.blade.php`).
+  - In Google Cloud moeten de **Analytics Data API én de Admin API** aan staan.
+  - Het tabblad blijft leeg tot er gemeten is: Analytics heeft geen
+    terugwerkende kracht, anders dan de 16 maanden van Search Console.
+- **Eén Google-koppeling voor beide** (`App\Services\Google\GoogleApiClient`).
+  Het volledige inlogwerk — consent-URL, code inwisselen, access token halen en
+  cachen, `invalid_grant` afvangen, JWT voor een service account, de HTTP-laag —
+  staat in die basisklasse; `GoogleSearchConsoleService` en
+  `GoogleAnalyticsService` vullen enkel `serviceAccountScope()`, `apiBase()` en
+  `label()` in. `CONSENT_SCOPES` vraagt beide rechten in één keer en Google's
+  antwoord landt in `google_oauth_scopes`.
+  - De inloggegevens staan onder `google_*`; ze heetten vroeger `gsc_*` en de
+    migratie `move_google_credentials_to_shared_keys` verplaatst ze en ruimt de
+    oude rijen op. `gsc_site_url` blijft van Search Console.
+  - Een koppeling van vóór deze uitbreiding dekt enkel Search Console. Het
+    scherm toont dan "Analytics hangt er nog niet aan" plus de knop **"Analytics
+    mee koppelen"** — je hoeft de bestaande koppeling dus niet te verbreken.
+  - **De route- en klassenaam blijven bewust "gsc"**: de omleidings-URI staat zo
+    in Google Cloud geregistreerd en hernoemen breekt elke koppeling.
+- **De cijfers sluiten niet op elkaar aan, en dat hoort zo.** Analytics telt
+  enkel wie cookies aanvaardde, Search Console telt elke klik, de leads-laag
+  telt iedereen. Vergelijk verhoudingen binnen één bron, geen absolute aantallen
+  tussen bronnen. Daarom staat er (nog) géén conversiegraad per pagina.
 - **Leads-meting**: de bestaande `leads`-tabel ís het conversie-grootboek. De
   migratie `2026_09_04_180000_add_attribution_to_leads_table` voegt kanaal,
   landingspagina, referrer en utm's toe; `Lead::booted()` vult die automatisch
@@ -180,6 +212,8 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
 - Migraties: `2026_06_01_1200xx_create_seo_*` + `create_gsc_*` (9 tabellen) en
   de leads-attributie-migratie — `php artisan migrate` lokaal en op prod.
 - Tests: `SeoModuleTest`, `LeadAttributionTest`, `SeoLeadsPageTest`,
+  `GoogleApiClientTest` (de gedeelde inloglaag, op een verzonnen subklasse),
+  `AnalyticsCollectorTest` (GA4-sync + tweede tabblad),
   `SearchConsoleTest`, `SeoKeywordSuggestTest` in `tests/Feature/`.
 
 ## Redirects van de oude site
@@ -217,18 +251,78 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   gebruiker. Commando's moeten letterlijk met `ssh raaminzichtbe@176.62.165.220`
   beginnen om de permissieregel te matchen.
 
-### Livegang-checklist (DNS www.raaminzicht.be → Combell)
+### Livegang-checklist (domein www.raaminzicht.be → Combell)
 
-1. `APP_URL=https://www.raaminzicht.be` in de server-`.env` (nu nog
+Stand op 07/09/2026: het domein staat bij **one.com** (registrar én nameservers
+ns01/ns02.one.com), de mailboxen draaien op one.com-mailservers (MX), er is geen
+SPF/DMARC, en **DNSSEC staat aan** (DS-records van one.com bij DNS Belgium). De
+klant heeft geen toegang tot het one.com-paneel (vorige webdeveloper, gestopt).
+Oude-site-redirects zijn op 07/09/2026 volledig getest op de preview-URL: alle
+891 sitemap-URL's landen op een 200.
+
+**A. Voorbereiden (kan nu al, DNS speelt geen rol)**
+
+1. **Houder controleren** in de web-whois op dnsbelgium.be: wie staat als houder
+   en met welk e-mailadres? Is dat Raaminzicht met een werkend adres → ok. Is het
+   de oude developer of een dood adres → eerst houderwijziging via DNS Belgium
+   (bewijs: KBO-uittreksel van de BV). Parallel evt. one.com-support vragen om
+   accounttoegang met hetzelfde bewijs (handig voor het overzicht van mailboxen
+   en aliassen, niet strikt nodig).
+2. **Mailboxen inventariseren**: welke adressen, aliassen, doorstuurregels, wie
+   leest ze op welk toestel (vermoedelijk Outlook), en de mailboxwachtwoorden
+   (= wat Outlook gebruikt; ook geldig op webmail.one.com).
+3. **Mailboxen aanmaken bij Combell** (controlepaneel → E-mail) vóór de
+   migratie; de tool heeft ze als bestemming nodig. Servergegevens noteren
+   (normaal `imap.mailprotect.be`:993 en `smtp-auth.mailprotect.be`:587,
+   gebruikersnaam = volledig adres; nakijken in het paneel).
+4. **Mail kopiëren** met de migratietool van Combell: bron `imap.one.com`:993 +
+   adres + one.com-wachtwoord, doel = nieuwe mailbox. Alternatief vanaf de Mac
+   (herhaalbaar, tweede run = enkel delta):
+   `imapsync --host1 imap.one.com --user1 <adres> --password1 '…' --host2 imap.mailprotect.be --user2 <adres> --password2 '…'`.
+   Wachtwoord onbekend → enkel via Outlook: Combell-account **handmatig** (IMAP,
+   servernamen hierboven, geen auto-detectie want die volgt de DNS naar one.com)
+   toevoegen en mappen slepen, of in klassiek Outlook exporteren naar .pst en
+   importeren (nieuwe Outlook kan geen .pst importeren). Controleren via de
+   Combell-webmail.
+5. **DNS-zone bij Combell volledig klaarzetten** vóór de nameservers switchen:
+   A-records `raaminzicht.be` + `www` → 176.62.165.220, MX van Combell, SPF, en
+   het Google Search Console TXT-record (`google-site-verification=…`, naam
+   leeg/`@`, TTL 3600). Zonder MX bouncen inkomende mails.
+6. `APP_URL=https://www.raaminzicht.be` in de server-`.env` (nu nog
    `raaminzicht.dewebgoeroe.be`, waardoor canonical/og:url naar een dood
    subdomein wijzen) + `php artisan optimize`.
-2. `php artisan db:seed --class=LegalPagesSeeder --force` op prod: vult en
+7. `php artisan db:seed --class=LegalPagesSeeder --force` op prod: vult en
    **publiceert** privacyverklaring + cookiebeleid en koppelt ze aan de footer
    (zie "Juridische pagina's" hieronder).
-3. `ProductSlugsSeeder` (roept RedirectsSeeder aan) draaien op prod en steekproef nemen.
-4. SSL-certificaat voor www.raaminzicht.be activeren in Combell (anders 403).
-5. Later, op basis van Search Console-data: eventueel enkele échte regiopagina's
-   (gemeenten met realisaties) en die als exacte redirect boven het patroon zetten.
+8. `ProductSlugsSeeder` (roept RedirectsSeeder aan) draaien op prod en steekproef nemen.
+
+**B. Transfer (pas na A, mail eerst)**
+
+9. **Transfercode aanvragen** rechtstreeks bij DNS Belgium ("transfercode
+   aanvragen" op dnsbelgium.be; wordt naar het houder-adres gestuurd), niet via
+   het one.com-paneel. Transfer starten bij Combell met die code; een .be-transfer
+   is meestal binnen enkele uren rond en de nameservers gaan dan naar Combell.
+10. **DNSSEC**: Combell expliciet vragen om de one.com-DS-records te verwijderen
+    of te vervangen door eigen sleutels. Anders is site én mail na de transfer
+    onbereikbaar voor validerende resolvers.
+11. SSL-certificaat voor www.raaminzicht.be activeren in Combell (anders 403).
+12. Search Console: op "Verifiëren" klikken (TXT-record uit stap 5) en de
+    OAuth-koppeling op Groei → Verkeer nakijken.
+
+**C. Nazorg**
+
+13. Migratietool/imapsync nog één keer draaien voor mails die tijdens de
+    overgang nog bij one.com toekwamen.
+14. Outlook van de klant: Combell-account toevoegen (auto-detectie werkt nu wel
+    via de DNS), Outlook synct alles wat gemigreerd is; **uitgaande server (SMTP)
+    ook op Combell** zetten, anders vertrekt mail nog via one.com. Het oude
+    one.com-account laten staan tot de opzegging.
+15. Redirects + productpagina's steekproefsgewijs testen op www.raaminzicht.be.
+16. **one.com pas na 2–4 weken opzeggen**, nooit vóór de transfer (dan verdwijnen
+    domein én mail). Let op: oude WordPress-URL's doen nu twee hops (slash-strip
+    301 + redirect 301); werkt voor Google, één hop zou netter zijn.
+17. Later, op basis van Search Console-data: eventueel enkele échte regiopagina's
+    (gemeenten met realisaties) en die als exacte redirect boven het patroon zetten.
 
 ## Juridische pagina's & cookies
 

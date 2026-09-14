@@ -20,6 +20,12 @@ Schedule::command('queue:work --stop-when-empty --queue=default --tries=3')
 // Groei-meetlaag: gemeten Google-verkeer uit Search Console (gratis, geen credits).
 Schedule::command('seo:sync-search-console')->dailyAt('6:00')->withoutOverlapping();
 
+// Groei-meetlaag: gemeten gedrag óp de site uit Google Analytics. Een kwartier
+// ná Search Console, zodat twee API-syncs elkaar niet in de weg zitten op een
+// trage shared host. GA4 kent geen "definitieve" dagen zoals Search Console,
+// dus ook hier een rollend venster dat de laatste dagen telkens overschrijft.
+Schedule::command('seo:sync-analytics')->dailyAt('6:15')->withoutOverlapping();
+
 // Wekelijkse SEO-cijfers + AI-briefing + actie-voorstellen (maandag 7:00).
 // Bewust uitgeschakeld tot de schakelaar op Groei → Instellingen aan staat:
 // de code is voorzien, maar het wekelijkse AI-gebeuren is nog niet geactiveerd.
