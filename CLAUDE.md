@@ -145,10 +145,25 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
 Sidebar-groep **Groei**: Overzicht (`SeoDashboard`), Verkeer (`SearchConsole`,
 gemeten Google-verkeer via OAuth), Leads (`SeoLeads`, first-party conversies +
 nulmeting), Keywords (`SeoKeywordResource`, incl. "Stel keywords voor"), Acties
-(`SeoActions`, goedkeuringsdashboard) en Instellingen (`SeoSettings`). De
+(`SeoActions`, goedkeuringsdashboard) en **SEO-instellingen** (`SeoSettings`). De
 app-brede AI-config (Anthropic-key, merknaam, omschrijving, "Feiten voor AI")
 staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
 `ANTHROPIC_API_KEY` via `config('services.anthropic.api_key')`.
+
+**Instelwerk en cijfers staan strikt gescheiden** (sinds 14/09/2026). Álles wat
+je invult staat op **Groei → SEO-instellingen**: de Google-koppeling met
+client-ID/secret en omleidings-URI, de knoppen "Verbinden met Google", "Andere
+site kiezen", "Andere property kiezen" en "Koppeling verbreken", het GA4-meet-ID
+en property-ID, DataForSEO, de GEO-prompts, de rapport-ontvanger en de
+briefing-schakelaar. De koppelknoppen hangen als `Section::headerActions()` aan
+de sectie waar ze over gaan.
+
+Het item heet bewust **"SEO-instellingen"** en niet "Instellingen": de sidebar
+heeft al een gróep met die naam. Het **Verkeer**-scherm houdt enkel de twee
+ververs-knoppen plus een doorverwijzing; z'n lege toestanden linken naar
+`SeoSettings::getUrl()`, en de OAuth-callback keert daar ook naartoe terug.
+`SeoSettings` draagt nu óók de `isAdmin()`-check, want de credentials die daar
+staan zijn gevoeliger dan de cijfers.
 
 - **Wekelijkse AI-briefing staat bewust UIT.** De code (`seo:weekly-report`,
   mail, actie-generatie) is voorzien, maar de cron in `routes/console.php` draait
@@ -169,7 +184,7 @@ staat op **Instellingen → Algemeen** (`GeneralSettings`); `.env`-fallback
   (`Ga4Collector`, tabellen `ga4_daily_metrics` + `ga4_dimension_metrics`).
   - Property-ID in `ga4_property_id` — het **getal** uit Beheer →
     Property-instellingen, niet het `G-XXXX` meet-ID uit de meetcode (dat staat
-    op Instellingen → Algemeen en voedt `components/site/analytics.blade.php`).
+    op Groei → SEO-instellingen en voedt `components/site/analytics.blade.php`).
   - In Google Cloud moeten de **Analytics Data API én de Admin API** aan staan.
   - Het tabblad blijft leeg tot er gemeten is: Analytics heeft geen
     terugwerkende kracht, anders dan de 16 maanden van Search Console.
