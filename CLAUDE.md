@@ -191,6 +191,18 @@ staan zijn gevoeliger dan de cijfers.
     Property-instellingen, niet het `G-XXXX` meet-ID uit de meetcode (dat staat
     op Groei → SEO-instellingen en voedt `components/site/analytics.blade.php`).
   - In Google Cloud moeten de **Analytics Data API én de Admin API** aan staan.
+    Staat de Data API uit, dan weigert Google met een 403 en komt er geen rij
+    binnen; de ververs-knop toont dan Google's eigen zin, inclusief het
+    projectnummer en de link om hem aan te zetten.
+  - **Een ververs-knop die niets oplevert zegt waaróm.** `GoogleApiClient`
+    houdt de laatste fout bij (`lastError()`, met Google's `error.message`),
+    de collectors geven die door als `error` in hun `sync()`-resultaat, en het
+    Verkeer-scherm splitst dat in "Google weigerde de opvraging" (instelfout,
+    zelf oplossen) en "Nog geen cijfers bij Google" (koppeling werkt, wachten).
+    `php artisan seo:sync-analytics` / `seo:sync-search-console` drukken
+    diezelfde reden af en geven exitcode 1. Die fouten loggen bewust als
+    **error** en niet als warning: op Combell staat `LOG_LEVEL=error`, en dan
+    zou net de verklarende regel wegvallen.
   - Het tabblad blijft leeg tot er gemeten is: Analytics heeft geen
     terugwerkende kracht, anders dan de 16 maanden van Search Console.
 - **Eén Google-koppeling voor beide** (`App\Services\Google\GoogleApiClient`).
