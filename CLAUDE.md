@@ -109,6 +109,11 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
   anders blokkeert Filament het opslaan met "Realisaties is ongeldig".
 - Let op: de oude "andere cover per pagina"-truc (`['knokke', 2]`) is weg — de
   cover is nu gewoon de eerste foto van de realisatie, herordenbaar in de admin.
+- **`photos` is een MySQL `json`-kolom, en MySQL sorteert de sleutels binnen elk
+  object zelf** (`alt` vóór `src`, terwijl wij `src` eerst wegschrijven). Lees je
+  die kolom terug in een test, vergelijk dan met `toEqual` en niet met `toBe`:
+  strikt vergelijken faalt op een volgorde die de database nooit belooft. De
+  vólgorde van de foto's zelf blijft wél hard vergeleken — dat zijn lijstindexen.
 - Tests: `tests/Feature/RealisatiesTest.php`, `tests/Feature/AdminSmokeTest.php`.
 
 ## Stack & structuur

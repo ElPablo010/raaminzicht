@@ -80,7 +80,13 @@ it('bewaart de foto-volgorde en houdt bestaande alt-teksten', function () {
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($realisatie->fresh()->photos)->toBe([
+    // toEqual, niet toBe: MySQL bewaart een `json`-kolom als een écht
+    // JSON-document en sorteert de sleutels binnen elk object zelf (`alt` vóór
+    // `src`). Wij schrijven `src` eerst weg, dus een strikte vergelijking faalt
+    // op iets wat de database nooit belooft. De vólgorde van de foto's — waar
+    // deze test over gaat — blijft wél hard vergeleken: dat zijn lijstindexen,
+    // en die laat `toEqual` niet schuiven.
+    expect($realisatie->fresh()->photos)->toEqual([
         ['src' => '/images/realisaties/bonheiden/02.jpg', 'alt' => 'Rij nieuwbouwwoningen'],
         // Nieuwe foto: geen alt bekend, dus de projectnaam.
         ['src' => '/storage/website-media/nieuw.webp', 'alt' => 'Bonheiden — Ramen en deuren'],
