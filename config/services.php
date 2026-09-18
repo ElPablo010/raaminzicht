@@ -30,6 +30,25 @@ return [
 
     'anthropic' => [
         'api_key' => env('ANTHROPIC_API_KEY'),
+
+        /*
+         * Het model per soort klus, niet per klasse. Wie het model in de
+         * service zelf hardcodeert, krijgt na drie features drie verschillende
+         * modellen zonder dat iemand dat besloot — en een model dat er bij het
+         * schrijven toevallig stond, blijft daar jaren staan.
+         *
+         * `reasoning` is het denkwerk: SEO-advies, verbeteracties en volledige
+         * landingspagina's uitschrijven. Daar telt de kwaliteit, dus een sterk
+         * model.
+         *
+         * Een project met een vertaallaag zet hier een tweede sleutel bij
+         * (`bulk`) voor het sleurwerk — korte strings omzetten, waar niets te
+         * bedenken valt. Deze site is eentalig, dus die sleutel staat hier
+         * bewust niet: geen dode config.
+         */
+        'models' => [
+            'reasoning' => env('ANTHROPIC_MODEL_REASONING', 'claude-sonnet-5'),
+        ],
     ],
 
     'slack' => [

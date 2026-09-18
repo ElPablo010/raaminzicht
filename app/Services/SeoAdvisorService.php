@@ -21,7 +21,11 @@ use Illuminate\Support\Str;
  */
 class SeoAdvisorService
 {
-    protected string $model = 'claude-sonnet-5';
+    /**
+     * Het "denkwerk"-model: SEO-advies, verbeteracties en landingspagina's.
+     * Uit config, nooit hier hardcoded — zie config/services.php.
+     */
+    protected string $model;
 
     /** Hoelang een afgehandeld voorstel een identiek nieuw voorstel blokkeert. */
     protected const DEDUPE_DAYS = 90;
@@ -56,6 +60,7 @@ class SeoAdvisorService
 
     public function __construct(protected DataForSeoService $api)
     {
+        $this->model = config('services.anthropic.models.reasoning', 'claude-sonnet-5');
     }
 
     /**
@@ -1022,7 +1027,24 @@ PROMPT;
                 return [];
             }
 
-            $text = trim((string) $response->json('content.0.text', ''));
+            // Via firstTextBlock(), niet `content.0.text`: denkt het model bij
+            // deze prompt hardop, dan is blok 0 een thinking-blok met lege
+            // tekst. Dat leverde stilzwijgend nul seeds op, waarna DataForSEO
+            // enkel het kale domein als zoekterm kreeg en het hele onderzoek
+            // zonder één foutmelding leeg terugkwam. Of er gedacht wordt hangt
+            // af van de prompt, niet van het model — dus "het werkte vorige
+            // week" zegt hier niets.
+            $text = $this->firstTextBlock($response->json('content', []));
+
+            if ($text === null) {
+                Log::warning('Keyword-seeds: geen tekstblok in het antwoord', [
+                    'stop_reason' => $response->json('stop_reason'),
+                    'types' => array_map(fn ($b) => $b['type'] ?? '?', $response->json('content', [])),
+                ]);
+
+                return [];
+            }
+
             $text = preg_replace('/^```(?:json)?|```$/m', '', $text);
             $decoded = json_decode(trim($text), true);
 
