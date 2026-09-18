@@ -26,8 +26,8 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   optimize). Preview-URL: https://raaminzichtbe.webhosting.be (het subdomein
   raaminzicht.dewebgoeroe.be geeft 404/403 en is niet meer gekoppeld); het echte
   domein www.raaminzicht.be wijst nog naar de oude WordPress-site bij one.com.
-  Deploy-stap voor "klaar en deploy" (SSH vanuit Claude wordt geblokkeerd, dus de
-  gebruiker draait dit zelf met `!`-prefix):
+  Deploy-stap voor "klaar en deploy" — Claude draait dit zelf; SSH is toegestaan
+  (zie "SSH vanuit Claude" verderop):
   `ssh raaminzichtbe@176.62.165.220 'bash ~/deploy.sh'` — en na content-
   migraties de bijhorende seeder(s) met `--force` (zie hieronder).
   Let op: de server heeft ooit gerebasede commits gehad; bij "diverged" eerst
