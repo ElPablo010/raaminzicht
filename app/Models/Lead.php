@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Log;
     'name',
     'email',
     'phone',
+    'street',
+    'postal_code',
+    'city',
     'subject',
     'appointment_at',
     'message',
@@ -53,6 +56,14 @@ class Lead extends Model
             'attachments' => 'array',
             'appointment_at' => 'datetime',
         ];
+    }
+
+    /** Adres op één regel ("Straat 1, 3200 Aarschot"), of null als er niets ingevuld is. */
+    public function addressLine(): ?string
+    {
+        $place = trim($this->postal_code.' '.$this->city);
+
+        return collect([$this->street, $place])->filter()->implode(', ') ?: null;
     }
 
     public function typeLabel(): string

@@ -48,6 +48,16 @@ class LeadForm extends Component
     #[Validate('nullable|string|max:40')]
     public string $phone = '';
 
+    /** Adres van de werf — optioneel, enkel bij een offerteaanvraag. */
+    #[Validate('nullable|string|max:160')]
+    public string $street = '';
+
+    #[Validate('nullable|string|max:10')]
+    public string $postalCode = '';
+
+    #[Validate('nullable|string|max:80')]
+    public string $city = '';
+
     /** @var array<int, string> Aangevinkte onderwerpen ("waarover gaat het?"). */
     #[Validate('nullable|array')]
     public array $selectedSubjects = [];
@@ -133,11 +143,16 @@ class LeadForm extends Component
             }
         }
 
+        $isOfferte = $resolvedType === 'offerte';
+
         $lead = Lead::create([
             'type' => $resolvedType,
             'name' => $data['name'],
             'email' => $data['email'],
             'phone' => $data['phone'] ?: null,
+            'street' => $isOfferte ? (trim($data['street']) ?: null) : null,
+            'postal_code' => $isOfferte ? (trim($data['postalCode']) ?: null) : null,
+            'city' => $isOfferte ? (trim($data['city']) ?: null) : null,
             'subject' => $resolvedType === 'offerte' ? (implode(', ', $data['selectedSubjects']) ?: null) : null,
             'message' => $data['message'] ?: null,
             'source_url' => url()->previous(),
@@ -155,7 +170,7 @@ class LeadForm extends Component
         }
 
         $this->submitted = true;
-        $this->reset(['name', 'email', 'phone', 'selectedSubjects', 'message', 'consent', 'attachments']);
+        $this->reset(['name', 'email', 'phone', 'street', 'postalCode', 'city', 'selectedSubjects', 'message', 'consent', 'attachments']);
 
         // Scroll terug naar het begin van de formuliersectie zodat de
         // bevestiging in beeld komt (de form stond mogelijk ver naar onder).

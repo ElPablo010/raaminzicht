@@ -144,6 +144,8 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
 - **Formulier** = `formulier`-sectie (`FormulierFields`: type offerte/contact/
   beide + onderwerpen + zijbalk) die de Livewire-component `App\Livewire\LeadForm`
   rendert (validatie NL, opslaan in `leads`, mailen via `LeadReceived`).
+  In offerte-modus vraagt het ook een optioneel adres (straat, postcode,
+  gemeente → `leads.street/postal_code/city`); bij contact wordt dat genegeerd.
 
 ## Groei-module (seo-analytics)
 
@@ -372,8 +374,8 @@ Oude-site-redirects zijn op 07/09/2026 volledig getest op de preview-URL: alle
 - **Teksten versioneren.** `LegalPagesSeeder::TEXT_VERSION` verhogen bij elke
   inhoudelijke tekstwijziging; de seeder overschrijft dan enkel tekst die nog
   exact de zijne is (md5-hash in Setting `legal_pages_seeded`), klant-edits in de
-  admin blijven staan (met waarschuwing). Huidige tekst = v2 (met Google
-  Analytics).
+  admin blijven staan (met waarschuwing). Huidige tekst = v3 (met Google
+  Analytics en het optionele werfadres bij een offerteaanvraag).
 - **Cookiebanner** (`components/site/cookie-consent.blade.php`, in de layout):
   functioneel altijd aan, analytics + marketing met toestemming; keuze in cookie
   `cookie_consent` (180 dagen). Gedragscontract voor tracking-scripts:

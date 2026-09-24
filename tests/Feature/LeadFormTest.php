@@ -102,3 +102,57 @@ it('resolves the contact type in "beide" mode', function () {
 
     expect(Lead::where('email', 'mia@example.be')->value('type'))->toBe('contact');
 });
+
+it('stores the optional address on an offerte and shows it in the mail', function () {
+    Mail::fake();
+    Setting::set(SiteFooter::KEY, ['contact' => ['email' => 'info@raaminzicht.be']]);
+
+    Livewire::test(LeadForm::class, ['type' => 'offerte'])
+        ->set('name', 'Jan Janssen')
+        ->set('email', 'jan@example.be')
+        ->set('street', ' Leuvensesteenweg 12 ')
+        ->set('postalCode', '3200')
+        ->set('city', 'Aarschot')
+        ->set('consent', true)
+        ->call('submit')
+        ->assertHasNoErrors()
+        ->assertSet('street', '');
+
+    $lead = Lead::where('email', 'jan@example.be')->first();
+    expect($lead->street)->toBe('Leuvensesteenweg 12')
+        ->and($lead->postal_code)->toBe('3200')
+        ->and($lead->city)->toBe('Aarschot')
+        ->and($lead->addressLine())->toBe('Leuvensesteenweg 12, 3200 Aarschot');
+
+    Mail::assertSent(LeadReceived::class, fn ($mail) => str_contains($mail->render(), 'Leuvensesteenweg 12, 3200 Aarschot'));
+});
+
+it('keeps the address optional and ignores it on a contact submission', function () {
+    Mail::fake();
+
+    Livewire::test(LeadForm::class, ['type' => 'offerte'])
+        ->set('name', 'Jan')
+        ->set('email', 'jan@example.be')
+        ->set('consent', true)
+        ->call('submit')
+        ->assertHasNoErrors();
+
+    Livewire::test(LeadForm::class, ['type' => 'beide'])
+        ->set('mode', 'contact')
+        ->set('name', 'Mia')
+        ->set('email', 'mia@example.be')
+        ->set('city', 'Aarschot')
+        ->set('consent', true)
+        ->call('submit')
+        ->assertHasNoErrors();
+
+    expect(Lead::where('email', 'jan@example.be')->first()->addressLine())->toBeNull()
+        ->and(Lead::where('email', 'mia@example.be')->value('city'))->toBeNull();
+});
+
+it('only shows the address fields in offerte mode', function () {
+    Livewire::test(LeadForm::class, ['type' => 'beide'])
+        ->assertSee('Straat en huisnummer')
+        ->set('mode', 'contact')
+        ->assertDontSee('Straat en huisnummer');
+});

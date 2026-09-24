@@ -38,7 +38,7 @@ class LegalPagesSeeder extends Seeder
     private const COOKIE_SLUGS = ['cookie-policy', 'cookiebeleid', 'cookie-beleid', 'cookies'];
 
     /** Verhogen bij elke inhoudelijke tekstwijziging (zie docblock). */
-    public const TEXT_VERSION = 2;
+    public const TEXT_VERSION = 3;
 
     public const SEEDED_KEY = 'legal_pages_seeded';
 
@@ -199,7 +199,7 @@ class LegalPagesSeeder extends Seeder
             <p>Hebt u vragen over deze verklaring of over de manier waarop we met uw gegevens omgaan, dan kunt u ons altijd bereiken via bovenstaande gegevens.</p>
 
             <h2>2. Welke gegevens verzamelen we?</h2>
-            <p><strong>Gegevens die u zelf aan ons bezorgt.</strong> Wanneer u een offerte aanvraagt, een vraag stelt via het contactformulier, een toonzaalafspraak inplant, ons belt of mailt, verwerken we de gegevens die u daarbij meedeelt: uw naam, e-mailadres, telefoonnummer, de onderwerpen waarin u interesse hebt, uw bericht, de gewenste datum en het tijdstip van een afspraak, en eventuele bijlagen zoals plannen of foto's van uw woning. Wordt u klant, dan verwerken we daarnaast uw adres en de gegevens die nodig zijn voor de opmeting, de bestelling, de plaatsing, de facturatie en de garantie.</p>
+            <p><strong>Gegevens die u zelf aan ons bezorgt.</strong> Wanneer u een offerte aanvraagt, een vraag stelt via het contactformulier, een toonzaalafspraak inplant, ons belt of mailt, verwerken we de gegevens die u daarbij meedeelt: uw naam, e-mailadres, telefoonnummer, bij een offerteaanvraag eventueel het adres van uw woning of werf, de onderwerpen waarin u interesse hebt, uw bericht, de gewenste datum en het tijdstip van een afspraak, en eventuele bijlagen zoals plannen of foto's van uw woning. Wordt u klant, dan verwerken we daarnaast uw adres en de gegevens die nodig zijn voor de opmeting, de bestelling, de plaatsing, de facturatie en de garantie.</p>
             <p><strong>Gegevens die automatisch verzameld worden.</strong> Bij een bezoek aan onze website registreren onze servers technische gegevens zoals uw IP-adres, het type browser en toestel, de bezochte pagina's en het tijdstip van uw bezoek. Tijdens uw bezoek onthouden we in uw sessie ook via welke weg u op de site terechtkwam (bijvoorbeeld via Google, een sociaal netwerk of rechtstreeks) en op welke pagina u binnenkwam. Die herkomst wordt enkel bij een aanvraag mee opgeslagen, zodat we weten welke kanalen voor ons werken. Deze gegevens zijn niet gekoppeld aan advertentieprofielen en worden niet gedeeld met advertentienetwerken.</p>
             <p>We verzamelen geen bijzondere categorieën van persoonsgegevens (zoals gezondheids- of financiële gegevens), tenzij u ze ons zelf meedeelt in een bericht.</p>
 

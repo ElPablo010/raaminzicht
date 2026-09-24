@@ -12,6 +12,10 @@
 
 **Telefoon:** {{ $lead->phone }}
 @endif
+@if ($lead->addressLine())
+
+**Adres:** {{ $lead->addressLine() }}
+@endif
 @if ($lead->subject)
 
 **Interesse:** {{ $lead->subject }}

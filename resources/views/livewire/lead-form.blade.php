@@ -52,6 +52,24 @@
                     @error('email') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                 </div>
 
+                @if ($mode === 'offerte')
+                    <div class="sm:col-span-2" wire:key="address-street">
+                        <label class="{{ $labelCls }}" for="lead-street">{{ $this->txt('label_street', 'Straat en huisnummer') }} <span class="font-normal text-primary-900/50">(optioneel)</span></label>
+                        <input id="lead-street" type="text" wire:model="street" autocomplete="street-address" class="{{ $field }} @error('street') {{ $fieldError }} @enderror" placeholder="{{ $this->txt('ph_street', 'Straatnaam 12') }}">
+                        @error('street') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div wire:key="address-postal">
+                        <label class="{{ $labelCls }}" for="lead-postal-code">{{ $this->txt('label_postal_code', 'Postcode') }}</label>
+                        <input id="lead-postal-code" type="text" wire:model="postalCode" autocomplete="postal-code" inputmode="numeric" class="{{ $field }} @error('postalCode') {{ $fieldError }} @enderror" placeholder="{{ $this->txt('ph_postal_code', '2220') }}">
+                        @error('postalCode') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                    <div wire:key="address-city">
+                        <label class="{{ $labelCls }}" for="lead-city">{{ $this->txt('label_city', 'Gemeente') }}</label>
+                        <input id="lead-city" type="text" wire:model="city" autocomplete="address-level2" class="{{ $field }} @error('city') {{ $fieldError }} @enderror" placeholder="{{ $this->txt('ph_city', 'Heist-op-den-Berg') }}">
+                        @error('city') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+                @endif
+
                 @if (! empty($subjects) && $mode === 'offerte')
                     <div class="sm:col-span-2">
                         <span class="{{ $labelCls }}">{{ $this->txt('label_subjects', 'Waarover gaat het?') }} <span class="font-normal text-primary-900/50">(meerdere mogelijk)</span></span>
