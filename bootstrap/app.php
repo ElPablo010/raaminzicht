@@ -12,6 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Globaal en vooraan, niet in de web-groep: het Filament-paneel (/admin)
+        // heeft een eigen middleware-stack en zou anders op de kale host blijven
+        // werken. Een bezoeker moet op de canonieke host landen vóór we een
+        // pagina of een DB-redirect opzoeken, anders redirect een oud pad twee keer.
+        $middleware->prepend(\App\Http\Middleware\RedirectToCanonicalHost::class);
+
         $middleware->web(append: [
             \App\Http\Middleware\HandleRedirects::class,
             \App\Http\Middleware\CaptureFirstTouch::class,

@@ -280,6 +280,13 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   04/09/2026 via mysqldump + rsync van `storage/app/public/website-media`).
   Slug-afhankelijke code (seeders, `Realisaties`) daarom tolerant houden en
   na een deploy op de preview-URL controleren, niet enkel lokaal.
+- **Canonieke host = `APP_URL` (`https://www.raaminzicht.be`).** `RedirectToCanonicalHost`
+  (globale middleware, `bootstrap/app.php`) stuurt `raaminzicht.be` met een 301 naar
+  `www.` voor GET/HEAD, ook op `/admin`. Reden: beide hosts wijzen bij Combell naar
+  dezelfde docroot, en de Google-OAuth-callback wordt uit de aanvraag-host opgebouwd
+  (`route()`), dus de kale host gaf `redirect_uri_mismatch`. In de OAuth-client in
+  Google Cloud (project *Client websites*) staan beide callbacks geregistreerd. Doet
+  niets lokaal of op de preview-URL, want enkel een `APP_URL` met `www.` activeert het.
 - **SSH vanuit Claude** is toegestaan via `.claude/settings.local.json`
   (buiten git): deploys, dumps en seeders op de server hoeven niet meer via de
   gebruiker. Commando's moeten letterlijk met `ssh raaminzichtbe@176.62.165.220`
