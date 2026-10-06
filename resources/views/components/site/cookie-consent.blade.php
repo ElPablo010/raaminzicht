@@ -3,7 +3,7 @@
     keuze wordt bewaard in de cookie `cookie_consent` (180 dagen).
 
     ── Gedragscontract (NIET wijzigen bij het herstylen) ─────────────────────
-    Tracking-scripts (Google Analytics in <x-site.analytics>, later evt. een
+    Tracking-scripts (Google Analytics in <x-seo-growth::site.analytics>, later evt. een
     Meta-pixel) checken vóór het laden:
 
         window.cookieConsent.has('analytics' | 'marketing' | 'functional')

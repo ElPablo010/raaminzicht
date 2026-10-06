@@ -2,9 +2,9 @@
 
 use App\Enums\UserRole;
 use App\Models\Page;
-use App\Models\SeoActionItem;
+use Webgoeroe\SeoGrowth\Models\SeoActionItem;
 use App\Models\User;
-use App\Services\SeoActionApplier;
+use Webgoeroe\SeoGrowth\Services\SeoActionApplier;
 
 function seoAdmin(): User
 {
@@ -95,4 +95,41 @@ it('merges an add_section FAQ into the existing FAQ block instead of adding a se
     expect($faqSections)->toHaveCount(1)
         ->and(array_column($faqSections->first()->content['items'], 'question'))
         ->toBe(['Wat kost zonwering?', 'Hoe lang gaat zonwering mee?']);
+});
+
+it('bewerkt het prose-tekstblok van een paginavoorstel in plaats van een onbekend blok toe te voegen', function () {
+    $item = SeoActionItem::create([
+        'action_type' => 'create_page',
+        'priority' => 'high',
+        'title' => 'Nieuwe pagina: schuiframen Aarschot',
+        'problem' => 'Geen pagina voor dit keyword.',
+        'source_keyword' => 'schuiframen aarschot',
+        'fingerprint' => sha1('test-edit-prose'),
+        'proposed' => [
+            'slug' => 'schuiframen-aarschot',
+            'meta_title' => 'Schuiframen in Aarschot',
+            'meta_description' => 'Alles over schuiframen.',
+            'sections' => [
+                ['section_type' => 'hero', 'content' => ['heading' => 'Schuiframen', 'subtitle' => 'Belofte']],
+                ['section_type' => 'prose', 'content' => ['heading' => 'Oud', 'body' => '<p>Oude tekst.</p>']],
+            ],
+        ],
+    ]);
+
+    $this->actingAs(seoAdmin());
+
+    Livewire\Livewire::test(Webgoeroe\SeoGrowth\Filament\Pages\SeoActions::class)
+        ->call('startEdit', $item->id)
+        ->assertSet('editForm.heading', 'Oud')
+        ->set('editForm.heading', 'Nieuw')
+        ->call('publish', $item->id);
+
+    $page = Page::where('slug', 'schuiframen-aarschot')->firstOrFail();
+
+    expect($page->sections->pluck('section_type')->all())->toBe(['hero', 'prose'])
+        ->and($page->sections->firstWhere('section_type', 'prose')->content['heading'])->toBe('Nieuw');
+});
+
+it('kiest prose als tekstblok van dit project', function () {
+    expect(Webgoeroe\SeoGrowth\Services\Seo\LandingPageBlueprint::sectionTypeFor('text'))->toBe('prose');
 });

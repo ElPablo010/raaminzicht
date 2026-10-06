@@ -56,7 +56,7 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   niet zelf; zijn team wel, onder zijn toezicht). Eenmalige migratie van bestaande
   content: `php artisan db:seed --class=ContactInfoSeeder --force` (ook op prod).
 - **Formulier-mail**: `LeadForm` mailt naar `info@raaminzicht.be` (uit de
-  Footer-settings) en slaat elke inzending op in de `leads`-tabel. Zet in prod
+  Footer-settings) en slaat elke inzending op in de `aanvragen`-tabel (model `Aanvraag`). Zet in prod
   een echte `MAIL_MAILER` (nu `smtp` met dummy-from); mailfouten worden enkel
   gelogd, de lead gaat nooit verloren.
 
@@ -143,11 +143,18 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
   ghost), `<x-site.section-heading>` (eyebrow/titel/intro).
 - **Formulier** = `formulier`-sectie (`FormulierFields`: type offerte/contact/
   beide + onderwerpen + zijbalk) die de Livewire-component `App\Livewire\LeadForm`
-  rendert (validatie NL, opslaan in `leads`, mailen via `LeadReceived`).
+  rendert (validatie NL, opslaan in `aanvragen`, mailen via `LeadReceived`).
   In offerte-modus vraagt het ook een optioneel adres (straat, postcode,
-  gemeente → `leads.street/postal_code/city`); bij contact wordt dat genegeerd.
+  gemeente → `aanvragen.street/postal_code/city`); bij contact wordt dat genegeerd.
 
-## Groei-module (seo-analytics)
+## Groei-module (package webgoeroe/seo-growth)
+
+De Groei-module komt uit de package **`webgoeroe/seo-growth`** (code in
+`Internal OS/Modules/repo/seo-growth`, private repo `ElPablo010/seo-growth`), niet
+meer uit gekopieerde bestanden. Pas de module nooit hier aan, maar in de package.
+Projecteigen afwijkingen staan in `config/seo-growth.php` (de types offerte,
+contact en afspraak). De planning (syncs 6:00/6:15, briefing maandag 7:00) en de
+OAuth-routes komen uit de package.
 
 Sidebar-groep **Groei**: Overzicht (`SeoDashboard`), Verkeer (`SearchConsole`,
 gemeten Google-verkeer via OAuth), Leads (`SeoLeads`, first-party conversies +
@@ -173,9 +180,9 @@ ververs-knoppen plus een doorverwijzing; z'n lege toestanden linken naar
 staan zijn gevoeliger dan de cijfers.
 
 - **Wekelijkse AI-briefing staat bewust UIT.** De code (`seo:weekly-report`,
-  mail, actie-generatie) is voorzien, maar de cron in `routes/console.php` draait
-  enkel als de schakelaar *Wekelijkse AI-briefing actief* op Groei → Instellingen
-  aan staat (Setting `seo_weekly_report_enabled`). Manueel blijft alles werken:
+  mail, actie-generatie) is voorzien, maar draait enkel als de schakelaar
+  *Wekelijkse AI-briefing actief* op Groei → SEO-instellingen aan staat (Setting
+  `seo_weekly_report_enabled`, op Raaminzicht uit). Manueel blijft alles werken:
   "Ververs cijfers", "Genereer acties nu", "Stel keywords voor".
 - **Search Console**: `seo:sync-search-console` dagelijks 6:00 (eerste run =
   16 maanden backfill). Koppelen op Groei → Verkeer (Google Cloud OAuth-client,
@@ -226,15 +233,20 @@ staan zijn gevoeliger dan de cijfers.
   enkel wie cookies aanvaardde, Search Console telt elke klik, de leads-laag
   telt iedereen. Vergelijk verhoudingen binnen één bron, geen absolute aantallen
   tussen bronnen. Daarom staat er (nog) géén conversiegraad per pagina.
-- **Leads-meting**: de bestaande `leads`-tabel ís het conversie-grootboek. De
-  migratie `2026_09_04_180000_add_attribution_to_leads_table` voegt kanaal,
-  landingspagina, referrer en utm's toe; `Lead::booted()` vult die automatisch
-  uit de sessie-first-touch (`Attribution` + middleware `CaptureFirstTouch` in
-  de `web`-groep). Formulieren hoeven niets te doen; nieuwe conversiepunten ook
-  niet zolang ze een `Lead` aanmaken. Type-labels in `Lead::TYPE_LABELS`.
-  Nulmeting-velden (`seo_live_since`, `seo_goal_leads_month`,
-  `seo_leads_baseline`) op het Leads-scherm.
-- **Sectie-contract** van de actie-applier is afgestemd op dit project:
+- **Aanvragen en leads zijn gescheiden** (sinds 6/10/2026). `aanvragen` (model
+  `Aanvraag`) is de aanvraag zelf: naam, adres, bijlagen, afspraak. `leads` is het
+  conversie-grootboek van de package: enkel type en herkomst (kanaal,
+  landingspagina, referrer, utm's), met een verwijzing naar de aanvraag
+  (`$aanvraag->lead`, `$lead->source`). `Aanvraag::booted()` registreert elke
+  nieuwe aanvraag met `Lead::record()`, dat de herkomst uit de sessie-first-touch
+  haalt (`Attribution` + middleware `CaptureFirstTouch`). Nieuwe formulieren
+  hoeven niets te doen zolang ze een `Aanvraag` aanmaken. Type-labels in
+  `Aanvraag::TYPE_LABELS`. De splitsing gebeurde met
+  `2026_10_06_120000_split_aanvragen_from_leads`. Nulmeting-velden
+  (`seo_live_since`, `seo_goal_leads_month`, `seo_leads_baseline`) op het
+  Leads-scherm.
+- **Sectie-contract**: de package herkent zelf dat het tekstblok hier `prose` heet
+  (eerste kandidaat met een view in `components/site/sections/`):
   `hero` → `prose` (heading + body) → `faq` → `cta`. De gekloonde CTA-knop volgt
   het `CtaLinkSchema`-contract (`link_type` + `page_id` + `href`).
 - **Queue via de scheduler** (`QUEUE_CONNECTION=database`): verversen, acties en

@@ -2,7 +2,7 @@
 
 use App\Livewire\AppointmentForm;
 use App\Mail\LeadReceived;
-use App\Models\Lead;
+use App\Models\Aanvraag;
 use App\Models\Setting;
 use App\Support\SiteFooter;
 use Illuminate\Support\Facades\Mail;
@@ -57,7 +57,7 @@ it('bewaart een afspraak-lead en mailt ze bij een geldige inzending', function (
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    $lead = Lead::where('email', 'eva@example.be')->first();
+    $lead = Aanvraag::where('email', 'eva@example.be')->first();
     expect($lead->type)->toBe('afspraak');
     expect($lead->appointment_at->format('Y-m-d H:i'))->toBe($date.' '.$time);
     Mail::assertSent(LeadReceived::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
@@ -84,7 +84,7 @@ it('weigert een tijdstip dat buiten de vensters valt', function () {
         ->call('submit')
         ->assertHasErrors(['time']);
 
-    expect(Lead::count())->toBe(0);
+    expect(Aanvraag::count())->toBe(0);
 });
 
 it('toont de afspraakpagina met het formulier', function () {

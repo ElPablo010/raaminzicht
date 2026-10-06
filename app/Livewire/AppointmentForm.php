@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Mail\LeadReceived;
-use App\Models\Lead;
+use App\Models\Aanvraag;
 use App\Support\SiteFooter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -196,7 +196,7 @@ class AppointmentForm extends Component
 
         $appointmentAt = Carbon::createFromFormat('Y-m-d H:i', $this->date.' '.$this->time);
 
-        $lead = Lead::create([
+        $lead = Aanvraag::create([
             'type' => 'afspraak',
             'name' => $this->name,
             'email' => $this->email,

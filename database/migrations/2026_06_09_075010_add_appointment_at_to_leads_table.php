@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             // Gewenst afspraakmoment bij een toonzaalbezoek (type 'afspraak').
             $table->dateTime('appointment_at')->nullable()->after('subject');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             $table->dropColumn('appointment_at');
         });
     }

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             // Bewaarde upload-paden (plannen/foto's bij een offerteaanvraag),
             // relatief op de 'local' (private) disk. JSON-array van strings.
             $table->json('attachments')->nullable()->after('source_url');
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             $table->dropColumn('attachments');
         });
     }

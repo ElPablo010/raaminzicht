@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Mail\LeadReceived;
-use App\Models\Lead;
+use App\Models\Aanvraag;
 use App\Support\SiteFooter;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
@@ -145,7 +145,7 @@ class LeadForm extends Component
 
         $isOfferte = $resolvedType === 'offerte';
 
-        $lead = Lead::create([
+        $lead = Aanvraag::create([
             'type' => $resolvedType,
             'name' => $data['name'],
             'email' => $data['email'],

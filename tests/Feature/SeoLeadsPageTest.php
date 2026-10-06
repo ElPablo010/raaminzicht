@@ -1,12 +1,13 @@
 <?php
 
-use App\Filament\Pages\SeoLeads;
-use App\Models\Lead;
+use Webgoeroe\SeoGrowth\Filament\Pages\SeoLeads;
+use App\Models\Aanvraag;
+use Webgoeroe\SeoGrowth\Models\Lead;
 use App\Models\Setting;
 use App\Enums\UserRole;
 use App\Models\User;
-use App\Support\Attribution;
-use App\Support\LeadStats;
+use Webgoeroe\SeoGrowth\Support\Attribution;
+use Webgoeroe\SeoGrowth\Support\LeadStats;
 use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
@@ -18,14 +19,17 @@ use function Pest\Laravel\get;
  */
 function leadRow(string $type, string $channel, string $path, ?string $referrer = null): Lead
 {
-    return Lead::create([
+    $aanvraag = Aanvraag::create([
         'type' => $type,
         'name' => 'Test',
         'email' => 'test@example.com',
-        'channel' => $channel,
-        'referrer_host' => $referrer,
-        'landing_path' => $path,
     ]);
+
+    // Aanvraag::booted registreert de lead; de herkomst zetten we hier zelf.
+    $lead = $aanvraag->lead;
+    $lead->update(['channel' => $channel, 'referrer_host' => $referrer, 'landing_path' => $path]);
+
+    return $lead;
 }
 
 beforeEach(fn () => actingAs(User::factory()->create(['role' => UserRole::Admin])));

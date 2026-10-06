@@ -2,7 +2,7 @@
 
 use App\Livewire\LeadForm;
 use App\Mail\LeadReceived;
-use App\Models\Lead;
+use App\Models\Aanvraag;
 use App\Models\Setting;
 use App\Support\SiteFooter;
 use Illuminate\Http\UploadedFile;
@@ -25,7 +25,7 @@ it('stores a lead and mails it on a valid offerte submission', function () {
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    expect(Lead::where('email', 'jan@example.be')->where('type', 'offerte')->value('subject'))
+    expect(Aanvraag::where('email', 'jan@example.be')->where('type', 'offerte')->value('subject'))
         ->toBe("Ramen & deuren, Veranda's");
     Mail::assertSent(LeadReceived::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
 });
@@ -40,7 +40,7 @@ it('validates required fields and consent', function () {
         ->call('submit')
         ->assertHasErrors(['name', 'email', 'consent']);
 
-    expect(Lead::count())->toBe(0);
+    expect(Aanvraag::count())->toBe(0);
     Mail::assertNothingSent();
 });
 
@@ -61,7 +61,7 @@ it('stores uploaded plans/photos and attaches them to the mail on an offerte', f
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    $lead = Lead::where('email', 'jan@example.be')->first();
+    $lead = Aanvraag::where('email', 'jan@example.be')->first();
     expect($lead->attachments)->toHaveCount(2);
     Storage::disk('local')->assertExists($lead->attachments[0]['path']);
     Mail::assertSent(LeadReceived::class, fn ($mail) => count($mail->attachments()) === 2);
@@ -80,7 +80,7 @@ it('ignores uploads when the resolved type is contact', function () {
         ->call('submit')
         ->assertSet('submitted', true);
 
-    expect(Lead::where('email', 'mia@example.be')->value('attachments'))->toBeNull();
+    expect(Aanvraag::where('email', 'mia@example.be')->value('attachments'))->toBeNull();
 });
 
 it('orders the tabs with the default mode first in "beide"', function () {
@@ -100,7 +100,7 @@ it('resolves the contact type in "beide" mode', function () {
         ->call('submit')
         ->assertSet('submitted', true);
 
-    expect(Lead::where('email', 'mia@example.be')->value('type'))->toBe('contact');
+    expect(Aanvraag::where('email', 'mia@example.be')->value('type'))->toBe('contact');
 });
 
 it('stores the optional address on an offerte and shows it in the mail', function () {
@@ -118,7 +118,7 @@ it('stores the optional address on an offerte and shows it in the mail', functio
         ->assertHasNoErrors()
         ->assertSet('street', '');
 
-    $lead = Lead::where('email', 'jan@example.be')->first();
+    $lead = Aanvraag::where('email', 'jan@example.be')->first();
     expect($lead->street)->toBe('Leuvensesteenweg 12')
         ->and($lead->postal_code)->toBe('3200')
         ->and($lead->city)->toBe('Aarschot')
@@ -146,8 +146,8 @@ it('keeps the address optional and ignores it on a contact submission', function
         ->call('submit')
         ->assertHasNoErrors();
 
-    expect(Lead::where('email', 'jan@example.be')->first()->addressLine())->toBeNull()
-        ->and(Lead::where('email', 'mia@example.be')->value('city'))->toBeNull();
+    expect(Aanvraag::where('email', 'jan@example.be')->first()->addressLine())->toBeNull()
+        ->and(Aanvraag::where('email', 'mia@example.be')->value('city'))->toBeNull();
 });
 
 it('only shows the address fields in offerte mode', function () {

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leads', function (Blueprint $table) {
+        Schema::create('aanvragen', function (Blueprint $table) {
             $table->id();
             $table->string('type')->default('offerte');   // offerte | contact
             $table->string('name');
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leads');
+        Schema::dropIfExists('aanvragen');
     }
 };

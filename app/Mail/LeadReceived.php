@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Lead;
+use App\Models\Aanvraag;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
@@ -14,7 +14,7 @@ class LeadReceived extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public function __construct(public Lead $lead)
+    public function __construct(public Aanvraag $lead)
     {
     }
 

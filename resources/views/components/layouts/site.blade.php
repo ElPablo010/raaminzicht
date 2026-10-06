@@ -57,7 +57,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 
-    <x-site.analytics />
+    <x-seo-growth::site.analytics />
 </head>
 <body class="min-h-screen">
     <x-site.header />

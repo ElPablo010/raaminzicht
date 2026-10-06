@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             // Optioneel adres van de werf bij een offerteaanvraag.
             $table->string('street')->nullable()->after('phone');
             $table->string('postal_code', 10)->nullable()->after('street');
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leads', function (Blueprint $table) {
+        Schema::table('aanvragen', function (Blueprint $table) {
             $table->dropColumn(['street', 'postal_code', 'city']);
         });
     }
