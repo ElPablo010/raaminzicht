@@ -1,6 +1,17 @@
+{{--
+    Eigen agenda bestaat alleen op Raaminzicht. Vraagt een andere site een eigen
+    agenda: niet opnieuw bouwen, maar deze agenda naar de core-package verhuizen
+    en Raaminzicht daarop overzetten. Zie Modules/wiki/modules.md → Beslissingen
+    (7 oktober 2026).
+
+    Agenda-sectie (`booking`, vroeger `afspraak`). `provider` kiest de agenda;
+    hier bestaat enkel 'eigen_agenda' (tijdsloten via App\Livewire\AppointmentForm).
+--}}
 @props(['section' => null, 'content' => []])
 
 @php
+    // Secties van vóór de provider-keuze (zonder sleutel) = eigen agenda.
+    $provider = ($content['provider'] ?? null) ?: 'eigen_agenda';
     $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
     $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $showSidebar = $content['show_sidebar'] ?? true;
@@ -22,6 +33,7 @@
         ->all();
 @endphp
 
+@if ($provider === 'eigen_agenda')
 <x-site.sections.wrapper :content="$content" class="{{ $bg }}">
     <div class="mx-auto max-w-7xl px-6 py-20 lg:py-28">
         <div class="grid items-start gap-12 {{ $showSidebar ? 'lg:grid-cols-5' : 'mx-auto max-w-2xl' }}">
@@ -80,3 +92,4 @@
         </div>
     </div>
 </x-site.sections.wrapper>
+@endif

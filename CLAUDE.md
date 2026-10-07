@@ -135,17 +135,32 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
   1. `resources/views/components/site/sections/<type-met-streepjes>.blade.php`
   2. `app/Filament/Schemas/Sections/<Type>Fields.php` (`static make(): array`)
   3. een `Block::make('<type_snake_case>')` in `PageSectionsBuilder::blocks()`
-- **Sectietypes:** hero (met `height` groot/compact + `highlights`-chips),
-  partners (logo-strip), text_media, cards (icon óf image), gallery (met
-  Alpine-lightbox; put uit de realisaties of uit losse foto's), reviews (testimonials + score), faq, formulier, cta.
+- **Sectietypes:** hero (met `height` compact/medium/tall + `highlights`-chips),
+  partners (logo-strip), text_media, text (full-width rich text), cards (icon óf
+  image), gallery (met Alpine-lightbox; put uit de realisaties of uit losse
+  foto's), reviews (testimonials + score, `items[]` met name/role/rating/quote/
+  image), faq, form, booking, cta.
+- **Core-standaard (sinds 07/10/2026)**, voorbereiding op een gedeelde
+  `core`-package: `prose` → `text`, `formulier` → `form`, `afspraak` → `booking`
+  (+ `provider`), reviews `reviews[]` → `items[]` (location → role, avatar →
+  image), hero `groot` → `tall` (+ nieuw `medium`). Omgezet met migratie
+  `2026_10_07_120000_align_section_types_with_core` (ook `seo_action_items.proposed`;
+  heeft een `down()`). Achtergronden zijn bewust níet hernoemd. Seeders en
+  tests gebruiken de nieuwe namen.
 - **Gedeelde frontend-primitives:** `<x-site.picture>` (WebP+JPG via
   `WebsiteMedia` of lokale sibling-detectie), `<x-site.btn>` (primary/secondary/
   ghost), `<x-site.section-heading>` (eyebrow/titel/intro).
-- **Formulier** = `formulier`-sectie (`FormulierFields`: type offerte/contact/
+- **Formulier** = `form`-sectie (`FormFields`: type offerte/contact/
   beide + onderwerpen + zijbalk) die de Livewire-component `App\Livewire\LeadForm`
   rendert (validatie NL, opslaan in `aanvragen`, mailen via `LeadReceived`).
   In offerte-modus vraagt het ook een optioneel adres (straat, postcode,
   gemeente → `aanvragen.street/postal_code/city`); bij contact wordt dat genegeerd.
+  De form_types zijn Raaminzicht-eigen; enkel de sectienaam volgt de core-standaard.
+- **Agenda** = `booking`-sectie (`BookingFields`, label "Agenda (afspraak)") met
+  `provider`; hier enkel `eigen_agenda` (tijdsloten → `App\Livewire\AppointmentForm`,
+  aanvraagtype `afspraak` in `aanvragen`). De eigen agenda bestaat alleen op
+  Raaminzicht: vraagt een andere site er een, dan niet opnieuw bouwen maar naar de
+  core-package verhuizen (zie Modules/wiki/modules.md → Beslissingen, 7 oktober 2026).
 
 ## Groei-module (package webgoeroe/seo-growth)
 
@@ -245,9 +260,9 @@ staan zijn gevoeliger dan de cijfers.
   `2026_10_06_120000_split_aanvragen_from_leads`. Nulmeting-velden
   (`seo_live_since`, `seo_goal_leads_month`, `seo_leads_baseline`) op het
   Leads-scherm.
-- **Sectie-contract**: de package herkent zelf dat het tekstblok hier `prose` heet
+- **Sectie-contract**: de package herkent zelf dat het tekstblok hier `text` heet
   (eerste kandidaat met een view in `components/site/sections/`):
-  `hero` → `prose` (heading + body) → `faq` → `cta`. De gekloonde CTA-knop volgt
+  `hero` → `text` (heading + body) → `faq` → `cta`. De gekloonde CTA-knop volgt
   het `CtaLinkSchema`-contract (`link_type` + `page_id` + `href`).
 - **Queue via de scheduler** (`QUEUE_CONNECTION=database`): verversen, acties en
   keyword-onderzoek zijn jobs. `routes/console.php` plant elke minuut een
@@ -380,7 +395,7 @@ Oude-site-redirects zijn op 07/09/2026 volledig getest op de preview-URL: alle
 ## Juridische pagina's & cookies
 
 - **Privacyverklaring** (`/privacy-policy`) en **cookiebeleid** (`/cookie-policy`)
-  worden gevuld door `database/seeders/LegalPagesSeeder.php` (één `prose`-sectie
+  worden gevuld door `database/seeders/LegalPagesSeeder.php` (één `text`-sectie
   per pagina, tekst op maat van wat de site echt doet). Slug-tolerant (kandidaat-
   slugs per pagina) en edit-veilig: een pagina die al secties heeft wordt enkel
   gepubliceerd, de tekst blijft staan. Bedrijfsgegevens komen uit de Footer-

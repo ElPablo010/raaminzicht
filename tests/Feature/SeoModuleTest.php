@@ -37,7 +37,7 @@ it('publishes a create_page action as a landing page in the project section cont
             'meta_description' => 'Laat je ramen vervangen door een vakman.',
             'sections' => [
                 ['section_type' => 'hero', 'content' => ['heading' => 'Ramen vervangen in Antwerpen', 'subtitle' => 'Belofte']],
-                ['section_type' => 'prose', 'content' => ['heading' => 'Waarom nu', 'body' => '<p>Omdat het loont.</p>']],
+                ['section_type' => 'text', 'content' => ['heading' => 'Waarom nu', 'body' => '<p>Omdat het loont.</p>']],
                 ['section_type' => 'faq', 'content' => ['heading' => 'Veelgestelde vragen', 'items' => [
                     ['question' => 'Hoe lang duurt het?', 'answer' => 'Eén dag. <a href="https://evil.example">x</a>'],
                 ]]],
@@ -53,7 +53,7 @@ it('publishes a create_page action as a landing page in the project section cont
     $page = Page::where('slug', 'ramen-vervangen-antwerpen')->firstOrFail();
     expect($page->published)->toBeTrue()
         ->and($page->meta_robots)->toBe('index, follow')
-        ->and($page->sections->pluck('section_type')->all())->toBe(['hero', 'prose', 'faq']);
+        ->and($page->sections->pluck('section_type')->all())->toBe(['hero', 'text', 'faq']);
 
     // Externe link in een FAQ-antwoord wordt door de sanitizer uitgepakt.
     $faq = $page->sections->firstWhere('section_type', 'faq');
@@ -97,21 +97,21 @@ it('merges an add_section FAQ into the existing FAQ block instead of adding a se
         ->toBe(['Wat kost zonwering?', 'Hoe lang gaat zonwering mee?']);
 });
 
-it('bewerkt het prose-tekstblok van een paginavoorstel in plaats van een onbekend blok toe te voegen', function () {
+it('bewerkt het text-tekstblok van een paginavoorstel in plaats van een onbekend blok toe te voegen', function () {
     $item = SeoActionItem::create([
         'action_type' => 'create_page',
         'priority' => 'high',
         'title' => 'Nieuwe pagina: schuiframen Aarschot',
         'problem' => 'Geen pagina voor dit keyword.',
         'source_keyword' => 'schuiframen aarschot',
-        'fingerprint' => sha1('test-edit-prose'),
+        'fingerprint' => sha1('test-edit-text'),
         'proposed' => [
             'slug' => 'schuiframen-aarschot',
             'meta_title' => 'Schuiframen in Aarschot',
             'meta_description' => 'Alles over schuiframen.',
             'sections' => [
                 ['section_type' => 'hero', 'content' => ['heading' => 'Schuiframen', 'subtitle' => 'Belofte']],
-                ['section_type' => 'prose', 'content' => ['heading' => 'Oud', 'body' => '<p>Oude tekst.</p>']],
+                ['section_type' => 'text', 'content' => ['heading' => 'Oud', 'body' => '<p>Oude tekst.</p>']],
             ],
         ],
     ]);
@@ -126,10 +126,10 @@ it('bewerkt het prose-tekstblok van een paginavoorstel in plaats van een onbeken
 
     $page = Page::where('slug', 'schuiframen-aarschot')->firstOrFail();
 
-    expect($page->sections->pluck('section_type')->all())->toBe(['hero', 'prose'])
-        ->and($page->sections->firstWhere('section_type', 'prose')->content['heading'])->toBe('Nieuw');
+    expect($page->sections->pluck('section_type')->all())->toBe(['hero', 'text'])
+        ->and($page->sections->firstWhere('section_type', 'text')->content['heading'])->toBe('Nieuw');
 });
 
-it('kiest prose als tekstblok van dit project', function () {
-    expect(Webgoeroe\SeoGrowth\Services\Seo\LandingPageBlueprint::sectionTypeFor('text'))->toBe('prose');
+it('kiest text als tekstblok van dit project', function () {
+    expect(Webgoeroe\SeoGrowth\Services\Seo\LandingPageBlueprint::sectionTypeFor('text'))->toBe('text');
 });

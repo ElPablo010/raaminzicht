@@ -11,14 +11,19 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 
 /**
- * Formulier — herbruikbaar lead-formulier. Eén sectietype dat via 'form_type'
+ * Formulier (`form`, vroeger `formulier`) — herbruikbaar lead-formulier. Eén sectietype dat via 'form_type'
  * een offerte- óf contactformulier toont (of beide, met een keuzeschakelaar).
  *
  * NB: de visuele markup staat in de partial; de daadwerkelijke verzending
  * (opslaan + mailen) wordt door een Livewire-component afgehandeld. De
  * veldlabels/teksten zijn optioneel overschrijfbaar — leeg = standaardtekst.
+ *
+ * De form_types offerte/contact/beide zijn Raaminzicht-eigen: ze renderen
+ * App\Livewire\LeadForm, dat in de `aanvragen`-tabel schrijft. Enkel de
+ * sectienaam volgt de core-standaard (migratie
+ * 2026_10_07_120000_align_section_types_with_core); de content is ongewijzigd.
  */
-class FormulierFields
+class FormFields
 {
     public static function make(): array
     {

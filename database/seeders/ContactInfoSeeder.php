@@ -96,7 +96,8 @@ class ContactInfoSeeder extends Seeder
                 $content = self::replaceDeep($section->content);
 
                 // Contactpagina: beide contactpersonen in de formulier-zijbalk.
-                if ($page->slug === 'contact' && $section->section_type === 'formulier') {
+                // ('formulier' = de sectienaam van vóór de core-standaard.)
+                if ($page->slug === 'contact' && in_array($section->section_type, ['form', 'formulier'], true)) {
                     $content['show_all_contacts'] = true;
                 }
 

@@ -45,12 +45,15 @@ class HeroFields
                 ->schema([
                     Select::make('height')
                         ->label('Hoogte')
-                        // Logische volgorde (groot → compact), geen alfabetische.
+                        // Logische volgorde (klein → groot), geen alfabetische.
+                        // Core-standaard: compact / medium / tall ('groot' heet nu 'tall').
                         ->options([
-                            'groot' => 'Groot (homepage)',
-                            'compact' => 'Compact (binnenpagina)',
+                            'compact' => 'Compact (alleen de inhoud)',
+                            'medium' => 'Normaal (± 60% van het scherm)',
+                            'tall' => 'Groot (bijna schermvullend)',
                         ])
-                        ->default('groot'),
+                        ->default('tall')
+                        ->selectablePlaceholder(false),
                     TextInput::make('image.alt')
                         ->label('Achtergrond — alt-tekst')
                         ->maxLength(255),

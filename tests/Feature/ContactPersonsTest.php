@@ -21,7 +21,7 @@ function formPage(string $slug, array $extra = []): Page
 {
     $page = Page::create(['title' => $slug, 'slug' => $slug, 'published' => true]);
     $page->sections()->create([
-        'section_type' => 'formulier',
+        'section_type' => 'form',
         'position' => 0,
         'content' => ['heading' => 'Formulier', 'form_type' => 'contact', 'show_sidebar' => true, ...$extra],
     ]);

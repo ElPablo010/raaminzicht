@@ -16,9 +16,10 @@ class HeadingFields
     /**
      * @param  bool  $headingRequired  Of de titel verplicht is (meestal wel).
      * @param  bool  $withIntro         Of er een intro-RichEditor onder de kop komt.
+     * @param  string  $introLabel      Label van de intro (bv. 'Intro' als er nog een body-veld volgt).
      * @return array<int, mixed>
      */
-    public static function make(bool $headingRequired = true, bool $withIntro = true): array
+    public static function make(bool $headingRequired = true, bool $withIntro = true, string $introLabel = 'Tekst'): array
     {
         $fields = [
             Grid::make(['default' => 1, 'md' => 2])
@@ -35,7 +36,7 @@ class HeadingFields
 
         if ($withIntro) {
             $fields[] = RichEditor::make('intro')
-                ->label('Tekst')
+                ->label($introLabel)
                 ->toolbarButtons([['bold', 'italic', 'link'], ['bulletList', 'orderedList'], ['undo', 'redo']]);
         }
 

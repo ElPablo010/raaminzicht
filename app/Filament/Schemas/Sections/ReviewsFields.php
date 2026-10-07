@@ -12,6 +12,10 @@ use Filament\Schemas\Components\Grid;
 /**
  * Reviews / testimonials — social proof vlak vóór de beslissing. Optioneel een
  * samenvattend cijfer (bv. "4,9/5 op Google") + een grid van losse reviews.
+ *
+ * Core-standaard: de reviews staan in `items[]` met per item name, role
+ * (plaats / type project), rating, quote en image. Vroeger `reviews[]` met
+ * location/avatar — omgezet door 2026_10_07_120000_align_section_types_with_core.
  */
 class ReviewsFields
 {
@@ -38,7 +42,7 @@ class ReviewsFields
                         ->maxLength(60),
                 ]),
 
-            Repeater::make('reviews')
+            Repeater::make('items')
                 ->label('Reviews')
                 ->collapsible()
                 ->collapsed()
@@ -52,7 +56,7 @@ class ReviewsFields
                                 ->label('Naam')
                                 ->required()
                                 ->maxLength(120),
-                            TextInput::make('location')
+                            TextInput::make('role')
                                 ->label('Plaats / type project')
                                 ->placeholder('Bv. Booischot — nieuwe ramen')
                                 ->maxLength(120),
@@ -74,7 +78,7 @@ class ReviewsFields
                         ->required()
                         ->rows(4)
                         ->maxLength(600),
-                    MediaPickerField::make('avatar', 'Foto (optioneel)', required: false),
+                    MediaPickerField::make('image', 'Foto (optioneel)', required: false),
                 ])
                 ->columns(1)
                 ->defaultItems(0)

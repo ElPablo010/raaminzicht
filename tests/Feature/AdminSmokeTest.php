@@ -170,3 +170,33 @@ it('zet Instellingen onderaan de zijbalk en toont uitloggen en het oogje naar de
         ->assertSee('Bekijk website')
         ->assertSee(filament()->getLogoutUrl());
 });
+
+it('laadt en bewaart de core-sectietypes (text, reviews.items, form, booking) in de page builder', function () {
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
+
+    $page = Page::create(['title' => 'Core', 'slug' => 'core', 'published' => true]);
+    $rows = [
+        ['section_type' => 'hero', 'content' => ['heading' => 'Hero', 'height' => 'tall']],
+        ['section_type' => 'text', 'content' => ['heading' => 'Tekst', 'body' => '<p>Body</p>']],
+        ['section_type' => 'reviews', 'content' => ['heading' => 'Reviews', 'items' => [['name' => 'An', 'role' => 'Booischot', 'rating' => '5', 'quote' => 'Top']]]],
+        ['section_type' => 'form', 'content' => ['form_type' => 'offerte', 'subjects' => ['Ramen']]],
+        ['section_type' => 'booking', 'content' => ['provider' => 'eigen_agenda', 'slot_minutes' => 30, 'lead_days' => 1, 'horizon_days' => 30, 'windows' => [['day' => 1, 'from' => '09:00', 'to' => '12:00']]]],
+    ];
+    foreach ($rows as $i => $row) {
+        $page->sections()->create([...$row, 'position' => $i]);
+    }
+
+    Livewire::test(EditPage::class, ['record' => $page->getKey()])
+        ->assertOk()
+        ->assertSee('Eigen agenda (tijdsloten)')
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    $sections = $page->fresh()->sections()->orderBy('position')->get();
+    expect($sections->pluck('section_type')->all())->toBe(['hero', 'text', 'reviews', 'form', 'booking'])
+        ->and($sections[0]->content['height'])->toBe('tall')
+        ->and($sections[2]->content['items'][0]['role'])->toBe('Booischot')
+        ->and($sections[3]->content['form_type'])->toBe('offerte')
+        ->and($sections[4]->content['provider'])->toBe('eigen_agenda')
+        ->and($sections[4]->content['windows'])->toHaveCount(1);
+});

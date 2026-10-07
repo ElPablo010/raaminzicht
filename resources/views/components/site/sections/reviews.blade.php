@@ -3,7 +3,7 @@
 @php
     $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
     $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
-    $reviews = array_values(array_filter($content['reviews'] ?? [], fn ($r) => ! empty($r['quote'])));
+    $reviews = array_values(array_filter($content['items'] ?? [], fn ($r) => ! empty($r['quote'])));
     $summary = $content['summary'] ?? [];
     $cardBg = $dark ? 'bg-white/5 ring-white/10' : 'bg-white ring-primary-950/5';
     $quoteTone = $dark ? 'text-white/85' : 'text-primary-900/80';
@@ -47,15 +47,15 @@
                         </div>
                         <blockquote class="mt-4 flex-1 text-[0.95rem] leading-relaxed {{ $quoteTone }}">“{{ $review['quote'] }}”</blockquote>
                         <figcaption class="mt-6 flex items-center gap-3">
-                            @if (! empty($review['avatar']))
-                                <x-site.picture :src="$review['avatar']" :alt="$review['name'] ?? ''" class="h-11 w-11 shrink-0 overflow-hidden rounded-full" imgClass="h-full w-full object-cover" />
+                            @if (! empty($review['image']))
+                                <x-site.picture :src="$review['image']" :alt="$review['name'] ?? ''" class="h-11 w-11 shrink-0 overflow-hidden rounded-full" imgClass="h-full w-full object-cover" />
                             @else
                                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full {{ $dark ? 'bg-white/10 text-accent-200' : 'bg-primary-100 text-primary-700' }} font-display text-lg font-semibold">{{ mb_substr($review['name'] ?? '?', 0, 1) }}</span>
                             @endif
                             <div>
                                 <div class="text-sm font-semibold {{ $dark ? 'text-white' : 'text-primary-950' }}">{{ $review['name'] ?? '' }}</div>
-                                @if (! empty($review['location']))
-                                    <div class="text-xs {{ $dark ? 'text-white/55' : 'text-primary-900/55' }}">{{ $review['location'] }}</div>
+                                @if (! empty($review['role']))
+                                    <div class="text-xs {{ $dark ? 'text-white/55' : 'text-primary-900/55' }}">{{ $review['role'] }}</div>
                                 @endif
                             </div>
                         </figcaption>

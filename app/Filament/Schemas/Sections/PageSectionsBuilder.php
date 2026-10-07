@@ -15,6 +15,10 @@ use Filament\Forms\Components\Builder\Block;
  *
  * De render-dispatch (pages/show.blade.php) mapt section_type → partial via
  * str_replace('_', '-', $type), dus geen route-aanpassingen nodig.
+ *
+ * Bloknamen volgen de gedeelde core-standaard (text, reviews.items[], form,
+ * booking + provider, hero.height compact/medium/tall) — zie migratie
+ * 2026_10_07_120000_align_section_types_with_core.
  */
 class PageSectionsBuilder
 {
@@ -55,11 +59,11 @@ class PageSectionsBuilder
                     ...SectionCommonFields::make(),
                     ...TextMediaFields::make(),
                 ]),
-            Block::make('prose')
-                ->label(self::numberedLabel('Tekstblok (prose)'))
+            Block::make('text')
+                ->label(self::numberedLabel('Tekst'))
                 ->schema([
                     ...SectionCommonFields::make(),
-                    ...ProseFields::make(),
+                    ...TextFields::make(),
                 ]),
             Block::make('cards')
                 ->label(self::numberedLabel('Cards'))
@@ -85,17 +89,17 @@ class PageSectionsBuilder
                     ...SectionCommonFields::make(),
                     ...ReviewsFields::make(),
                 ]),
-            Block::make('formulier')
+            Block::make('form')
                 ->label(self::numberedLabel('Formulier'))
                 ->schema([
                     ...SectionCommonFields::make(),
-                    ...FormulierFields::make(),
+                    ...FormFields::make(),
                 ]),
-            Block::make('afspraak')
-                ->label(self::numberedLabel('Afspraak (toonzaalbezoek)'))
+            Block::make('booking')
+                ->label(self::numberedLabel('Agenda (afspraak)'))
                 ->schema([
                     ...SectionCommonFields::make(),
-                    ...AfspraakFields::make(),
+                    ...BookingFields::make(),
                 ]),
             Block::make('cta')
                 ->label(self::numberedLabel('Call-to-action'))

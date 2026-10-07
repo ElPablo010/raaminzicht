@@ -15,7 +15,7 @@ it('creates, fills and publishes both legal pages', function () {
         ->and($cookie->published)->toBeTrue()
         ->and($privacy->sections()->count())->toBe(1)
         ->and($cookie->sections()->count())->toBe(1)
-        ->and($privacy->sections()->first()->section_type)->toBe('prose');
+        ->and($privacy->sections()->first()->section_type)->toBe('text');
 
     $this->get('/privacy-policy')
         ->assertOk()
@@ -67,7 +67,7 @@ it('rewrites its own earlier text when the text version is bumped, but keeps cli
 it('upgrades a version-1 seed that predates hash tracking', function () {
     $page = Page::create(['title' => 'Cookie policy', 'slug' => 'cookie-policy', 'published' => false]);
     $page->sections()->create([
-        'section_type' => 'prose',
+        'section_type' => 'text',
         'position' => 0,
         'content' => ['eyebrow' => 'Juridisch', 'heading' => 'Cookiebeleid', 'body' => '<p><em>Laatst bijgewerkt op 04/09/2026.</em></p><p>We gebruiken momenteel geen analytische cookies.</p>'],
     ]);
@@ -81,7 +81,7 @@ it('upgrades a version-1 seed that predates hash tracking', function () {
 it('publishes existing draft pages under their own slug without overwriting edited content', function () {
     $draft = Page::create(['title' => 'Privacy policy', 'slug' => 'privacybeleid', 'published' => false]);
     $draft->sections()->create([
-        'section_type' => 'prose',
+        'section_type' => 'text',
         'position' => 0,
         'content' => ['heading' => 'Eigen tekst', 'body' => '<p>Door de klant geschreven.</p>'],
     ]);
@@ -109,7 +109,7 @@ it('links the legal pages in the footer and under the forms', function () {
 
     $contact = Page::create(['title' => 'Contact', 'slug' => 'contact', 'published' => true]);
     $contact->sections()->create([
-        'section_type' => 'formulier',
+        'section_type' => 'form',
         'position' => 0,
         'content' => ['heading' => 'Contacteer ons', 'form_type' => 'contact'],
     ]);

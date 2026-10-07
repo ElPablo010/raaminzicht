@@ -5,8 +5,12 @@
     $ctas = $content['ctas'] ?? [];
     $highlights = array_filter($content['highlights'] ?? []);
     $hasImage = ! empty($image['src']);
-    $compact = ($content['height'] ?? 'groot') === 'compact';
-    $minH = $compact ? 'min-h-[48vh] py-24 lg:min-h-[56vh]' : 'min-h-[78vh] py-28 sm:py-32 lg:min-h-[86vh]';
+    // Hoogte: compact / medium / tall (core-standaard; 'tall' = de vroegere 'groot').
+    $minH = match ($content['height'] ?? 'tall') {
+        'compact' => 'min-h-[48vh] py-24 lg:min-h-[56vh]',
+        'medium' => 'min-h-[60vh] py-28 lg:min-h-[66vh]',
+        default => 'min-h-[78vh] py-28 sm:py-32 lg:min-h-[86vh]',
+    };
 @endphp
 
 <x-site.sections.wrapper :content="$content" class="relative isolate overflow-hidden bg-primary-950 text-white">

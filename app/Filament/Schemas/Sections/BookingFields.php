@@ -1,5 +1,10 @@
 <?php
 
+// Eigen agenda bestaat alleen op Raaminzicht. Vraagt een andere site een eigen
+// agenda: niet opnieuw bouwen, maar deze agenda naar de core-package verhuizen
+// en Raaminzicht daarop overzetten. Zie Modules/wiki/modules.md → Beslissingen
+// (7 oktober 2026).
+
 namespace App\Filament\Schemas\Sections;
 
 use Filament\Forms\Components\Repeater;
@@ -8,25 +13,57 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 
 /**
- * Afspraak — toonzaalbezoek inplannen. De bezoeker kiest een datum (enkel
+ * Agenda (`booking`, vroeger `afspraak`) — afspraak inplannen. De `provider`
+ * bepaalt welke agenda de sectie toont; op deze site bestaat enkel
+ * 'eigen_agenda' (tijdsloten, hieronder). Alle velden daarvan staan onder
+ * dezelfde sleutels als vroeger en zijn enkel zichtbaar bij die provider.
+ *
+ * Eigen agenda — toonzaalbezoek inplannen. De bezoeker kiest een datum (enkel
  * weekdagen waarvoor een openingsvenster bestaat) en een tijdslot binnen dat
  * venster. De aanvraag wordt opgeslagen (lead, type 'afspraak') en gemaild;
  * de zaakvoerder bevestigt manueel — er is dus bewust geen externe
  * agenda-synchronisatie of dubbel-boeking-check.
  *
- * Net als bij FormulierFields: de markup staat in de partial, de verzending in
+ * Net als bij FormFields: de markup staat in de partial, de verzending in
  * de Livewire-component App\Livewire\AppointmentForm.
  */
-class AfspraakFields
+class BookingFields
 {
     public static function make(): array
     {
         return [
             ...HeadingFields::make(headingRequired: false),
 
+            Select::make('provider')
+                ->label('Agenda')
+                ->options(self::providers())
+                ->default('eigen_agenda')
+                ->selectablePlaceholder(false)
+                ->live()
+                ->required(),
+
+            Group::make(self::eigenAgendaFields())
+                // Secties van vóór de provider-keuze (zonder sleutel) = eigen agenda.
+                ->visible(fn ($get) => ($get('provider') ?: 'eigen_agenda') === 'eigen_agenda'),
+        ];
+    }
+
+    /** @return array<string, string> */
+    public static function providers(): array
+    {
+        return [
+            'eigen_agenda' => 'Eigen agenda (tijdsloten)',
+        ];
+    }
+
+    /** Velden van de eigen agenda (tijdsloten) — zelfde sleutels als de vroegere afspraak-sectie. */
+    private static function eigenAgendaFields(): array
+    {
+        return [
             Section::make('Beschikbaarheid')
                 ->description('Bepaal per weekdag wanneer een toonzaalbezoek mogelijk is. Meerdere vensters per dag kan (bv. voor- én namiddag).')
                 ->schema([

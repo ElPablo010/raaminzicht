@@ -104,7 +104,7 @@ class LegalPagesSeeder extends Seeder
 
         if ($section === null) {
             $page->sections()->create([
-                'section_type' => 'prose',
+                'section_type' => 'text',
                 'position' => 0,
                 'locale' => 'nl',
                 'content' => [

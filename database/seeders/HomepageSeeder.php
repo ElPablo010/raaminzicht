@@ -65,17 +65,17 @@ class HomepageSeeder extends Seeder
             'eyebrow' => 'Tevreden klanten',
             'heading' => 'Wat onze klanten zeggen',
             'summary' => ['score' => '4,9', 'count' => '87', 'source' => 'Google'],
-            'reviews' => [
-                ['name' => 'Familie Vermeulen', 'location' => 'Booischot — nieuwe ramen', 'rating' => '5', 'quote' => 'Van advies tot plaatsing alles tot in de puntjes verzorgd. De ramen zijn prachtig en het verschil in comfort is enorm. Echt een aanrader!'],
-                ['name' => 'Kris D.', 'location' => 'Heist-op-den-Berg — veranda', 'rating' => '5', 'quote' => 'Onze veranda is een tweede woonkamer geworden. Correcte prijs, nette werkmensen en perfect nagekomen afspraken.'],
-                ['name' => 'Sofie & Tom', 'location' => 'Putte — voordeur & rolluiken', 'rating' => '5', 'quote' => 'Persoonlijke aanpak die je tegenwoordig zelden nog ziet. Je merkt dat ze zelf meedenken. Heel tevreden.'],
+            'items' => [
+                ['name' => 'Familie Vermeulen', 'role' => 'Booischot — nieuwe ramen', 'rating' => '5', 'quote' => 'Van advies tot plaatsing alles tot in de puntjes verzorgd. De ramen zijn prachtig en het verschil in comfort is enorm. Echt een aanrader!'],
+                ['name' => 'Kris D.', 'role' => 'Heist-op-den-Berg — veranda', 'rating' => '5', 'quote' => 'Onze veranda is een tweede woonkamer geworden. Correcte prijs, nette werkmensen en perfect nagekomen afspraken.'],
+                ['name' => 'Sofie & Tom', 'role' => 'Putte — voordeur & rolluiken', 'rating' => '5', 'quote' => 'Persoonlijke aanpak die je tegenwoordig zelden nog ziet. Je merkt dat ze zelf meedenken. Heel tevreden.'],
             ],
         ]];
     }
 
     private function offerteForm(string $heading = 'Vraag vrijblijvend uw offerte aan', ?string $intro = null, string $bg = 'white'): array
     {
-        return ['type' => 'formulier', 'content' => [
+        return ['type' => 'form', 'content' => [
             'background' => $bg,
             'section_id' => 'offerte',
             'eyebrow' => 'Offerte aanvragen',
@@ -295,7 +295,7 @@ class HomepageSeeder extends Seeder
                         ['label' => 'Bekijk realisaties', 'variant' => 'ghost', 'link_type' => 'url', 'href' => '/realisaties'],
                     ],
                     ['25+ jaar ervaring', 'PVC · aluminium · hout', 'Gratis opmeting aan huis', 'Eén vast aanspreekpunt'],
-                    'groot',
+                    'tall',
                     'center 55%',
                 ),
                 ['type' => 'partners', 'content' => [
@@ -696,7 +696,7 @@ class HomepageSeeder extends Seeder
             'meta_description' => 'Contacteer Raaminzicht in Heist-op-den-Berg (Booischot). Bel 0469 79 22 40, mail info@raaminzicht.be of bezoek onze toonzaal op afspraak.',
             'sections' => [
                 $this->hero('Contact', 'Laten we kennismaken', '<p>Een vraag, een idee of meteen een offerte? We helpen u graag verder.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur', [], [], 'compact'),
-                ['type' => 'formulier', 'content' => [
+                ['type' => 'form', 'content' => [
                     'background' => 'white',
                     'section_id' => 'contact',
                     'eyebrow' => 'Stuur ons een bericht',
@@ -742,7 +742,8 @@ class HomepageSeeder extends Seeder
             'meta_description' => 'Plan online je bezoek aan onze toonzaal in Booischot. Kies een dag en uur dat jou past — je krijgt alle tijd voor persoonlijk advies.',
             'sections' => [
                 $this->hero('Toonzaalbezoek', 'Plan je bezoek aan onze toonzaal', '<p>Kom de mogelijkheden in PVC, aluminium en hout met eigen ogen bekijken. Kies hieronder een moment dat jou past.</p>', $this->img('realisatie-6'), 'Lichtrijk interieur met grote ramen', [], ['Persoonlijk advies', 'Op afspraak — alle tijd voor jou', 'Eén vast aanspreekpunt'], 'compact'),
-                ['type' => 'afspraak', 'content' => [
+                ['type' => 'booking', 'content' => [
+                    'provider' => 'eigen_agenda',
                     'background' => 'white',
                     'section_id' => 'afspraak',
                     'eyebrow' => 'Kies een moment',
