@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AanvraagAttachmentController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,12 @@ Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
 
 // Google OAuth (Groei → Verkeer) komt uit de package webgoeroe/seo-growth
 // (admin/search-console/oauth/*) en laadt vóór deze routes.
+
+// Bijlagen van aanvragen (admin → Aanvragen); private disk, enkel voor admins.
+Route::middleware('auth')
+    ->get('/admin/aanvragen/{aanvraag}/bijlage/{index}', AanvraagAttachmentController::class)
+    ->whereNumber('index')
+    ->name('admin.aanvragen.attachment');
 
 // Design-previews voor pagina's die nog niet via de Filament-builder bestaan.
 // Bereikbaar voor ingelogde users als referentie naast de live versie.

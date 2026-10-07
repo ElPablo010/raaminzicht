@@ -30,6 +30,7 @@ use Webgoeroe\SeoGrowth\Models\Lead;
     'message',
     'source_url',
     'attachments',
+    'read_at',
 ])]
 class Aanvraag extends Model
 {
@@ -54,6 +55,7 @@ class Aanvraag extends Model
         return [
             'attachments' => 'array',
             'appointment_at' => 'datetime',
+            'read_at' => 'datetime',
         ];
     }
 
