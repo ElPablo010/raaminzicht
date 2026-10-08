@@ -1,6 +1,9 @@
 <?php
 
+// De hoofd-URL-middleware van webgoeroe/core werkt niet lokaal/in tests: hier
+// wordt productie nagebootst (env production + de echte APP_URL).
 beforeEach(function () {
+    $this->app['env'] = 'production';
     config(['app.url' => 'https://www.raaminzicht.be']);
 });
 

@@ -12,9 +12,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // De canonieke host (raaminzicht.be → www, globaal en vooraan, ook op
-        // /admin) en de redirects uit de admin zet webgoeroe/core
-        // (config/core.php → middleware).
+        // De hoofd-URL (raaminzicht.be → www, /index.php en slash achteraan;
+        // globaal en vooraan, ook op /admin en de Google-OAuth-callback) en de
+        // redirects uit de admin zet webgoeroe/core zelf.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

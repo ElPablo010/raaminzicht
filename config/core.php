@@ -8,15 +8,6 @@
 
 return [
 
-    // Canonieke host = APP_URL (https://www.raaminzicht.be): raaminzicht.be gaat
-    // met een 301 naar www. ('auto'), en dat globaal, dus ook op /admin. Reden:
-    // beide hosts wijzen bij Combell naar dezelfde docroot, en de Google-OAuth-
-    // callback wordt uit de aanvraag-host opgebouwd (anders redirect_uri_mismatch).
-    // Lokaal (raaminzicht.test) en op de preview-URL gebeurt er niets.
-    'middleware' => [
-        'canonical_host_scope' => 'global',
-    ],
-
     // Achtergronden op het "Patrijspoort"-palet. Sleutels nooit hernoemen.
     'backgrounds' => [
         'default' => 'white',

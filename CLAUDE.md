@@ -128,23 +128,23 @@ Menu's, Redirects (met jokerteken), Header, Footer, Algemeen, het
 Aanvragen-scherm, de admin-chrome ("Bekijk de website", uitloggen),
 `Seo`/`SiteHeader`/`SiteFooter`/`Url`, `WebsiteMediaService`,
 sitemap/robots/llms.txt, de catch-all paginarouter en de middleware
-(canonieke host, redirects).
+(één hoofd-URL, redirects).
 
 Wat Raaminzicht-eigen blijft en waar het hangt:
 
 | Wat | Hoe |
 |---|---|
 | Alle publieke views (layout, header, footer, meta, cookiebanner, secties, `pages/show`, `sitemap`, formulieren) | in het project, gaan voor op de core |
-| Achtergronden (Patrijspoort), blokopties (hero-troeven, tekst-intro, reviews-score, …), favicon, tweede contactpersoon, juridische pagina's, geen LinkedIn, canonieke host globaal | `config/core.php` |
+| Achtergronden (Patrijspoort), blokopties (hero-troeven, tekst-intro, reviews-score, …), favicon, tweede contactpersoon, juridische pagina's, geen LinkedIn | `config/core.php` |
 | Blokken `partners` en `gallery` (realisaties-bron), extra velden `form` (`LeadFormFields`) en `booking` (`EigenAgendaFields`) | `AppServiceProvider::registerBlocks()` |
 | Formuliertypes offerte/contact/beide → `LeadForm` (→ `aanvragen`) | `AppServiceProvider::registerFormTypes()` |
 | Aanvragen-scherm: kolommen, typefilter, bekijk-modal (`filament/aanvragen/view`) | `config/core.php` (`form_submissions`) + `AppServiceProvider::registerAanvragenScreen()` |
 | Realisaties (resources, `GalleryUploadField`, `GalleryItems`), `SectionLinks`, bijlagen-route, seeders | ongewijzigd in de site |
 
 De core-tests draaien mee (`tests/Pest.php`, testsuite `Core` in `phpunit.xml`).
-Composer staat (tot de deploy) op de lokale path-repository
-`../../Modules/repo/core` (`@dev`); vóór de deploy core v0.4.0 pushen en
-overschakelen naar de VCS-repository met `^0.4`.
+Composer: op branch `core-0.5` staat de core als path-repository (`../../Modules/repo/core`,
+`@dev`, core v0.5.0 lokaal getagd). Vóór een deploy: core v0.5.0 pushen en de
+VCS-repository `ElPablo010/core` met `^0.5` zetten.
 
 ## Stack & structuur
 
@@ -346,14 +346,14 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   04/09/2026 via mysqldump + rsync van `storage/app/public/website-media`).
   Slug-afhankelijke code (seeders, `Realisaties`) daarom tolerant houden en
   na een deploy op de preview-URL controleren, niet enkel lokaal.
-- **Canonieke host = `APP_URL` (`https://www.raaminzicht.be`).** `RedirectToCanonicalHost`
-  (uit de core; `config/core.php` → `middleware.canonical_host_scope = global`,
-  dus globaal en vooraan) stuurt `raaminzicht.be` met een 301 naar
-  `www.` voor GET/HEAD, ook op `/admin`. Reden: beide hosts wijzen bij Combell naar
+- **Canonieke host = `APP_URL` (`https://www.raaminzicht.be`).** `RedirectToCanonicalUrl`
+  (core 0.5, altijd globaal en vooraan) stuurt `raaminzicht.be`, `/index.php(/…)` en
+  een slash achteraan in één 301 naar `www.` voor GET/HEAD, ook op `/admin`. Geen
+  www-/trailing-slash-regels in `public/.htaccess`. Reden: beide hosts wijzen bij Combell naar
   dezelfde docroot, en de Google-OAuth-callback wordt uit de aanvraag-host opgebouwd
   (`route()`), dus de kale host gaf `redirect_uri_mismatch`. In de OAuth-client in
   Google Cloud (project *Client websites*) staan beide callbacks geregistreerd. Doet
-  niets lokaal of op de preview-URL, want enkel een `APP_URL` met `www.` activeert het.
+  niets lokaal (env local/testing) of op de preview-URL (andere host).
 - **SSH vanuit Claude** is toegestaan via `.claude/settings.local.json`
   (buiten git): deploys, dumps en seeders op de server hoeven niet meer via de
   gebruiker. Commando's moeten letterlijk met `ssh raaminzichtbe@176.62.165.220`
