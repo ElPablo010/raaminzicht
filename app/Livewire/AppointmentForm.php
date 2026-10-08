@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Mail\LeadReceived;
 use App\Models\Aanvraag;
-use App\Support\SiteFooter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /**
  * Afspraakformulier voor een toonzaalbezoek. De bezoeker kiest een datum (enkel
@@ -96,7 +97,7 @@ class AppointmentForm extends Component
      * Selecteerbare datums binnen [vandaag + leadDays, vandaag + horizonDays]
      * waarvan de weekdag minstens één tijdslot heeft.
      *
-     * @return array<string, string>  'Y-m-d' => 'maandag 16 juni'
+     * @return array<string, string> 'Y-m-d' => 'maandag 16 juni'
      */
     public function availableDates(): array
     {
@@ -188,8 +189,8 @@ class AppointmentForm extends Component
             'phone' => 'nullable|string|max:40',
             // De datum moet een effectief beschikbare dag zijn, het tijdstip een
             // geldig slot binnen die dag — server-side hergecontroleerd.
-            'date' => ['required', 'string', \Illuminate\Validation\Rule::in(array_keys($this->availableDates()))],
-            'time' => ['required', 'string', \Illuminate\Validation\Rule::in($this->slotsForSelectedDate())],
+            'date' => ['required', 'string', Rule::in(array_keys($this->availableDates()))],
+            'time' => ['required', 'string', Rule::in($this->slotsForSelectedDate())],
             'message' => 'nullable|string|max:2000',
             'consent' => 'accepted',
         ]);

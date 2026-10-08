@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Page;
 use App\Models\Setting;
-use App\Support\SiteFooter;
 use Illuminate\Database\Seeder;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /**
  * Vult de juridische pagina's (privacyverklaring + cookiebeleid), publiceert ze

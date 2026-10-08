@@ -1,12 +1,12 @@
 <?php
 
 use App\Enums\UserRole;
-use App\Http\Middleware\HandleRedirects;
 use App\Models\Page;
 use App\Models\Redirect;
 use App\Models\User;
 use Database\Seeders\RedirectsSeeder;
 use Illuminate\Support\Facades\Cache;
+use Webgoeroe\Core\Http\Middleware\HandleRedirects;
 
 beforeEach(function () {
     Cache::forget(HandleRedirects::CACHE_KEY);

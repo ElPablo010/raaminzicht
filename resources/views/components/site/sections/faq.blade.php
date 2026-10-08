@@ -1,8 +1,8 @@
 @props(['section' => null, 'content' => []])
 
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $items = array_values(array_filter($content['items'] ?? [], fn ($i) => ! empty($i['question'])));
     $itemBorder = $dark ? 'border-white/10' : 'border-primary-100';
     $qTone = $dark ? 'text-white' : 'text-primary-950';

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Schemas\Components;
 
-use App\Services\Website\WebsiteMediaService;
 use Filament\Forms\Components\FileUpload;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Webgoeroe\Core\Services\WebsiteMediaService;
 
 /**
  * Een drag-and-drop galerij-veld: sleep in één keer een hele reeks foto's naar

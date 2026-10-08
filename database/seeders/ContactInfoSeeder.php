@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Page;
 use App\Models\Setting;
-use App\Support\SiteFooter;
 use Illuminate\Database\Seeder;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /**
  * Contactgegevens en -teksten bijwerken in bestaande content (2026-09):

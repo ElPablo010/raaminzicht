@@ -2,8 +2,8 @@
 
 {{-- Tekst (`text`, vroeger `prose`): kop (eyebrow/heading/intro) + full-width rich-text body. --}}
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     // Een lege RichEditor laat soms "<p></p>" achter: tel enkel echte tekst als intro.
     $intro = filled(trim(strip_tags($content['intro'] ?? ''))) ? $content['intro'] : null;
     $hasHeading = ! empty($content['eyebrow']) || ! empty($content['heading']) || $intro;

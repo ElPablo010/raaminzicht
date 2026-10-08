@@ -12,9 +12,9 @@
 ])
 
 @php
-    $title = $title ?? \App\Support\Seo::siteName();
-    $description = $description ?? \App\Support\Seo::defaultDescription();
-    $ogImage = \App\Support\Seo::absoluteUrl($image);
+    $title = $title ?? \Webgoeroe\Core\Support\Seo::siteName();
+    $description = $description ?? \Webgoeroe\Core\Support\Seo::defaultDescription();
+    $ogImage = \Webgoeroe\Core\Support\Seo::absoluteUrl($image);
 @endphp
 
 <title>{{ $title }}</title>
@@ -26,8 +26,8 @@
 
 {{-- Open Graph (Facebook, LinkedIn, WhatsApp, …) --}}
 <meta property="og:type" content="{{ $type }}">
-<meta property="og:site_name" content="{{ \App\Support\Seo::siteName() }}">
-<meta property="og:locale" content="{{ \App\Support\Seo::LOCALE }}">
+<meta property="og:site_name" content="{{ \Webgoeroe\Core\Support\Seo::siteName() }}">
+<meta property="og:locale" content="{{ \Webgoeroe\Core\Support\Seo::LOCALE }}">
 <meta property="og:title" content="{{ $title }}">
 <meta property="og:description" content="{{ $description }}">
 @if ($canonical)
@@ -54,5 +54,5 @@
 
 {{-- Structured data (schema.org JSON-LD) — site-breed + pagina-specifiek in één @graph. --}}
 @if (! empty($graph))
-    <script type="application/ld+json">{!! \App\Support\Seo::jsonLd($graph) !!}</script>
+    <script type="application/ld+json">{!! \Webgoeroe\Core\Support\Seo::jsonLd($graph) !!}</script>
 @endif

@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\Storage;
 use Webgoeroe\SeoGrowth\Models\Lead;
 
 /**
  * Eén rij per aanvraag via de website (offerte, contactvraag, afspraak): de
  * aanvraag zelf, met naam, adres, bijlagen en gewenst afspraakmoment. Zelfde
- * rol als `form_submissions` op de andere sites.
+ * rol als `form_submissions` op de andere sites; het admin-scherm is dat van de
+ * core ("Aanvragen", config/core.php + AppServiceProvider).
  *
  * De meting (kanaal, landingspagina, utm's) staat niet hier maar in de
  * `leads`-tabel van de package webgoeroe/seo-growth: elke nieuwe aanvraag
@@ -48,6 +50,19 @@ class Aanvraag extends Model
         // Faalt nooit hard: Lead::record() vangt zijn eigen fouten op, een
         // meting mag geen aanvraag blokkeren.
         static::created(fn (Aanvraag $aanvraag) => Lead::record($aanvraag->type, $aanvraag));
+
+        // Bijlagen staan op de private 'local'-disk; ze verdwijnen mee met de
+        // aanvraag (verwijderen in Website → Aanvragen, ook in bulk).
+        static::deleted(fn (Aanvraag $aanvraag) => $aanvraag->deleteAttachments());
+    }
+
+    public function deleteAttachments(): void
+    {
+        foreach ($this->attachments ?? [] as $file) {
+            if (! empty($file['path'])) {
+                Storage::disk('local')->delete($file['path']);
+            }
+        }
     }
 
     protected function casts(): array

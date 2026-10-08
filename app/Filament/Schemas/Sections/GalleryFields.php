@@ -2,13 +2,15 @@
 
 namespace App\Filament\Schemas\Sections;
 
-use App\Filament\Schemas\Components\MediaPickerField;
 use App\Models\Realisatie;
 use App\Models\RealisatieCategory;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use Webgoeroe\Core\Filament\Schemas\Components\MediaPickerField;
+use Webgoeroe\Core\Filament\Schemas\Sections\HeadingFields;
+use Webgoeroe\Core\Filament\Schemas\Sections\RepeaterToggleStyle;
 
 /**
  * Gallery — een grid van projecten. Elk project bundelt meerdere foto's; de

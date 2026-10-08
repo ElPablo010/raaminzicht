@@ -7,9 +7,9 @@ use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Support\Realisaties;
-use App\Support\SiteFooter;
-use App\Support\SiteHeader;
 use Illuminate\Database\Seeder;
+use Webgoeroe\Core\Support\SiteFooter;
+use Webgoeroe\Core\Support\SiteHeader;
 
 /**
  * Volledige demo-content voor Raaminzicht: header/footer-instellingen, menu's en

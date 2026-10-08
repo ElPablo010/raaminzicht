@@ -1,9 +1,11 @@
 @php
     // Leest de instellingen uit de admin (Footer-pagina) + de footermenu's uit de DB.
-    $footer = \App\Support\SiteFooter::current();
+    $footer = \Webgoeroe\Core\Support\SiteFooter::current();
     $contact = $footer['contact'] ?? [];
     $brand = $footer['brand'] ?? [];
-    $social = $footer['social'] ?? [];
+    // Enkel de netwerken met een icoon hieronder (de core kent ook LinkedIn, dat
+    // deze site niet gebruikt: config/core.php → footer.linkedin).
+    $social = array_intersect_key($footer['social'] ?? [], array_flip(['facebook', 'instagram', 'youtube']));
     $logo = $brand['logo'] ?: asset('images/brand/raaminzicht-logo.png');
     $footerMenus = \App\Models\Menu::whereIn('location', ['footer_1', 'footer_2', 'footer_3'])
         ->with('items')
@@ -14,7 +16,7 @@
     $phoneName = $contact['phone_name'] ?? null;
     $phoneHref = $phone ? 'tel:'.preg_replace('/[^0-9+]/', '', $phone) : null;
     $email = $contact['email'] ?? null;
-    $legalPages = \App\Support\SiteFooter::legalPages();
+    $legalPages = \Webgoeroe\Core\Support\SiteFooter::legalPages();
     $socialIcons = [
         'facebook' => 'M13 3h4V0h-4a5 5 0 00-5 5v3H5v4h3v8h4v-8h3l1-4h-4V5a1 1 0 011-1z',
         'instagram' => 'M12 2c2.7 0 3 0 4.1.1 1 0 1.7.2 2.3.5.6.2 1.1.5 1.6 1s.8 1 .1 1.6c.3.6.5 1.3.5 2.3.1 1.1.1 1.4.1 4.1s0 3-.1 4.1c0 1-.2 1.7-.5 2.3a4.5 4.5 0 01-2.6 2.6c-.6.3-1.3.5-2.3.5-1.1.1-1.4.1-4.1.1s-3 0-4.1-.1c-1 0-1.7-.2-2.3-.5a4.5 4.5 0 01-2.6-2.6c-.3-.6-.5-1.3-.5-2.3C2 15 2 14.7 2 12s0-3 .1-4.1c0-1 .2-1.7.5-2.3a4.5 4.5 0 012.6-2.6c.6-.3 1.3-.5 2.3-.5C8.6 2 9 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm5.3-3.4a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z',

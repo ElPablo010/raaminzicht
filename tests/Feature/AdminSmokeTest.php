@@ -1,14 +1,11 @@
 <?php
 
 use App\Enums\UserRole;
-use App\Filament\Resources\Pages\Pages\CreatePage;
-use App\Filament\Resources\Pages\Pages\EditPage;
 use App\Filament\Resources\RealisatieCategories\Pages\ListRealisatieCategories;
 use App\Filament\Resources\Realisaties\Pages\CreateRealisatie;
 use App\Filament\Resources\Realisaties\Pages\EditRealisatie;
 use App\Filament\Resources\Realisaties\Pages\ListRealisaties;
 use App\Filament\Resources\Realisaties\RealisatieResource;
-use App\Filament\Resources\WebsiteMedia\Pages\ListWebsiteMedia;
 use App\Models\Page;
 use App\Models\Realisatie;
 use App\Models\RealisatieCategory;
@@ -18,6 +15,9 @@ use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\Livewire;
+use Webgoeroe\Core\Filament\Resources\Pages\Pages\CreatePage;
+use Webgoeroe\Core\Filament\Resources\Pages\Pages\EditPage;
+use Webgoeroe\Core\Filament\Resources\WebsiteMedia\Pages\ListWebsiteMedia;
 
 /**
  * Rookt de admin-schermen van het realisaties-post-type uit: booten de
@@ -167,7 +167,7 @@ it('zet Instellingen onderaan de zijbalk en toont uitloggen en het oogje naar de
 
     $response
         ->assertSee('Uitloggen')
-        ->assertSee('Bekijk website')
+        ->assertSee('Bekijk de website')
         ->assertSee(filament()->getLogoutUrl());
 });
 

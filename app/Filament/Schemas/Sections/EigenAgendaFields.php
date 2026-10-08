@@ -17,46 +17,32 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 
 /**
- * Agenda (`booking`, vroeger `afspraak`) — afspraak inplannen. De `provider`
- * bepaalt welke agenda de sectie toont; op deze site bestaat enkel
- * 'eigen_agenda' (tijdsloten, hieronder). Alle velden daarvan staan onder
- * dezelfde sleutels als vroeger en zijn enkel zichtbaar bij die provider.
+ * Eigen agenda — de provider `eigen_agenda` van het core-blok `booking`
+ * (Core::blocks()->configure('booking', …) in config/core.php, deze velden via
+ * Core::blocks()->extend('booking', …) in AppServiceProvider). Alle velden staan
+ * onder dezelfde sleutels als de vroegere afspraak-sectie en zijn enkel
+ * zichtbaar bij die provider.
  *
- * Eigen agenda — toonzaalbezoek inplannen. De bezoeker kiest een datum (enkel
- * weekdagen waarvoor een openingsvenster bestaat) en een tijdslot binnen dat
- * venster. De aanvraag wordt opgeslagen (lead, type 'afspraak') en gemaild;
- * de zaakvoerder bevestigt manueel — er is dus bewust geen externe
+ * Toonzaalbezoek inplannen. De bezoeker kiest een datum (enkel weekdagen
+ * waarvoor een openingsvenster bestaat) en een tijdslot binnen dat venster. De
+ * aanvraag wordt opgeslagen (aanvraag, type 'afspraak') en gemaild; de
+ * zaakvoerder bevestigt manueel — er is dus bewust geen externe
  * agenda-synchronisatie of dubbel-boeking-check.
  *
- * Net als bij FormFields: de markup staat in de partial, de verzending in
- * de Livewire-component App\Livewire\AppointmentForm.
+ * De markup staat in de partial (components/site/sections/booking), de
+ * verzending in de Livewire-component App\Livewire\AppointmentForm.
  */
-class BookingFields
+class EigenAgendaFields
 {
+    public const PROVIDER = 'eigen_agenda';
+
+    /** De velden van de eigen agenda, als groep die enkel bij die provider zichtbaar is. */
     public static function make(): array
     {
         return [
-            ...HeadingFields::make(headingRequired: false),
-
-            Select::make('provider')
-                ->label('Agenda')
-                ->options(self::providers())
-                ->default('eigen_agenda')
-                ->selectablePlaceholder(false)
-                ->live()
-                ->required(),
-
             Group::make(self::eigenAgendaFields())
                 // Secties van vóór de provider-keuze (zonder sleutel) = eigen agenda.
-                ->visible(fn ($get) => ($get('provider') ?: 'eigen_agenda') === 'eigen_agenda'),
-        ];
-    }
-
-    /** @return array<string, string> */
-    public static function providers(): array
-    {
-        return [
-            'eigen_agenda' => 'Eigen agenda (tijdsloten)',
+                ->visible(fn ($get) => ($get('provider') ?: self::PROVIDER) === self::PROVIDER),
         ];
     }
 

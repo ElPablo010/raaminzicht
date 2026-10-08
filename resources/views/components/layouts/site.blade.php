@@ -15,10 +15,10 @@
 @php
     // Site-brede structured data (LocalBusiness + WebSite) + pagina-specifieke nodes
     // in één @graph.
-    $graph = array_merge(\App\Support\Seo::globalGraph(), $schema ?? []);
+    $graph = array_merge(\Webgoeroe\Core\Support\Seo::globalGraph(), $schema ?? []);
 
     // Favicon uit de Header-instellingen; valt terug op de meegeleverde set.
-    $favicon = \App\Support\SiteHeader::current()['favicon'] ?? null;
+    $favicon = \Webgoeroe\Core\Support\SiteHeader::current()['favicon'] ?? null;
 @endphp
 
 <!DOCTYPE html>

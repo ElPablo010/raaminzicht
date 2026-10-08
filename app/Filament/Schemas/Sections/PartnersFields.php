@@ -2,10 +2,11 @@
 
 namespace App\Filament\Schemas\Sections;
 
-use App\Filament\Schemas\Components\MediaPickerField;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
+use Webgoeroe\Core\Filament\Schemas\Components\MediaPickerField;
+use Webgoeroe\Core\Filament\Schemas\Sections\RepeaterToggleStyle;
 
 /**
  * Partners / merken — een logo-strip die vertrouwen wekt (vaak net onder de hero).

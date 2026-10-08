@@ -11,38 +11,23 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 
 /**
- * Formulier (`form`, vroeger `formulier`) — herbruikbaar lead-formulier. Eén sectietype dat via 'form_type'
- * een offerte- óf contactformulier toont (of beide, met een keuzeschakelaar).
+ * Extra velden van het core-blok `form` op Raaminzicht (via
+ * Core::blocks()->extend('form', …) in AppServiceProvider): standaardtabblad,
+ * onderwerpen, contact-zijbalk en de optionele veldlabels.
  *
- * NB: de visuele markup staat in de partial; de daadwerkelijke verzending
- * (opslaan + mailen) wordt door een Livewire-component afgehandeld. De
- * veldlabels/teksten zijn optioneel overschrijfbaar — leeg = standaardtekst.
- *
- * De form_types offerte/contact/beide zijn Raaminzicht-eigen: ze renderen
- * App\Livewire\LeadForm, dat in de `aanvragen`-tabel schrijft. Enkel de
- * sectienaam volgt de core-standaard (migratie
- * 2026_10_07_120000_align_section_types_with_core); de content is ongewijzigd.
+ * De formuliertypes offerte / contact / beide zijn Raaminzicht-eigen: ze renderen
+ * App\Livewire\LeadForm, dat in de `aanvragen`-tabel schrijft
+ * (Core::formTypes() in AppServiceProvider). De veldlabels/teksten zijn optioneel
+ * overschrijfbaar — leeg = standaardtekst.
  */
-class FormFields
+class LeadFormFields
 {
     public static function make(): array
     {
         return [
-            ...HeadingFields::make(headingRequired: false),
-
+            // Naast "Formulier" (core) zou logischer zijn; de core-velden staan
+            // in hun eigen rij, dus deze krijgt een halve breedte eronder.
             Grid::make(['default' => 1, 'md' => 2])->schema([
-                Select::make('form_type')
-                    ->label('Type formulier')
-                    // Logische volgorde: enkelvoudig → enkelvoudig → gecombineerd.
-                    ->options([
-                        'offerte' => 'Offerteaanvraag',
-                        'contact' => 'Contactformulier',
-                        'beide' => 'Beide (met keuzeschakelaar)',
-                    ])
-                    ->default('offerte')
-                    ->live()
-                    ->required(),
-
                 Select::make('default_mode')
                     ->label('Standaard geopend tabblad')
                     ->helperText('Welk formulier staat actief bij het laden van de pagina.')

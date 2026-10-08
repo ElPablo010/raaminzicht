@@ -1,23 +1,19 @@
 <?php
 
 use App\Http\Controllers\Admin\AanvraagAttachmentController;
-use App\Http\Controllers\PublicPageController;
-use App\Http\Controllers\SeoController;
 use Illuminate\Support\Facades\Route;
 
 // Filament is het enige login-systeem; de korte /login redirect ernaartoe.
 Route::redirect('/login', '/admin/login')->name('login');
 
-// SEO/GEO-assets — dynamisch zodat ze de live database + omgeving weerspiegelen.
-// Vóór de catch-all geregistreerd.
-Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
-Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
-Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
+// sitemap.xml, robots.txt, llms.txt en de catch-all paginarouter komen uit
+// webgoeroe/core, ná deze routes (de catch-all is altijd de laatste route).
 
 // Google OAuth (Groei → Verkeer) komt uit de package webgoeroe/seo-growth
 // (admin/search-console/oauth/*) en laadt vóór deze routes.
 
-// Bijlagen van aanvragen (admin → Aanvragen); private disk, enkel voor admins.
+// Bijlagen van aanvragen (admin → Aanvragen, het inzendingen-scherm van de core
+// op App\Models\Aanvraag); private disk, enkel voor admins.
 Route::middleware('auth')
     ->get('/admin/aanvragen/{aanvraag}/bijlage/{index}', AanvraagAttachmentController::class)
     ->whereNumber('index')
@@ -35,8 +31,3 @@ Route::middleware('auth')
     })
     ->where('slug', '[a-z0-9-]+')
     ->name('design.preview');
-
-// Catch-all paginarouter (homepage + alle slugs). Sluit admin/livewire/storage uit.
-Route::get('/{slug?}', [PublicPageController::class, 'show'])
-    ->where('slug', '^(?!admin|login|livewire|storage|_debugbar|design).*$')
-    ->name('page.show');

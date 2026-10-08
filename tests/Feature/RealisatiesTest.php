@@ -1,10 +1,14 @@
 <?php
 
+use App\Enums\UserRole;
 use App\Models\Page;
 use App\Models\Realisatie;
 use App\Models\RealisatieCategory;
+use App\Models\User;
 use App\Support\Realisaties;
 use Database\Seeders\RealisatiesSeeder;
+use Livewire\Livewire;
+use Webgoeroe\Core\Filament\Resources\Pages\Pages\EditPage;
 
 /**
  * Realisaties als eigen post-type: records met categorieën, en gallery-secties
@@ -179,7 +183,7 @@ it('koppelt een productpagina aan de juiste categorie', function () {
 });
 
 it('laat verdwenen realisaties uit een selectie vallen zodat de pagina opslaat', function () {
-    $this->actingAs(\App\Models\User::factory()->create(['role' => \App\Enums\UserRole::Admin]));
+    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
 
     $kept = Realisatie::create(['title' => 'A', 'location' => 'Retie', 'photos' => []]);
 
@@ -196,7 +200,7 @@ it('laat verdwenen realisaties uit een selectie vallen zodat de pagina opslaat',
         ],
     ]);
 
-    \Livewire\Livewire::test(\App\Filament\Resources\Pages\Pages\EditPage::class, ['record' => $page->getKey()])
+    Livewire::test(EditPage::class, ['record' => $page->getKey()])
         ->assertOk()
         ->call('save')
         ->assertHasNoFormErrors();

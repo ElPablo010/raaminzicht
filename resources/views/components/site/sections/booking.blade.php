@@ -12,11 +12,11 @@
 @php
     // Secties van vóór de provider-keuze (zonder sleutel) = eigen agenda.
     $provider = ($content['provider'] ?? null) ?: 'eigen_agenda';
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $showSidebar = $content['show_sidebar'] ?? true;
 
-    $footer = \App\Support\SiteFooter::current();
+    $footer = \Webgoeroe\Core\Support\SiteFooter::current();
     $contact = $footer['contact'] ?? [];
     $phone = $contact['phone'] ?? null;
     $phoneHref = $phone ? 'tel:'.preg_replace('/[^0-9+]/', '', $phone) : null;

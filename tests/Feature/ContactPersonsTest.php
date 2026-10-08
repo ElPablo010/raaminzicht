@@ -2,7 +2,7 @@
 
 use App\Models\Page;
 use App\Models\Setting;
-use App\Support\SiteFooter;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /**
  * Contactpersonen uit de Footer-instellingen: standaard toont een formulier-

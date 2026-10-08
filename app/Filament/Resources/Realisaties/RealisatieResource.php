@@ -14,6 +14,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use Webgoeroe\Core\Filament\NavigationOrder;
 
 /**
  * Realisaties beheren: één record per uitgevoerd project. De volgorde in deze
@@ -28,7 +29,7 @@ class RealisatieResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 15;
+    protected static ?int $navigationSort = NavigationOrder::POST_TYPES;
 
     protected static ?string $recordTitleAttribute = 'title';
 

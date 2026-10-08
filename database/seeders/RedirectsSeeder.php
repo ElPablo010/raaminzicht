@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Http\Middleware\HandleRedirects;
 use App\Models\Page;
 use App\Models\Redirect;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
+use Webgoeroe\Core\Http\Middleware\HandleRedirects;
 
 /**
  * Redirects van de oude WordPress-site (www.raaminzicht.be bij one.com) naar

@@ -1,8 +1,8 @@
 @props(['section' => null, 'content' => []])
 
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? 'primary');
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? 'primary');
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? 'primary');
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? 'primary');
     $ctas = $content['ctas'] ?? [];
 @endphp
 

@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Http\Middleware\HandleRedirects;
 use App\Models\MenuItem;
 use App\Models\Page;
 use App\Models\PageSection;
 use App\Models\Redirect;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Cache;
+use Webgoeroe\Core\Http\Middleware\HandleRedirects;
 
 /**
  * Productpagina's van `/producten/<x>` naar `/<x>` (beslissing 04/09/2026: het

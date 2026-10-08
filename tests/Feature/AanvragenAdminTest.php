@@ -1,12 +1,12 @@
 <?php
 
 use App\Enums\UserRole;
-use App\Filament\Resources\Aanvragen\AanvraagResource;
-use App\Filament\Resources\Aanvragen\Pages\ListAanvragen;
 use App\Models\Aanvraag;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Webgoeroe\Core\Filament\Resources\FormSubmissions\FormSubmissionResource as AanvraagResource;
+use Webgoeroe\Core\Filament\Resources\FormSubmissions\Pages\ListFormSubmissions as ListAanvragen;
 
 /**
  * Website → Aanvragen: overzicht van de formulier-aanvragen, gelezen-status,

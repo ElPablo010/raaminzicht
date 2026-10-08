@@ -4,9 +4,11 @@ use App\Livewire\AppointmentForm;
 use App\Mail\LeadReceived;
 use App\Models\Aanvraag;
 use App\Models\Setting;
-use App\Support\SiteFooter;
+use Database\Seeders\HomepageSeeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /** Vensters voor elke weekdag, zodat een testdatum altijd beschikbaar is. */
 function allWeekWindows(): array
@@ -29,7 +31,7 @@ it('genereert datums en tijdslots uit de openingsvensters', function () {
 
     // Elke beschikbare datum valt op een maandag en levert de 4 halfuur-slots.
     $first = $dates[0];
-    expect(\Illuminate\Support\Carbon::parse($first)->dayOfWeekIso)->toBe(1);
+    expect(Carbon::parse($first)->dayOfWeekIso)->toBe(1);
     expect($component->instance()->slotsForDate($first))->toBe(['10:00', '10:30', '11:00', '11:30']);
 });
 
@@ -88,7 +90,7 @@ it('weigert een tijdstip dat buiten de vensters valt', function () {
 });
 
 it('toont de afspraakpagina met het formulier', function () {
-    $this->seed(\Database\Seeders\HomepageSeeder::class);
+    $this->seed(HomepageSeeder::class);
 
     $this->get('/afspraak')
         ->assertOk()

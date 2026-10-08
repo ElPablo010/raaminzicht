@@ -21,7 +21,7 @@
     x-transition, en `detailed` reset pas ná de leave-duur (zie `saveConsent`).
 --}}
 @php
-    $legal = \App\Support\SiteFooter::legalPages();
+    $legal = \Webgoeroe\Core\Support\SiteFooter::legalPages();
     $cookieUrl = isset($legal['Cookiebeleid']) ? $legal['Cookiebeleid']->publicUrl() : null;
     $privacyUrl = isset($legal['Privacyverklaring']) ? $legal['Privacyverklaring']->publicUrl() : null;
 @endphp

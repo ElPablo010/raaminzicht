@@ -1,13 +1,12 @@
 @props(['section' => null, 'content' => []])
 
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $type = $content['form_type'] ?? 'offerte';
     $showSidebar = $content['show_sidebar'] ?? true;
-    $subjects = collect($content['subjects'] ?? [])->filter()->sort()->values();
 
-    $footer = \App\Support\SiteFooter::current();
+    $footer = \Webgoeroe\Core\Support\SiteFooter::current();
     $contact = $footer['contact'] ?? [];
     $tel = fn (?string $p) => $p ? 'tel:'.preg_replace('/[^0-9+]/', '', $p) : null;
     // Contactpersonen uit de Footer-instellingen. Standaard enkel het hoofdnummer;
@@ -36,27 +35,18 @@
                 />
 
                 @php
-                    // Optionele label-overrides → enkel niet-lege waarden doorgeven,
-                    // de component valt terug op zijn standaardteksten.
-                    $labelKeys = [
-                        'label_name', 'ph_name', 'label_phone', 'ph_phone', 'label_email', 'ph_email',
-                        'label_subjects', 'label_message', 'ph_message', 'label_consent', 'label_uploads',
-                        'submit_offerte', 'submit_contact', 'footnote', 'success_heading',
-                    ];
-                    $labels = collect($labelKeys)
-                        ->mapWithKeys(fn ($k) => [$k => $content[$k] ?? null])
-                        ->filter(fn ($v) => filled($v))
-                        ->all();
+                    // form_type → Livewire-component + parameters uit het register
+                    // (Core::formTypes(), AppServiceProvider): offerte/contact/beide
+                    // renderen allemaal LeadForm.
+                    $formTypes = \Webgoeroe\Core\Core::formTypes();
+                    $formComponent = $formTypes->component($type) ?? 'lead-form';
+                    $formParams = $formTypes->has($type)
+                        ? $formTypes->params($type, $content, $section)
+                        : \App\Providers\AppServiceProvider::leadFormParams($content, $section);
                 @endphp
 
                 <div class="mt-8">
-                    @livewire('lead-form', [
-                        'type' => $type,
-                        'defaultMode' => $content['default_mode'] ?? 'offerte',
-                        'subjects' => $subjects->all(),
-                        'success' => $content['success_message'] ?? null,
-                        'labels' => $labels,
-                    ], key('lead-form-'.($section?->id ?? $content['section_id'] ?? 'x')))
+                    @livewire($formComponent, $formParams, key('lead-form-'.($section?->id ?? $content['section_id'] ?? 'x')))
                 </div>
             </div>
 

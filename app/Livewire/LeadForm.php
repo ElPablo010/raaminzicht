@@ -4,12 +4,13 @@ namespace App\Livewire;
 
 use App\Mail\LeadReceived;
 use App\Models\Aanvraag;
-use App\Support\SiteFooter;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Webgoeroe\Core\Support\SiteFooter;
 
 /**
  * Lead-formulier (offerte / contact). Slaat de inzending op en mailt ze naar het
@@ -69,7 +70,7 @@ class LeadForm extends Component
      * Bijlagen bij een offerteaanvraag (plannen/foto's). Max 6 bestanden,
      * elk ≤ 12 MB; courante plan- en beeldformaten.
      *
-     * @var array<int, \Illuminate\Http\UploadedFile>
+     * @var array<int, UploadedFile>
      */
     #[Validate([
         'attachments' => 'nullable|array|max:6',

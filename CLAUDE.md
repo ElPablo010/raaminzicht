@@ -17,7 +17,8 @@ globale website-context; hieronder enkel wat projectspecifiek is.
   plus warme `sand`-neutralen — alle in `resources/css/app.css` (`@theme`).
   Filament panel-kleur (`AdminPanelProvider::colors`) staat op `#286872`.
   Koppen in **Fraunces** (serif), tekst in **Inter** (via Google Fonts in
-  `layouts/site.blade.php`). `SectionBackground` is op deze schaal afgestemd.
+  `layouts/site.blade.php`). De achtergronden van secties (`config/core.php` →
+  `backgrounds`) zijn op deze schaal afgestemd.
 - **Hosting / deploy:** Combell shared hosting, SSH `raaminzichtbe@176.62.165.220`
   (níet ssh.raaminzicht.be, dat is de oude one.com-server). App staat in
   `~/raaminzicht` (= `/data/sites/web/raaminzichtbe/raaminzicht`), docroot `~/www`
@@ -116,32 +117,62 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
   vólgorde van de foto's zelf blijft wél hard vergeleken — dat zijn lijstindexen.
 - Tests: `tests/Feature/RealisatiesTest.php`, `tests/Feature/AdminSmokeTest.php`.
 
+## Site-basis (package webgoeroe/core)
+
+De basis van de site komt sinds 8 oktober 2026 (stap 3d, branch `core-package`)
+uit de package **`webgoeroe/core`** (code in `Internal OS/Modules/repo/core`,
+private repo `ElPablo010/core`; uitleg in `Modules/wiki/modules.md`). Pas die
+basis nooit hier aan, maar in de package. Uit de core: de modellen (dunne
+subklassen in `app/Models`), page-builder en standaardblokken, Pagina's, Media,
+Menu's, Redirects (met jokerteken), Header, Footer, Algemeen, het
+Aanvragen-scherm, de admin-chrome ("Bekijk de website", uitloggen),
+`Seo`/`SiteHeader`/`SiteFooter`/`Url`, `WebsiteMediaService`,
+sitemap/robots/llms.txt, de catch-all paginarouter en de middleware
+(canonieke host, redirects).
+
+Wat Raaminzicht-eigen blijft en waar het hangt:
+
+| Wat | Hoe |
+|---|---|
+| Alle publieke views (layout, header, footer, meta, cookiebanner, secties, `pages/show`, `sitemap`, formulieren) | in het project, gaan voor op de core |
+| Achtergronden (Patrijspoort), blokopties (hero-troeven, tekst-intro, reviews-score, …), favicon, tweede contactpersoon, juridische pagina's, geen LinkedIn, canonieke host globaal | `config/core.php` |
+| Blokken `partners` en `gallery` (realisaties-bron), extra velden `form` (`LeadFormFields`) en `booking` (`EigenAgendaFields`) | `AppServiceProvider::registerBlocks()` |
+| Formuliertypes offerte/contact/beide → `LeadForm` (→ `aanvragen`) | `AppServiceProvider::registerFormTypes()` |
+| Aanvragen-scherm: kolommen, typefilter, bekijk-modal (`filament/aanvragen/view`) | `config/core.php` (`form_submissions`) + `AppServiceProvider::registerAanvragenScreen()` |
+| Realisaties (resources, `GalleryUploadField`, `GalleryItems`), `SectionLinks`, bijlagen-route, seeders | ongewijzigd in de site |
+
+De core-tests draaien mee (`tests/Pest.php`, testsuite `Core` in `phpunit.xml`).
+Composer staat (tot de deploy) op de lokale path-repository
+`../../Modules/repo/core` (`@dev`); vóór de deploy core v0.4.0 pushen en
+overschakelen naar de VCS-repository met `^0.4`.
+
 ## Stack & structuur
 
-- Admin op `/admin` (Filament), sidebar-groep **Website**: Pagina's, Media,
-  Menu's, Redirects, Realisaties, Realisatie-categorieën, Aanvragen, Header, Footer.
-  Groepsvolgorde staat vast in `AdminPanelProvider::navigationGroups()`
-  (Website → Groei → Instellingen). Admin-chrome via render hooks in dezelfde
-  provider: oogje naar de site vóór het account-menu
-  (`filament/admin/topbar-site-link`) en een uitlogknop onderaan de zijbalk
-  (`filament/admin/sidebar-logout`).
-- **Aanvragen** (`AanvraagResource`, sinds 07/10/2026): overzicht van de tabel
-  `aanvragen` (offerte, contact, afspraak), zelfde rol als "Inzendingen" op de
-  andere sites. Badge = ongelezen (`aanvragen.read_at`; bestaande aanvragen zijn
-  bij de migratie als gelezen gemarkeerd), bekijken markeert als gelezen, filter
-  per type, verwijderen ruimt de bijlagen mee op. Bijlagen staan op de private
+- Admin op `/admin` (Filament), sidebar-groep **Website** (vaste volgorde van de
+  core): Pagina's, Realisaties (`NavigationOrder::POST_TYPES`),
+  Realisatie-categorieën (`POST_TYPES + 1`), Media, Menu's, Redirects, Header,
+  Footer, Aanvragen. Groepsvolgorde in `AdminPanelProvider::navigationGroups()`
+  (Website → Groei → Instellingen). De admin-chrome komt uit de core
+  (`CorePlugin`).
+- **Aanvragen** (sinds 07/10/2026, sinds 8/10/2026 het inzendingen-scherm van
+  de core op `App\Models\Aanvraag`, URL `/admin/aanvragen`): overzicht van de
+  tabel `aanvragen` (offerte, contact, afspraak). Badge = ongelezen
+  (`aanvragen.read_at`), bekijken markeert als gelezen, filter per type, zoeken
+  op naam/e-mail, verwijderen (ook in bulk) ruimt de bijlagen mee op
+  (`Aanvraag::booted()` → `deleteAttachments()`). Bijlagen staan op de private
   `local`-disk en gaan via `admin.aanvragen.attachment` (enkel admins).
-  Test: `tests/Feature/AanvragenAdminTest.php`.
+  Tests: `AanvragenAdminTest`, `AanvragenScreenTest`, `CoreRegistrationsTest`.
+  De core maakt ook een lege tabel `form_submissions` aan (ongebruikt hier).
 - **Media-URL's in Filament-kolommen altijd absoluut maken** (`url($record->url)`):
   de opgeslagen URL's zijn root-relatief (`/storage/…`) en `ImageColumn` ziet
   zo'n string als disk-pad, vindt het niet en rendert een lege `src`.
 - Publieke site: Blade + Livewire + Alpine, server-side gerenderd, catch-all
-  route → `PublicPageController`.
-- Pagina-builder: secties als herordenbare blokken. Een **nieuw sectietype** =
-  drie plekken:
+  route van de core (`PublicPageController`) → `pages/show` van het project.
+- Pagina-builder: secties als herordenbare blokken (bloklijst alfabetisch). Een
+  **nieuw sectietype** = twee plekken:
   1. `resources/views/components/site/sections/<type-met-streepjes>.blade.php`
-  2. `app/Filament/Schemas/Sections/<Type>Fields.php` (`static make(): array`)
-  3. een `Block::make('<type_snake_case>')` in `PageSectionsBuilder::blocks()`
+  2. een Fields-klasse in `app/Filament/Schemas/Sections` (`static make(): array`),
+     geregistreerd met `Core::blocks()->register(...)` in `AppServiceProvider`
 - **Sectietypes:** hero (met `height` compact/medium/tall + `highlights`-chips),
   partners (logo-strip), text_media, text (full-width rich text), cards (icon óf
   image), gallery (met Alpine-lightbox; put uit de realisaties of uit losse
@@ -157,14 +188,15 @@ Realisaties zijn een apart post-type i.p.v. losse foto's per galerij-sectie, zod
 - **Gedeelde frontend-primitives:** `<x-site.picture>` (WebP+JPG via
   `WebsiteMedia` of lokale sibling-detectie), `<x-site.btn>` (primary/secondary/
   ghost), `<x-site.section-heading>` (eyebrow/titel/intro).
-- **Formulier** = `form`-sectie (`FormFields`: type offerte/contact/
-  beide + onderwerpen + zijbalk) die de Livewire-component `App\Livewire\LeadForm`
-  rendert (validatie NL, opslaan in `aanvragen`, mailen via `LeadReceived`).
+- **Formulier** = `form`-sectie (core-blok + `LeadFormFields`: type offerte/contact/
+  beide + onderwerpen + zijbalk) die via `Core::formTypes()` de Livewire-component
+  `App\Livewire\LeadForm` rendert (validatie NL, opslaan in `aanvragen`, mailen via `LeadReceived`).
   In offerte-modus vraagt het ook een optioneel adres (straat, postcode,
   gemeente → `aanvragen.street/postal_code/city`); bij contact wordt dat genegeerd.
   De form_types zijn Raaminzicht-eigen; enkel de sectienaam volgt de core-standaard.
-- **Agenda** = `booking`-sectie (`BookingFields`, label "Agenda (afspraak)") met
-  `provider`; hier enkel `eigen_agenda` (tijdsloten → `App\Livewire\AppointmentForm`,
+- **Agenda** = `booking`-sectie (core-blok, label "Agenda (afspraak)", velden van de
+  eigen agenda in `EigenAgendaFields`) met `provider`; hier enkel `eigen_agenda`
+  (tijdsloten → `App\Livewire\AppointmentForm`,
   aanvraagtype `afspraak` in `aanvragen`). De eigen agenda bestaat alleen op
   Raaminzicht: vraagt een andere site er een, dan niet opnieuw bouwen maar naar de
   core-package verhuizen (zie Modules/wiki/modules.md → Beslissingen, 7 oktober 2026).
@@ -292,7 +324,7 @@ locatie-landingspagina's (`/ramen-en-deuren-<gemeente>/`, `/zonwering-…`,
 `/verandabouw-…`, `/terrasoverkapping-…`; near-duplicate doorway pages, 8 woorden
 verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpagina.
 
-- **Patroon-redirects:** een `from` met `*` is een patroon ("alles wat volgt",
+- **Patroon-redirects** (sinds 8/10/2026 uit de core, zelfde gedrag): een `from` met `*` is een patroon ("alles wat volgt",
   minstens één teken, hoofdletter-ongevoelig). `HandleRedirects` checkt eerst
   exact (O(1) uit cache), dan patronen op aflopende lengte van `from`. Een exacte
   regel voor één gemeente wint dus altijd van `/ramen-en-deuren-*`. Geen extra
@@ -315,7 +347,8 @@ verschil op 3380). Die worden **niet** herbouwd; ze redirecten naar de productpa
   Slug-afhankelijke code (seeders, `Realisaties`) daarom tolerant houden en
   na een deploy op de preview-URL controleren, niet enkel lokaal.
 - **Canonieke host = `APP_URL` (`https://www.raaminzicht.be`).** `RedirectToCanonicalHost`
-  (globale middleware, `bootstrap/app.php`) stuurt `raaminzicht.be` met een 301 naar
+  (uit de core; `config/core.php` → `middleware.canonical_host_scope = global`,
+  dus globaal en vooraan) stuurt `raaminzicht.be` met een 301 naar
   `www.` voor GET/HEAD, ook op `/admin`. Reden: beide hosts wijzen bij Combell naar
   dezelfde docroot, en de Google-OAuth-callback wordt uit de aanvraag-host opgebouwd
   (`route()`), dus de kale host gaf `redirect_uri_mismatch`. In de OAuth-client in

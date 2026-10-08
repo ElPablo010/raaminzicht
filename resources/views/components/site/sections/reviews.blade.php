@@ -1,8 +1,8 @@
 @props(['section' => null, 'content' => []])
 
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $reviews = array_values(array_filter($content['items'] ?? [], fn ($r) => ! empty($r['quote'])));
     $summary = $content['summary'] ?? [];
     $cardBg = $dark ? 'bg-white/5 ring-white/10' : 'bg-white ring-primary-950/5';

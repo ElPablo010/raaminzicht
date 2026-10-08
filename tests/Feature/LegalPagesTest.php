@@ -2,8 +2,8 @@
 
 use App\Models\Page;
 use App\Models\Setting;
-use App\Support\SiteFooter;
 use Database\Seeders\LegalPagesSeeder;
+use Webgoeroe\Core\Support\SiteFooter;
 
 it('creates, fills and publishes both legal pages', function () {
     $this->seed(LegalPagesSeeder::class);

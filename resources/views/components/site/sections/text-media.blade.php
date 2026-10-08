@@ -1,8 +1,8 @@
 @props(['section' => null, 'content' => []])
 
 @php
-    $bg = \App\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
-    $dark = \App\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
+    $bg = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::classes($content['background'] ?? null);
+    $dark = \Webgoeroe\Core\Filament\Schemas\Sections\SectionBackground::isDark($content['background'] ?? null);
     $mediaType = $content['media_type'] ?? 'image';
     $mediaSide = $content['media_side'] ?? 'right';
     $ctas = $content['ctas'] ?? [];

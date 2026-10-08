@@ -4,11 +4,11 @@ use App\Livewire\LeadForm;
 use App\Mail\LeadReceived;
 use App\Models\Aanvraag;
 use App\Models\Setting;
-use App\Support\SiteFooter;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Webgoeroe\Core\Support\SiteFooter;
 
 it('stores a lead and mails it on a valid offerte submission', function () {
     Mail::fake();

@@ -1,7 +1,7 @@
 @php
     // Leest de instellingen uit de admin (Header-pagina) + het hoofdmenu uit de DB.
-    $header = \App\Support\SiteHeader::current();
-    $footer = \App\Support\SiteFooter::current();
+    $header = \Webgoeroe\Core\Support\SiteHeader::current();
+    $footer = \Webgoeroe\Core\Support\SiteFooter::current();
     $menu = \App\Models\Menu::where('location', 'main')->with('items.children')->first();
     $cta = $header['cta'] ?? [];
     $contact = $footer['contact'] ?? [];

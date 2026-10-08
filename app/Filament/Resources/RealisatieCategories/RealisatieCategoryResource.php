@@ -12,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
+use Webgoeroe\Core\Filament\NavigationOrder;
 
 /**
  * Categorieën van realisaties (Ramen en deuren, Veranda's, Zonwering, …).
@@ -25,7 +26,7 @@ class RealisatieCategoryResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Website';
 
-    protected static ?int $navigationSort = 16;
+    protected static ?int $navigationSort = NavigationOrder::POST_TYPES + 1;
 
     protected static ?string $recordTitleAttribute = 'name';
 
