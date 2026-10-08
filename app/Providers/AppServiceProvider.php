@@ -45,7 +45,7 @@ class AppServiceProvider extends ServiceProvider
             ->register('partners', 'Partners / logo\'s', PartnersFields::class)
             // Galerij die uit de realisaties put (of uit losse foto's): eigen
             // velden en een eigen opslagvorm (projecten met foto's).
-            ->register('gallery', 'Gallerij', GalleryFields::class)
+            ->register('gallery', 'Galerij', GalleryFields::class)
             // Formulier: offerte/contact/beide (LeadForm) met onderwerpen,
             // contact-zijbalk en optionele veldlabels.
             ->extend('form', fn (array $fields): array => [...$fields, ...LeadFormFields::make()])
