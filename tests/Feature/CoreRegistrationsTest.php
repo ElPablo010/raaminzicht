@@ -42,8 +42,7 @@ it('registreert de formuliertypes offerte, contact en beide op LeadForm', functi
 });
 
 it('kent de eigen blokken en de eigen agenda als enige booking-provider', function () {
-    expect(Core::blocks()->types())->toContain('partners', 'gallery', 'form', 'booking')
-        ->not->toContain('problem_recognition', 'advantages', 'process_steps')
+    expect(Core::blocks()->types())->toContain('partners', 'gallery', 'form', 'booking', 'problem_recognition', 'advantages', 'process_steps')
         ->and(Core::blocks()->options('booking')['providers'])->toBe(['eigen_agenda' => 'Eigen agenda (tijdsloten)'])
         ->and(Core::blocks()->all()['booking']['label'])->toBe('Agenda (afspraak)');
 });

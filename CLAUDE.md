@@ -135,6 +135,7 @@ Wat Raaminzicht-eigen blijft en waar het hangt:
 | Wat | Hoe |
 |---|---|
 | Alle publieke views (layout, header, footer, meta, cookiebanner, secties, `pages/show`, `sitemap`, formulieren) | in het project, gaan voor op de core |
+| Probleemherkenning, voordelen en werkwijze (aan sinds 9 oktober 2026; afsluiter in `site.section-closing`) | eigen sectieviews |
 | Achtergronden (Patrijspoort), blokopties (hero-troeven, tekst-intro, reviews-score, …), favicon, tweede contactpersoon, juridische pagina's, geen LinkedIn | `config/core.php` |
 | Blokken `partners` en `gallery` (realisaties-bron), extra velden `form` (`LeadFormFields`) en `booking` (`EigenAgendaFields`) | `AppServiceProvider::registerBlocks()` |
 | Formuliertypes offerte/contact/beide → `LeadForm` (→ `aanvragen`) | `AppServiceProvider::registerFormTypes()` |

@@ -22,8 +22,6 @@ return [
     ],
 
     'blocks' => [
-        // Geen Raaminzicht-view: probleemherkenning, voordelen en werkwijze.
-        'disabled' => ['problem_recognition', 'advantages', 'process_steps'],
         'options' => [
             'hero' => [
                 'highlights' => true,       // trust-punten onder de knoppen
