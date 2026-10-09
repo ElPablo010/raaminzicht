@@ -58,4 +58,9 @@ return [
         ],
     ],
 
+    // Tijdval van het lead-formulier: sneller verzonden = bot.
+    'lead_form' => [
+        'min_seconds' => (int) env('LEAD_FORM_MIN_SECONDS', 3),
+    ],
+
 ];

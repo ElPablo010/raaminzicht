@@ -22,6 +22,10 @@
         </div>
     @else
         <form wire:submit="submit" class="rounded-3xl border border-primary-100 bg-white p-6 shadow-xl shadow-primary-950/5 sm:p-8">
+            {{-- Honeypot — verborgen voor mensen, ingevuld door bots. --}}
+            <div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+                <label>Website <input type="text" wire:model="website" tabindex="-1" autocomplete="off"></label>
+            </div>
             @if ($type === 'beide')
                 @php
                     // De standaard-modus staat eerst; de andere als tweede tab.

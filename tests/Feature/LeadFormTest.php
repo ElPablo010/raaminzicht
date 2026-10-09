@@ -7,6 +7,7 @@ use App\Models\Setting;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Webgoeroe\Core\Support\SiteFooter;
 
@@ -155,4 +156,85 @@ it('only shows the address fields in offerte mode', function () {
         ->assertSee('Straat en huisnummer')
         ->set('mode', 'contact')
         ->assertDontSee('Straat en huisnummer');
+});
+
+function spamCandidate(array $overrides = []): Testable
+{
+    $test = Livewire::test(LeadForm::class, ['type' => 'offerte'])
+        ->set('name', 'Jan Janssen')
+        ->set('email', 'jan@example.be')
+        ->set('message', 'Graag een offerte.')
+        ->set('consent', true);
+
+    foreach ($overrides as $field => $value) {
+        $test->set($field, $value);
+    }
+
+    return $test;
+}
+
+it('silently drops a submission with the honeypot filled in', function () {
+    Mail::fake();
+
+    spamCandidate(['website' => 'https://spam.example'])
+        ->call('submit')
+        ->assertSet('submitted', true);
+
+    expect(Aanvraag::count())->toBe(0);
+    Mail::assertNothingSent();
+});
+
+it('silently drops a submission sent faster than a human can', function () {
+    Mail::fake();
+    config(['services.lead_form.min_seconds' => 3]);
+
+    spamCandidate()->call('submit')->assertSet('submitted', true);
+    expect(Aanvraag::count())->toBe(0);
+
+    spamCandidate()->tap(fn () => $this->travel(5)->seconds())->call('submit')->assertSet('submitted', true);
+    expect(Aanvraag::count())->toBe(1);
+});
+
+it('silently drops submissions with links in the name or a message full of links', function () {
+    Mail::fake();
+
+    spamCandidate(['name' => 'Cheap SEO www.spam.example'])->call('submit');
+    spamCandidate(['message' => 'Visit https://a.example and https://b.example'])->call('submit');
+
+    expect(Aanvraag::count())->toBe(0);
+    Mail::assertNothingSent();
+});
+
+it('limits submissions to 5 per hour per IP', function () {
+    Mail::fake();
+
+    foreach (range(1, 5) as $i) {
+        spamCandidate()->call('submit')->assertHasNoErrors();
+    }
+
+    spamCandidate()->call('submit')->assertHasErrors('email');
+
+    expect(Aanvraag::count())->toBe(5);
+});
+
+it('silently drops the bot pattern seen in October 2026', function (array $fields) {
+    Mail::fake();
+
+    spamCandidate($fields)->call('submit')->assertSet('submitted', true);
+
+    expect(Aanvraag::count())->toBe(0);
+})->with([
+    'gibberish name' => [['name' => 'PIIoXFKGuIfWqSoneFwaht']],
+    'dotted gmail' => [['email' => 'a.b.c.def@gmail.com']],
+    'digits-only message' => [['message' => '8204810801']],
+]);
+
+it('accepts ordinary names, addresses and messages', function () {
+    Mail::fake();
+
+    spamCandidate(['name' => 'Jan Van den Bossche', 'email' => 'jan.vdb@gmail.com', 'message' => 'Raam 120x80, graag prijs'])
+        ->call('submit')->assertHasNoErrors();
+    spamCandidate(['name' => 'McDonaldson', 'message' => ''])->call('submit')->assertHasNoErrors();
+
+    expect(Aanvraag::count())->toBe(2);
 });
