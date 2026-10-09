@@ -7,11 +7,10 @@ use App\Models\Aanvraag;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\RateLimiter;
-use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Webgoeroe\Core\Livewire\Concerns\GuardsAgainstSpam;
 use Webgoeroe\Core\Support\SiteFooter;
 
 /**
@@ -21,6 +20,7 @@ use Webgoeroe\Core\Support\SiteFooter;
  */
 class LeadForm extends Component
 {
+    use GuardsAgainstSpam;
     use WithFileUploads;
 
     /** offerte | contact | beide */
@@ -83,13 +83,6 @@ class LeadForm extends Component
     #[Validate('accepted')]
     public bool $consent = false;
 
-    /** Honeypot: bots vullen dit in, mensen zien het niet. */
-    public string $website = '';
-
-    /** Tijdstip waarop het formulier geladen werd (tijdval tegen bots). */
-    #[Locked]
-    public int $renderedAt = 0;
-
     public function mount(string $type = 'offerte', string $defaultMode = 'offerte', array $subjects = [], ?string $success = null, array $labels = []): void
     {
         $this->type = in_array($type, ['offerte', 'contact', 'beide'], true) ? $type : 'offerte';
@@ -105,7 +98,6 @@ class LeadForm extends Component
         $this->subjects = collect($subjects)->filter()->sort()->values()->all();
         $this->success = $success;
         $this->labels = $labels;
-        $this->renderedAt = now()->getTimestamp();
     }
 
     /** Label-/tekst-override uit de sectie, of de meegegeven standaardtekst. */
@@ -136,45 +128,6 @@ class LeadForm extends Component
         $this->attachments = array_values($this->attachments);
     }
 
-    /**
-     * Spamcontrole: honeypot ingevuld, te snel verzonden (bots), links, of de
-     * kenmerken van de nep-aanvragen van oktober 2026 (letterbrij als naam,
-     * Gmail-adres vol punten, bericht enkel cijfers). Zo'n inzending wordt stil
-     * genegeerd.
-     */
-    protected function looksLikeSpam(): bool
-    {
-        if ($this->website !== '') {
-            return true;
-        }
-
-        if (now()->getTimestamp() - $this->renderedAt < (int) config('services.lead_form.min_seconds', 3)) {
-            return true;
-        }
-
-        if (preg_match('~https?://|www\.~i', $this->name)) {
-            return true;
-        }
-
-        // Willekeurige letterbrij als naam (bv. "PIIoXFKGuIfWqSoneFwaht").
-        $name = trim($this->name);
-        if (! preg_match('/\s/', $name) && mb_strlen($name) >= 10 && preg_match_all('/\p{Lu}/u', mb_substr($name, 1)) >= 3) {
-            return true;
-        }
-
-        // Gmail-adres met veel punten (Gmail negeert ze; bots misbruiken dat).
-        if (preg_match('/^([^@]+)@(gmail|googlemail)\.com$/i', trim($this->email), $m) && substr_count($m[1], '.') >= 3) {
-            return true;
-        }
-
-        // Bericht dat enkel uit cijfers bestaat (bv. "8204810801").
-        if (preg_match('/^[\d\s]+$/', trim($this->message))) {
-            return true;
-        }
-
-        return preg_match_all('~https?://|www\.~i', $this->message) >= 2;
-    }
-
     /** Doe alsof het lukte, zonder iets op te slaan of te mailen. */
     protected function fakeSuccess(): void
     {
@@ -185,8 +138,8 @@ class LeadForm extends Component
 
     public function submit(): void
     {
-        if ($this->looksLikeSpam()) {
-            Log::info('Lead-formulier: spam genegeerd.', ['ip' => request()->ip(), 'email' => $this->email]);
+        // Spamcontrole van de core: stil negeren, of max. aantal per uur per IP.
+        if ($this->isSpam($this->name, $this->email, $this->message)) {
             $this->fakeSuccess();
 
             return;
@@ -194,14 +147,11 @@ class LeadForm extends Component
 
         $data = $this->validate();
 
-        // Max 5 aanvragen per uur per IP-adres.
-        $key = 'lead-form:'.request()->ip();
-        if (RateLimiter::tooManyAttempts($key, 5)) {
+        if ($this->tooManySubmissions()) {
             $this->addError('email', 'Je hebt al meerdere aanvragen verstuurd. Probeer het later opnieuw of bel ons.');
 
             return;
         }
-        RateLimiter::hit($key, 3600);
 
         $resolvedType = $this->type === 'beide' ? $this->mode : $this->type;
 

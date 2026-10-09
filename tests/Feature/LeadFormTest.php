@@ -186,7 +186,7 @@ it('silently drops a submission with the honeypot filled in', function () {
 
 it('silently drops a submission sent faster than a human can', function () {
     Mail::fake();
-    config(['services.lead_form.min_seconds' => 3]);
+    config(['core.spam.min_seconds' => 3]);
 
     spamCandidate()->call('submit')->assertSet('submitted', true);
     expect(Aanvraag::count())->toBe(0);
