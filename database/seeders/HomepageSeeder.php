@@ -403,7 +403,7 @@ class HomepageSeeder extends Seeder
         ];
     }
 
-    private function productPage(string $slug, string $title, string $metaDesc, string $heroImg, string $heroAlt, string $eyebrow, string $heroHeading, string $heroSub, array $textMedia, array $cards, array $faq, ?string $cardsHeading = null, ?string $heroCtaLabel = null): array
+    private function productPage(string $slug, string $title, string $metaDesc, string $heroImg, string $heroAlt, string $eyebrow, string $heroHeading, string $heroSub, array $textMedia, array $cards, array $faq, ?string $cardsHeading = null, ?string $heroCtaLabel = null, string $heroPosition = 'center 55%'): array
     {
         return [
             'slug' => $slug,
@@ -413,7 +413,7 @@ class HomepageSeeder extends Seeder
             'sections' => [
                 $this->hero($eyebrow, $heroHeading, '<p>'.$heroSub.'</p>', $heroImg, $heroAlt, [
                     ['label' => $heroCtaLabel ?? 'Vraag uw offerte', 'variant' => 'secondary', 'link_type' => 'url', 'href' => '/offerte'],
-                ], [], 'compact', 'center 55%'),
+                ], [], 'compact', $heroPosition),
                 ['type' => 'text_media', 'content' => $textMedia],
                 ['type' => 'cards', 'content' => [
                     'background' => 'light',
@@ -443,8 +443,8 @@ class HomepageSeeder extends Seeder
             'ramen-en-deuren',
             'Ramen & deuren',
             'Ramen en deuren op maat in PVC, aluminium en hout. Voordeuren, schuiframen en vliegenramen — vakkundig geplaatst in Heist-op-den-Berg en omstreken.',
-            $this->img('ramen-deuren'),
-            'Moderne ramen en schuiframen in een woning',
+            '/images/ramen-en-deuren/ramen-en-deuren-hero.jpg',
+            'Lichtgrijze baksteenwoning met antracietgrijze voordeur en zwarte aluminium ramen',
             'Ramen & deuren',
             'Ramen en deuren op maat',
             'Warmer, stiller en veiliger wonen. Ramen en deuren op maat in PVC, aluminium of hout, vakkundig geplaatst door ons eigen team.',
@@ -455,7 +455,7 @@ class HomepageSeeder extends Seeder
                 'intro' => '<p>Elk materiaal heeft zijn sterktes. We adviseren je graag wat het beste past bij je woning en je budget.</p><ul><li><strong>PVC — de beste prijs voor jarenlang comfort.</strong> Onderhoudsvriendelijk, goed geïsoleerd en voordelig.</li><li><strong>Aluminium — strak design dat je gevel moderner maakt.</strong> Slanke profielen, sterk en tijdloos.</li><li><strong>Hout — warmte en karakter dat je voelt.</strong> Natuurlijke uitstraling voor wie houdt van authentiek.</li></ul><p>Ook voor schuiframen, voordeuren en vliegenramen ben je bij ons aan het juiste adres.</p>',
                 'media_type' => 'image',
                 'media_side' => 'right',
-                'media' => ['src' => $this->img('realisatie-4'), 'alt' => 'Nieuwe ramen in een lichtrijke leefruimte'],
+                'media' => ['src' => '/images/ramen-en-deuren/ramen-en-deuren-sectie2.jpg', 'alt' => 'Lichtrijke leefruimte met zwarte aluminium schuifpui en uitzicht op de tuin'],
             ],
             [
                 ['title' => 'Een warmer huis, een lagere energiefactuur', 'media_type' => 'icon', 'icon' => 'thermometer-sun', 'description' => 'Standaard hoogrendementsglas houdt de warmte binnen. Je stookt minder en voelt het verschil meteen.'],
@@ -472,6 +472,7 @@ class HomepageSeeder extends Seeder
             ],
             'Het verschil dat je elke dag voelt',
             'Vraag je offerte',
+            'center 90%',
         );
     }
 
@@ -481,8 +482,8 @@ class HomepageSeeder extends Seeder
             'verandas',
             "Veranda's",
             "Veranda's op maat in Heist-op-den-Berg. Een lichtrijke leefruimte die het hele jaar door comfortabel is — vakkundig ontworpen en geplaatst.",
-            $this->img('verandas'),
-            'Moderne veranda met glazen wanden',
+            '/images/verandas/verandas-hero.jpg',
+            'Lichte veranda met zwarte aluminium profielen en zicht op de tuin',
             "Veranda's",
             'Je veranda, een tweede woonkamer',
             'Extra leefruimte waar je het hele jaar van geniet. Op maat ontworpen en geplaatst door ons eigen team — warm in de winter, koel in de zomer.',
@@ -493,7 +494,7 @@ class HomepageSeeder extends Seeder
                 'intro' => '<p>Een veranda van Raaminzicht is geen kille serre, maar een volwaardige leefruimte die je woning groter en lichter maakt. Modern, landelijk of klassiek, in aluminium of PVC: volledig op maat van je woning en geplaatst door ons eigen team. Liever niet meteen een volledige veranda? Ook voor een <strong>terrasoverkapping</strong>, deels open of volledig gesloten, ben je bij ons aan het juiste adres.</p>',
                 'media_type' => 'image',
                 'media_side' => 'left',
-                'media' => ['src' => $this->img('realisatie-2'), 'alt' => 'Veranda met schuiframen en zicht op de tuin'],
+                'media' => ['src' => '/images/verandas/verandas-sectie2.jpg', 'alt' => 'Lichtrijke veranda als tweede woonkamer met eettafel, zithoek en zicht op de tuin'],
             ],
             [
                 ['title' => 'Een tweede woonkamer, het hele jaar door', 'media_type' => 'icon', 'icon' => 'sofa', 'description' => 'Geen kille serre, maar een echte leefruimte. Goed geïsoleerde profielen en beglazing houden de warmte binnen.'],
@@ -552,8 +553,8 @@ class HomepageSeeder extends Seeder
             'poorten',
             'Rolluiken & poorten',
             'Rolluiken en sectionaalpoorten op maat voor meer comfort, isolatie en veiligheid. Geplaatst in Heist-op-den-Berg en omstreken.',
-            $this->img('rolluiken-poorten'),
-            'Moderne woning met sectionaalpoort',
+            '/images/poorten/poorten-hero.jpg',
+            'Witte woning bij avondlicht met antracietgrijze sectionaalpoort en rolluiken, met buurwoningen in de straat',
             'Rolluiken & poorten',
             'Comfort en veiligheid op de koop toe',
             'Rolluiken en sectionaalpoorten isoleren, beveiligen en verduisteren — handig bediend, optioneel volledig automatisch.',
@@ -564,7 +565,7 @@ class HomepageSeeder extends Seeder
                 'intro' => '<p>Rolluiken zorgen voor verduistering, extra isolatie en inbraakvertraging. Onze <strong>sectionaalpoorten</strong> openen ruimtebesparend naar boven en zijn perfect geïsoleerd — beide optioneel met motor en afstandsbediening.</p>',
                 'media_type' => 'image',
                 'media_side' => 'left',
-                'media' => ['src' => $this->img('realisatie-3'), 'alt' => 'Woning met sectionaalpoorten'],
+                'media' => ['src' => '/images/poorten/poorten-sectie2.jpg', 'alt' => 'Sectionaalpoort met houtlook voor een moderne garage, volledig zichtbaar'],
             ],
             [
                 ['title' => 'Extra isolatie', 'media_type' => 'icon', 'icon' => 'thermometer', 'description' => 'Rolluiken vormen een extra isolerende laag voor uw ramen.'],
