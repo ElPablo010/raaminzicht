@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Filament\Resources\RealisatieCategories\Pages\ListRealisatieCategories;
 use App\Filament\Resources\Realisaties\Pages\CreateRealisatie;
 use App\Filament\Resources\Realisaties\Pages\EditRealisatie;

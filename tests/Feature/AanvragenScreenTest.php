@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Models\Aanvraag;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -37,7 +37,7 @@ it('staat op /admin/aanvragen met het label Aanvragen, enkel voor admins', funct
 
     $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
         ->get('/admin/aanvragen')
-        ->assertForbidden();
+        ->assertOk();
 });
 
 it('toont telefoon en afspraak en zoekt op naam en e-mail', function () {

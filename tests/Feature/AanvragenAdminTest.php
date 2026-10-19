@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Models\Aanvraag;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
@@ -57,7 +57,7 @@ it('marks an aanvraag as read when viewed', function () {
     expect(AanvraagResource::getNavigationBadge())->toBeNull();
 });
 
-it('refuses attachment downloads to non-admins', function () {
+it('lets a Medewerker download attachments too', function () {
     Storage::fake('local');
     Storage::disk('local')->put('leads/plan.pdf', 'pdf-inhoud');
 
@@ -65,7 +65,7 @@ it('refuses attachment downloads to non-admins', function () {
 
     $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
         ->get(route('admin.aanvragen.attachment', [$record, 0]))
-        ->assertForbidden();
+        ->assertOk();
 });
 
 it('downloads an attachment for an admin and 404s on a missing one', function () {

@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Models\Page;
 use App\Models\Redirect;
 use App\Models\User;
@@ -89,6 +89,10 @@ it('renders the admin redirects page with the pattern badge', function () {
     Redirect::create(['from' => '/zonweringen', 'to' => '/zonwering', 'status_code' => 301]);
 
     $this->actingAs(User::factory()->create(['role' => UserRole::Admin]))
+        ->get('/admin/redirects')
+        ->assertForbidden();
+
+    $this->actingAs(User::factory()->create(['role' => UserRole::SuperAdmin]))
         ->get('/admin/redirects')
         ->assertOk()
         ->assertSee('Patroon')

@@ -4,7 +4,7 @@ use Webgoeroe\SeoGrowth\Filament\Pages\SeoLeads;
 use App\Models\Aanvraag;
 use Webgoeroe\SeoGrowth\Models\Lead;
 use App\Models\Setting;
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Models\User;
 use Webgoeroe\SeoGrowth\Support\Attribution;
 use Webgoeroe\SeoGrowth\Support\LeadStats;

@@ -1,6 +1,6 @@
 <?php
 
-use App\Enums\UserRole;
+use Webgoeroe\Core\Enums\UserRole;
 use App\Models\Page;
 use Webgoeroe\SeoGrowth\Models\SeoActionItem;
 use App\Models\User;
@@ -11,16 +11,22 @@ function seoAdmin(): User
     return User::factory()->create(['role' => UserRole::Admin]);
 }
 
-it('shows the SEO admin pages and the general settings page', function (string $path) {
+it('shows the SEO admin pages to a Beheerder', function (string $path) {
     $this->actingAs(seoAdmin())->get($path)->assertOk();
 })->with([
     '/admin/seo-dashboard',
     '/admin/seo-actions',
-    '/admin/seo-settings',
     '/admin/seo-keywords',
-    '/admin/general-settings',
     '/admin/search-console',
     '/admin/seo-leads',
+]);
+
+it('shows the settings pages only to the Websitebouwer', function (string $path) {
+    $this->actingAs(seoAdmin())->get($path)->assertForbidden();
+    $this->actingAs(User::factory()->create(['role' => UserRole::SuperAdmin]))->get($path)->assertOk();
+})->with([
+    '/admin/seo-settings',
+    '/admin/general-settings',
 ]);
 
 it('publishes a create_page action as a landing page in the project section contract', function () {
