@@ -6,18 +6,20 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Facades\Storage;
+use Webgoeroe\Core\Models\Concerns\HasContact;
 use Webgoeroe\SeoGrowth\Models\Lead;
 
 /**
  * Eén rij per aanvraag via de website (offerte, contactvraag, afspraak): de
  * aanvraag zelf, met naam, adres, bijlagen en gewenst afspraakmoment. Zelfde
- * rol als `form_submissions` op de andere sites; het admin-scherm is dat van de
+ * rol als `form_submissions` op de andere sites (Leads → Aanvragen), en hangt
+ * zoals daar aan een contact (Leads → Contacten, trait HasContact); het admin-scherm is dat van de
  * core ("Aanvragen", config/core.php + AppServiceProvider).
  *
  * De meting (kanaal, landingspagina, utm's) staat niet hier maar in de
  * `leads`-tabel van de package webgoeroe/seo-growth: elke nieuwe aanvraag
  * registreert zichzelf daar, zodat ook later bijgebouwde formulieren meteen
- * meetellen op Groei → Leads.
+ * meetellen op Leads → Overzicht.
  */
 #[Fillable([
     'type',
@@ -36,6 +38,8 @@ use Webgoeroe\SeoGrowth\Models\Lead;
 ])]
 class Aanvraag extends Model
 {
+    use HasContact;
+
     protected $table = 'aanvragen';
 
     /** Nederlandse labels voor de UI — sleutel = `type`. Ook gebruikt door Groei → Leads. */
@@ -54,6 +58,12 @@ class Aanvraag extends Model
         // Bijlagen staan op de private 'local'-disk; ze verdwijnen mee met de
         // aanvraag (verwijderen in Website → Aanvragen, ook in bulk).
         static::deleted(fn (Aanvraag $aanvraag) => $aanvraag->deleteAttachments());
+    }
+
+    /** Voor de koppeling met Leads → Contacten (HasContact): eigen kolommen, geen data-bag. */
+    public function contactDetails(): array
+    {
+        return ['name' => $this->name, 'email' => $this->email, 'phone' => $this->phone];
     }
 
     public function deleteAttachments(): void

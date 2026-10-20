@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Webgoeroe\Core\CorePlugin;
+use Webgoeroe\Core\Filament\NavigationOrder;
 use Webgoeroe\SeoGrowth\SeoGrowthPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -38,7 +39,8 @@ class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             // Vaste volgorde van de zijbalk-groepen; Instellingen altijd onderaan.
-            ->navigationGroups(['Website', 'Groei', 'Instellingen'])
+            // Vaste volgorde op elke site: Website, Leads, Vindbaarheid, Reviews, ..., Instellingen.
+            ->navigationGroups(NavigationOrder::groups())
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 AccountWidget::class,
@@ -48,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
                 // algemene instellingen, Aanvragen (inzendingen-scherm op
                 // App\Models\Aanvraag, zie config/core.php) en de admin-chrome.
                 CorePlugin::make(),
-                // Groei-module (Search Console, Analytics, leads, SEO-advies en acties).
+                // Groei-module: Vindbaarheid (Search Console, Analytics, SEO-advies, acties) + Leads → Overzicht.
                 SeoGrowthPlugin::make(),
             ])
             ->middleware([

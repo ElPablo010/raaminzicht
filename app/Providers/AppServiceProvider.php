@@ -95,7 +95,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Website → Aanvragen: het inzendingen-scherm van de core op App\Models\Aanvraag
+     * Leads → Aanvragen: het aanvragen-scherm van de core op App\Models\Aanvraag
      * (model, labels en slug in config/core.php). Hier de kolommen, het
      * typefilter en de bekijk-modal met adres, afspraak en bijlagen. Bijlagen
      * gaan via de route admin.aanvragen.attachment (enkel admins) en verdwijnen
@@ -110,6 +110,7 @@ class AppServiceProvider extends ServiceProvider
                     ->label('Type')
                     ->badge()
                     ->formatStateUsing(fn (Aanvraag $record): string => $record->typeLabel()),
+                ...array_filter([FormSubmissionsTable::originColumn()]),
                 TextColumn::make('name')
                     ->label('Van')
                     ->searchable(),

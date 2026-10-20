@@ -163,7 +163,7 @@ it('zet Instellingen onderaan de zijbalk en toont uitloggen en het oogje naar de
         filament()->getNavigation(),
     )));
 
-    expect($groups)->toBe(['Website', 'Groei', 'Instellingen']);
+    expect($groups)->toBe(['Website', 'Leads', 'Vindbaarheid', 'Instellingen']);
 
     $response
         ->assertSee('Uitloggen')
