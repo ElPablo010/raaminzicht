@@ -25,7 +25,7 @@ it('shows the settings pages only to the Websitebouwer', function (string $path)
     $this->actingAs(seoAdmin())->get($path)->assertForbidden();
     $this->actingAs(User::factory()->create(['role' => UserRole::SuperAdmin]))->get($path)->assertOk();
 })->with([
-    '/admin/seo-settings',
+    '/admin/instellingen/vindbaarheid',
     '/admin/general-settings',
 ]);
 
