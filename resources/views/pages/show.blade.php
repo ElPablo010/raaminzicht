@@ -29,7 +29,6 @@
         @php
             $componentName = 'site.sections.' . str_replace('_', '-', $section->section_type);
             $content = \App\Support\SectionLinks::resolve($section->content ?? []);
-            $anchorId = $content['section_id'] ?? null;
 
             if ($section->section_type === 'hero') {
                 unset($content['number']);
@@ -37,11 +36,6 @@
                 $content['number'] = str_pad((string) (++$sectionNumber), 2, '0', STR_PAD_LEFT);
             }
         @endphp
-
-        @if ($anchorId)
-            {{-- Anchor target net vóór de sectie. scroll-mt compenseert de fixed header. --}}
-            <div id="{{ $anchorId }}" class="scroll-mt-32"></div>
-        @endif
 
         <x-dynamic-component
             :component="$componentName"
