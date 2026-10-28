@@ -55,6 +55,10 @@ class Aanvraag extends Model
         // meting mag geen aanvraag blokkeren.
         static::created(fn (Aanvraag $aanvraag) => Lead::record($aanvraag->type, $aanvraag));
 
+        // Een verwijderde aanvraag telt niet meer mee op Leads → Overzicht:
+        // de meting (leads-rij) verdwijnt mee.
+        static::deleted(fn (Aanvraag $aanvraag) => $aanvraag->lead()->delete());
+
         // Bijlagen staan op de private 'local'-disk; ze verdwijnen mee met de
         // aanvraag (verwijderen in Website → Aanvragen, ook in bulk).
         static::deleted(fn (Aanvraag $aanvraag) => $aanvraag->deleteAttachments());
