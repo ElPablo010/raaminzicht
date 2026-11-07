@@ -1,7 +1,7 @@
 <?php
 
 use App\Livewire\LeadForm;
-use App\Models\Aanvraag;
+use Webgoeroe\Core\Models\FormSubmission;
 use App\Models\Page;
 use Webgoeroe\SeoGrowth\Models\Lead;
 use Webgoeroe\SeoGrowth\Support\Attribution;
@@ -13,7 +13,7 @@ use function Pest\Laravel\get;
 /**
  * Groei-meetlaag: de herkomst van een bezoeker wordt bij zijn eerste bezoek
  * vastgelegd (first touch) en elke aanvraag via een formulier krijgt die
- * herkomst automatisch mee (Aanvraag::booted → Lead::record) — zonder dat het formulier daar
+ * herkomst automatisch mee (FormSubmission::booted → Lead::record) — zonder dat het formulier daar
  * zelf iets voor moet doen. Bots krijgen geen herkomst.
  */
 function leadHomepage(): Page
@@ -87,12 +87,12 @@ it('geeft elke formulierinzending automatisch de herkomst van de sessie mee', fu
     $lead = Lead::sole();
 
     expect($lead->lead_type)->toBe('contact')
-        ->and($lead->source)->toBeInstanceOf(Aanvraag::class)
-        ->and($lead->source->email)->toBe('an@example.com')
+        ->and($lead->source)->toBeInstanceOf(FormSubmission::class)
+        ->and($lead->source->data['email'])->toBe('an@example.com')
         ->and($lead->channel)->toBe(Attribution::CHANNEL_ORGANIC)
         ->and($lead->referrer_host)->toBe('www.google.be')
         ->and($lead->landing_path)->toBe('/ramen-deuren')
-        ->and($lead->typeLabel())->toBe('Contactvraag');
+        ->and($lead->typeLabel())->toBe('Contactformulier');
 });
 
 it('bewaart aanvraag én lead ook zonder herkomst-snapshot', function () {
@@ -106,7 +106,7 @@ it('bewaart aanvraag én lead ook zonder herkomst-snapshot', function () {
         ->call('submit')
         ->assertHasNoErrors();
 
-    expect(Aanvraag::count())->toBe(1)
+    expect(FormSubmission::count())->toBe(1)
         ->and(Lead::count())->toBe(1)
         ->and(Lead::sole()->channel)->toBeNull();
 });

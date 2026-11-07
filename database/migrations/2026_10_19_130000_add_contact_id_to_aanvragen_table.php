@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Aanvraag;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,7 +22,14 @@ return new class extends Migration
 
         Contact::flushTableReady();
 
-        Aanvraag::query()->whereNull('contact_id')->orderBy('id')->each(fn (Aanvraag $aanvraag) => $aanvraag->linkContact());
+        // Het model Aanvraag bestaat niet meer sinds de overstap naar
+        // form_submissions (7 november 2026); op een verse database is er
+        // niets te koppelen.
+        $model = 'App\\Models\\Aanvraag';
+
+        if (class_exists($model)) {
+            $model::query()->whereNull('contact_id')->orderBy('id')->each(fn ($aanvraag) => $aanvraag->linkContact());
+        }
     }
 
     public function down(): void

@@ -69,16 +69,6 @@ return [
     // Formuliertypes: zie AppServiceProvider (offerte, contact, beide → LeadForm).
     'form_types' => [],
 
-    // Aanvragen (App\Models\Aanvraag) in plaats van form_submissions; kolommen,
-    // filter en de bekijk-modal: AppServiceProvider::registerAanvragenScreen().
-    'form_submissions' => [
-        'model' => App\Models\Aanvraag::class,
-        'slug' => 'aanvragen',
-        'navigation_label' => 'Aanvragen',
-        'model_label' => 'aanvraag',
-        'plural_model_label' => 'aanvragen',
-    ],
-
     // Favicon op de Header-pagina; tweede contactpersoon (phone_2, namen) en
     // de juridische pagina's in de footer; geen LinkedIn.
     'header' => [

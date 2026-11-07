@@ -47,8 +47,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 // Site-basis: pagina's, media, menu's, redirects, header, footer,
-                // algemene instellingen, Aanvragen (inzendingen-scherm op
-                // App\Models\Aanvraag, zie config/core.php) en de admin-chrome.
+                // algemene instellingen, Aanvragen (form_submissions, met de
+                // opvolging) en de admin-chrome.
                 CorePlugin::make(),
                 // Groei-module: Vindbaarheid (Search Console, Analytics, SEO-advies, acties) + Leads → Overzicht.
                 SeoGrowthPlugin::make(),

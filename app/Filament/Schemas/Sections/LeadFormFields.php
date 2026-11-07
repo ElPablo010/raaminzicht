@@ -16,7 +16,7 @@ use Filament\Schemas\Components\Section;
  * onderwerpen, contact-zijbalk en de optionele veldlabels.
  *
  * De formuliertypes offerte / contact / beide zijn Raaminzicht-eigen: ze renderen
- * App\Livewire\LeadForm, dat in de `aanvragen`-tabel schrijft
+ * App\Livewire\LeadForm, dat een inzending (form_submissions) bewaart
  * (Core::formTypes() in AppServiceProvider). De veldlabels/teksten zijn optioneel
  * overschrijfbaar — leeg = standaardtekst.
  */

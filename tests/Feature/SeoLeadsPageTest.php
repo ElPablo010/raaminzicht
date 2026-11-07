@@ -1,7 +1,7 @@
 <?php
 
 use Webgoeroe\SeoGrowth\Filament\Pages\SeoLeads;
-use App\Models\Aanvraag;
+use Webgoeroe\Core\Models\FormSubmission;
 use Webgoeroe\SeoGrowth\Models\Lead;
 use App\Models\Setting;
 use Webgoeroe\Core\Enums\UserRole;
@@ -19,14 +19,13 @@ use function Pest\Laravel\get;
  */
 function leadRow(string $type, string $channel, string $path, ?string $referrer = null): Lead
 {
-    $aanvraag = Aanvraag::create([
+    $aanvraag = FormSubmission::create([
         'type' => $type,
-        'name' => 'Test',
-        'email' => 'test@example.com',
+        'data' => ['name' => 'Test', 'email' => 'test@example.com'],
     ]);
 
-    // Aanvraag::booted registreert de lead; de herkomst zetten we hier zelf.
-    $lead = $aanvraag->lead;
+    // FormSubmission::booted registreert de lead; de herkomst zetten we hier zelf.
+    $lead = Lead::where('source_type', $aanvraag->getMorphClass())->where('source_id', $aanvraag->id)->sole();
     $lead->update(['channel' => $channel, 'referrer_host' => $referrer, 'landing_path' => $path]);
 
     return $lead;
@@ -46,7 +45,7 @@ it('toont recente leads met herkomst en type', function () {
     get(SeoLeads::getUrl())
         ->assertOk()
         ->assertSee('AI-assistenten')
-        ->assertSee('Contactvraag')
+        ->assertSee('Contactformulier')
         ->assertSee('/seo');
 });
 

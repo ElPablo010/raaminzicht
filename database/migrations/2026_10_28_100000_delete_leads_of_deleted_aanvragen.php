@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Aanvraag;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -18,7 +17,7 @@ return new class extends Migration
         }
 
         DB::table('leads')
-            ->where('source_type', (new Aanvraag)->getMorphClass())
+            ->where('source_type', 'App\\Models\\Aanvraag')
             ->whereNotIn('source_id', DB::table('aanvragen')->select('id'))
             ->delete();
     }

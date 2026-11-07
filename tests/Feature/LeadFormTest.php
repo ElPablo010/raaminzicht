@@ -1,19 +1,19 @@
 <?php
 
 use App\Livewire\LeadForm;
-use App\Mail\LeadReceived;
-use App\Models\Aanvraag;
-use App\Models\Setting;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
-use Webgoeroe\Core\Support\SiteFooter;
+use Webgoeroe\Core\Mail\FormSubmissionMail;
+use Webgoeroe\Core\Models\FormSubmission;
 
-it('stores a lead and mails it on a valid offerte submission', function () {
+// De melding gaat naar config('mail.notify_to') (live: het afzenderadres info@).
+beforeEach(fn () => config(['mail.notify_to' => 'info@raaminzicht.be']));
+
+it('stores an aanvraag and mails it on a valid offerte submission', function () {
     Mail::fake();
-    Setting::set(SiteFooter::KEY, ['contact' => ['email' => 'info@raaminzicht.be']]);
 
     Livewire::test(LeadForm::class, ['type' => 'offerte', 'subjects' => ['Ramen & deuren', "Veranda's"]])
         ->set('name', 'Jan Janssen')
@@ -26,9 +26,12 @@ it('stores a lead and mails it on a valid offerte submission', function () {
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    expect(Aanvraag::where('email', 'jan@example.be')->where('type', 'offerte')->value('subject'))
-        ->toBe("Ramen & deuren, Veranda's");
-    Mail::assertSent(LeadReceived::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
+    $submission = FormSubmission::where('type', 'offerte')->sole();
+    expect($submission->data['subject'])->toBe("Ramen & deuren, Veranda's")
+        ->and($submission->data['email'])->toBe('jan@example.be')
+        ->and($submission->source)->toBe('website')
+        ->and($submission->status)->toBe('new');
+    Mail::assertSent(FormSubmissionMail::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
 });
 
 it('validates required fields and consent', function () {
@@ -41,14 +44,13 @@ it('validates required fields and consent', function () {
         ->call('submit')
         ->assertHasErrors(['name', 'email', 'consent']);
 
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
     Mail::assertNothingSent();
 });
 
 it('stores uploaded plans/photos and attaches them to the mail on an offerte', function () {
     Mail::fake();
     Storage::fake('local');
-    Setting::set(SiteFooter::KEY, ['contact' => ['email' => 'info@raaminzicht.be']]);
 
     Livewire::test(LeadForm::class, ['type' => 'offerte'])
         ->set('name', 'Jan Janssen')
@@ -62,10 +64,10 @@ it('stores uploaded plans/photos and attaches them to the mail on an offerte', f
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    $lead = Aanvraag::where('email', 'jan@example.be')->first();
-    expect($lead->attachments)->toHaveCount(2);
-    Storage::disk('local')->assertExists($lead->attachments[0]['path']);
-    Mail::assertSent(LeadReceived::class, fn ($mail) => count($mail->attachments()) === 2);
+    $submission = FormSubmission::sole();
+    expect($submission->attachments())->toHaveCount(2);
+    Storage::disk('local')->assertExists($submission->attachments()[0]['path']);
+    Mail::assertSent(FormSubmissionMail::class, fn ($mail) => count($mail->attachments()) === 2);
 });
 
 it('ignores uploads when the resolved type is contact', function () {
@@ -81,7 +83,7 @@ it('ignores uploads when the resolved type is contact', function () {
         ->call('submit')
         ->assertSet('submitted', true);
 
-    expect(Aanvraag::where('email', 'mia@example.be')->value('attachments'))->toBeNull();
+    expect(FormSubmission::sole()->attachments())->toBe([]);
 });
 
 it('orders the tabs with the default mode first in "beide"', function () {
@@ -101,12 +103,11 @@ it('resolves the contact type in "beide" mode', function () {
         ->call('submit')
         ->assertSet('submitted', true);
 
-    expect(Aanvraag::where('email', 'mia@example.be')->value('type'))->toBe('contact');
+    expect(FormSubmission::sole()->type)->toBe('contact');
 });
 
 it('stores the optional address on an offerte and shows it in the mail', function () {
     Mail::fake();
-    Setting::set(SiteFooter::KEY, ['contact' => ['email' => 'info@raaminzicht.be']]);
 
     Livewire::test(LeadForm::class, ['type' => 'offerte'])
         ->set('name', 'Jan Janssen')
@@ -119,13 +120,12 @@ it('stores the optional address on an offerte and shows it in the mail', functio
         ->assertHasNoErrors()
         ->assertSet('street', '');
 
-    $lead = Aanvraag::where('email', 'jan@example.be')->first();
-    expect($lead->street)->toBe('Leuvensesteenweg 12')
-        ->and($lead->postal_code)->toBe('3200')
-        ->and($lead->city)->toBe('Aarschot')
-        ->and($lead->addressLine())->toBe('Leuvensesteenweg 12, 3200 Aarschot');
+    $data = FormSubmission::sole()->data;
+    expect($data['street'])->toBe('Leuvensesteenweg 12')
+        ->and($data['postal_code'])->toBe('3200')
+        ->and($data['city'])->toBe('Aarschot');
 
-    Mail::assertSent(LeadReceived::class, fn ($mail) => str_contains($mail->render(), 'Leuvensesteenweg 12, 3200 Aarschot'));
+    Mail::assertSent(FormSubmissionMail::class, fn ($mail) => str_contains($mail->render(), 'Leuvensesteenweg 12'));
 });
 
 it('keeps the address optional and ignores it on a contact submission', function () {
@@ -147,8 +147,10 @@ it('keeps the address optional and ignores it on a contact submission', function
         ->call('submit')
         ->assertHasNoErrors();
 
-    expect(Aanvraag::where('email', 'jan@example.be')->first()->addressLine())->toBeNull()
-        ->and(Aanvraag::where('email', 'mia@example.be')->value('city'))->toBeNull();
+    $jan = FormSubmission::where('type', 'offerte')->sole()->data;
+    $mia = FormSubmission::where('type', 'contact')->sole()->data;
+    expect($jan)->not->toHaveKeys(['street', 'postal_code', 'city'])
+        ->and($mia)->not->toHaveKey('city');
 });
 
 it('only shows the address fields in offerte mode', function () {
@@ -180,7 +182,7 @@ it('silently drops a submission with the honeypot filled in', function () {
         ->call('submit')
         ->assertSet('submitted', true);
 
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
     Mail::assertNothingSent();
 });
 
@@ -189,10 +191,10 @@ it('silently drops a submission sent faster than a human can', function () {
     config(['core.spam.min_seconds' => 3]);
 
     spamCandidate()->call('submit')->assertSet('submitted', true);
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
 
     spamCandidate()->tap(fn () => $this->travel(5)->seconds())->call('submit')->assertSet('submitted', true);
-    expect(Aanvraag::count())->toBe(1);
+    expect(FormSubmission::count())->toBe(1);
 });
 
 it('silently drops submissions with links in the name or a message full of links', function () {
@@ -201,7 +203,7 @@ it('silently drops submissions with links in the name or a message full of links
     spamCandidate(['name' => 'Cheap SEO www.spam.example'])->call('submit');
     spamCandidate(['message' => 'Visit https://a.example and https://b.example'])->call('submit');
 
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
     Mail::assertNothingSent();
 });
 
@@ -214,7 +216,7 @@ it('limits submissions to 5 per hour per IP', function () {
 
     spamCandidate()->call('submit')->assertHasErrors('email');
 
-    expect(Aanvraag::count())->toBe(5);
+    expect(FormSubmission::count())->toBe(5);
 });
 
 it('silently drops the bot pattern seen in October 2026', function (array $fields) {
@@ -222,7 +224,7 @@ it('silently drops the bot pattern seen in October 2026', function (array $field
 
     spamCandidate($fields)->call('submit')->assertSet('submitted', true);
 
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
 })->with([
     'gibberish name' => [['name' => 'PIIoXFKGuIfWqSoneFwaht']],
     'dotted gmail' => [['email' => 'a.b.c.def@gmail.com']],
@@ -236,5 +238,5 @@ it('accepts ordinary names, addresses and messages', function () {
         ->call('submit')->assertHasNoErrors();
     spamCandidate(['name' => 'McDonaldson', 'message' => ''])->call('submit')->assertHasNoErrors();
 
-    expect(Aanvraag::count())->toBe(2);
+    expect(FormSubmission::count())->toBe(2);
 });

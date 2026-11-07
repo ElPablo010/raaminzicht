@@ -27,7 +27,9 @@
     <div @class(['pt-10 md:pt-16 lg:pt-20' => ! $startsWithHero])>
     @foreach ($page->sections as $section)
         @php
-            $componentName = 'site.sections.' . str_replace('_', '-', $section->section_type);
+            // Sectieview uit het project (components/site/sections/<type>), anders
+            // de standaardview van de core of een module; onbekend type = niets.
+            $componentName = \Webgoeroe\Core\Support\Views::section($section->section_type);
             $content = \App\Support\SectionLinks::resolve($section->content ?? []);
 
             if ($section->section_type === 'hero') {
@@ -37,11 +39,13 @@
             }
         @endphp
 
-        <x-dynamic-component
-            :component="$componentName"
-            :section="$section"
-            :content="$content"
-        />
+        @if ($componentName)
+            <x-dynamic-component
+                :component="$componentName"
+                :section="$section"
+                :content="$content"
+            />
+        @endif
     @endforeach
     </div>
 </x-layouts.site>

@@ -1,99 +1,108 @@
 <?php
 
-use Webgoeroe\Core\Enums\UserRole;
-use App\Models\Aanvraag;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
-use Webgoeroe\Core\Filament\Resources\FormSubmissions\FormSubmissionResource as AanvraagResource;
-use Webgoeroe\Core\Filament\Resources\FormSubmissions\Pages\ListFormSubmissions as ListAanvragen;
+use Webgoeroe\Core\Enums\UserRole;
+use Webgoeroe\Core\Filament\Resources\FormSubmissions\FormSubmissionResource;
+use Webgoeroe\Core\Filament\Resources\FormSubmissions\Pages\ListFormSubmissions;
+use Webgoeroe\Core\Models\FormSubmission;
 
 /**
- * Website → Aanvragen: overzicht van de formulier-aanvragen, gelezen-status,
- * badge en bijlagen-download (enkel voor admins).
+ * Leads → Aanvragen op Raaminzicht: sinds 7 november 2026 het gewone
+ * inzendingen-scherm van de core op form_submissions (geen eigen model meer).
+ * Hier enkel wat Raaminzicht eigen heeft: de types offerte/contact/afspraak,
+ * adres en afspraakmoment in de aanvraag, en bijlagen bij een offerte.
  */
-function aanvraag(array $attributes = []): Aanvraag
+function aanvraag(array $data = [], string $type = 'offerte'): FormSubmission
 {
-    return Aanvraag::create(array_merge([
-        'type' => 'offerte',
-        'name' => 'Jan Peeters',
-        'email' => 'jan@example.com',
-        'phone' => '0470 00 00 00',
-        'message' => 'Graag een offerte.',
-    ], $attributes));
+    return FormSubmission::create([
+        'type' => $type,
+        'data' => array_merge([
+            'name' => 'Jan Peeters',
+            'email' => 'jan@example.com',
+            'phone' => '0470 00 00 00',
+            'message' => 'Graag een offerte.',
+        ], $data),
+    ]);
 }
 
-it('lists aanvragen and shows a badge for unread ones', function () {
+it('gebruikt het standaardmodel van de core', function () {
+    expect(FormSubmissionResource::getModel())->toBe(FormSubmission::class)
+        ->and(FormSubmissionResource::getNavigationLabel())->toBe('Aanvragen');
+
+    $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
+        ->get(FormSubmissionResource::getUrl('index'))
+        ->assertOk();
+});
+
+it('toont de eigen types en in het menu het aantal te beantwoorden aanvragen', function () {
     $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
 
     $nieuw = aanvraag();
-    $gelezen = aanvraag(['name' => 'Els Janssens', 'type' => 'afspraak', 'appointment_at' => now()->addWeek()]);
-    $gelezen->update(['read_at' => now()]);
+    $beantwoord = aanvraag(['name' => 'Els Janssens', 'appointment' => 'maandag 9 november 2026 om 10:00'], 'afspraak');
+    $beantwoord->update(['read_at' => now(), 'status' => 'contacted']);
 
-    Livewire::test(ListAanvragen::class)
+    Livewire::test(ListFormSubmissions::class)
         ->assertOk()
-        ->assertCanSeeTableRecords([$nieuw, $gelezen])
-        ->filterTable('type', 'afspraak')
-        ->assertCanSeeTableRecords([$gelezen])
-        ->assertCanNotSeeTableRecords([$nieuw]);
+        ->assertCanSeeTableRecords([$nieuw])
+        ->assertCanNotSeeTableRecords([$beantwoord])
+        ->set('activeTab', 'all')
+        ->assertTableColumnFormattedStateSet('type', 'Toonzaalafspraak', $beantwoord);
 
-    expect(AanvraagResource::getNavigationBadge())->toBe('1');
+    expect(FormSubmissionResource::getNavigationBadge())->toBe('1');
 });
 
-it('marks an aanvraag as read when viewed', function () {
+it('toont adres en afspraak in de aanvraag en markeert ze als gelezen', function () {
     $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
 
-    $record = aanvraag(['street' => 'Kerkstraat 1', 'postal_code' => '2220', 'city' => 'Heist-op-den-Berg']);
+    $record = aanvraag(['street' => 'Kerkstraat 1', 'postal_code' => '2220', 'city' => 'Heist-op-den-Berg', 'appointment' => 'maandag 9 november 2026 om 10:00']);
 
-    Livewire::test(ListAanvragen::class)
+    Livewire::test(ListFormSubmissions::class)
         ->mountTableAction('view', $record)
         ->assertOk();
 
-    $html = view('filament.aanvragen.view', ['record' => $record->fresh()])->render();
-    expect($html)->toContain('Kerkstraat 1, 2220 Heist-op-den-Berg')
+    $html = view('core::filament.form-submissions.view', ['record' => $record->fresh()])->render();
+    expect($html)->toContain('Kerkstraat 1')
+        ->toContain('Gemeente')
+        ->toContain('Gewenst moment')
         ->toContain('Graag een offerte.');
 
     expect($record->fresh()->read_at)->not->toBeNull();
-    expect(AanvraagResource::getNavigationBadge())->toBeNull();
 });
 
-it('lets a Medewerker download attachments too', function () {
+it('laat admins en medewerkers bijlagen downloaden, anderen niet', function () {
     Storage::fake('local');
     Storage::disk('local')->put('leads/plan.pdf', 'pdf-inhoud');
 
     $record = aanvraag(['attachments' => [['path' => 'leads/plan.pdf', 'name' => 'plan.pdf']]]);
+    $url = route('core.submissions.attachment', [$record, 0]);
+
+    $this->get($url)->assertForbidden();
+
+    $html = view('core::filament.form-submissions.view', ['record' => $record])->render();
+    expect($html)->toContain($url)->toContain('plan.pdf');
 
     $this->actingAs(User::factory()->create(['role' => UserRole::Staff]))
-        ->get(route('admin.aanvragen.attachment', [$record, 0]))
-        ->assertOk();
-});
-
-it('downloads an attachment for an admin and 404s on a missing one', function () {
-    Storage::fake('local');
-    Storage::disk('local')->put('leads/plan.pdf', 'pdf-inhoud');
-
-    $record = aanvraag(['attachments' => [['path' => 'leads/plan.pdf', 'name' => 'plan.pdf']]]);
-
-    $this->get(route('admin.aanvragen.attachment', [$record, 0]))->assertRedirect();
-
-    $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
-
-    $this->get(route('admin.aanvragen.attachment', [$record, 0]))
+        ->get($url)
         ->assertOk()
         ->assertDownload('plan.pdf');
 
-    $this->get(route('admin.aanvragen.attachment', [$record, 5]))->assertNotFound();
+    $this->get(route('core.submissions.attachment', [$record, 5]))->assertNotFound();
 });
 
-it('deletes the attachments together with the aanvraag', function () {
+it('verwijdert de bijlagen mee met de aanvraag', function () {
     Storage::fake('local');
-    Storage::disk('local')->put('leads/plan.pdf', 'pdf-inhoud');
+    Storage::disk('local')->put('leads/a.pdf', 'a');
+    Storage::disk('local')->put('leads/b.pdf', 'b');
     $this->actingAs(User::factory()->create(['role' => UserRole::Admin]));
 
-    $record = aanvraag(['attachments' => [['path' => 'leads/plan.pdf', 'name' => 'plan.pdf']]]);
+    $a = aanvraag(['attachments' => [['path' => 'leads/a.pdf', 'name' => 'a.pdf']]]);
+    $b = aanvraag(['attachments' => [['path' => 'leads/b.pdf', 'name' => 'b.pdf']]]);
 
-    Livewire::test(ListAanvragen::class)->callTableAction('delete', $record);
+    Livewire::test(ListFormSubmissions::class)->callTableBulkAction('delete', [$a, $b]);
 
-    expect(Aanvraag::find($record->id))->toBeNull();
-    Storage::disk('local')->assertMissing('leads/plan.pdf');
+    expect(FormSubmission::count())->toBe(0);
+    Storage::disk('local')->assertMissing('leads/a.pdf');
+    Storage::disk('local')->assertMissing('leads/b.pdf');
 });

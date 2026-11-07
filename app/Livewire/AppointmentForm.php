@@ -2,15 +2,12 @@
 
 namespace App\Livewire;
 
-use App\Mail\LeadReceived;
-use App\Models\Aanvraag;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use Webgoeroe\Core\Support\SiteFooter;
+use Webgoeroe\Core\Core;
+use Webgoeroe\Core\Livewire\Forms\ContactForm;
 
 /**
  * Afspraakformulier voor een toonzaalbezoek. De bezoeker kiest een datum (enkel
@@ -197,26 +194,21 @@ class AppointmentForm extends Component
 
         $appointmentAt = Carbon::createFromFormat('Y-m-d H:i', $this->date.' '.$this->time);
 
-        $lead = Aanvraag::create([
+        $submission = Core::model('form_submission')::create([
             'type' => 'afspraak',
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone ?: null,
-            'subject' => 'Toonzaalbezoek',
-            'appointment_at' => $appointmentAt,
-            'message' => $this->message ?: null,
-            'source_url' => url()->previous(),
+            'data' => array_filter([
+                'name' => $this->name,
+                'email' => $this->email,
+                'phone' => $this->phone ?: null,
+                'subject' => 'Toonzaalbezoek',
+                'appointment' => $appointmentAt->locale('nl')->translatedFormat('l j F Y \\o\\m H:i'),
+                'message' => $this->message ?: null,
+            ], fn ($value): bool => $value !== null),
+            'page_url' => url()->previous(),
+            'ip' => request()->ip(),
         ]);
 
-        $recipient = SiteFooter::current()['contact']['email'] ?? config('mail.from.address');
-
-        if ($recipient) {
-            try {
-                Mail::to($recipient)->send(new LeadReceived($lead));
-            } catch (\Throwable $e) {
-                Log::warning('Afspraak-mail kon niet verzonden worden: '.$e->getMessage(), ['lead_id' => $lead->id]);
-            }
-        }
+        ContactForm::notifyOwner($submission);
 
         $this->submitted = true;
         $this->reset(['name', 'email', 'phone', 'date', 'time', 'message', 'consent']);

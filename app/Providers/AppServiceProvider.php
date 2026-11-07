@@ -6,12 +6,8 @@ use App\Filament\Schemas\Sections\EigenAgendaFields;
 use App\Filament\Schemas\Sections\GalleryFields;
 use App\Filament\Schemas\Sections\LeadFormFields;
 use App\Filament\Schemas\Sections\PartnersFields;
-use App\Models\Aanvraag;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\ServiceProvider;
 use Webgoeroe\Core\Core;
-use Webgoeroe\Core\Filament\Resources\FormSubmissions\Tables\FormSubmissionsTable;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,7 +26,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->registerBlocks();
         $this->registerFormTypes();
-        $this->registerAanvragenScreen();
     }
 
     /**
@@ -56,14 +51,17 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * Formuliertypes van het form-blok. Alle drie renderen App\Livewire\LeadForm,
-     * dat in de `aanvragen`-tabel schrijft (en elke aanvraag als lead meet).
+     * dat een gewone inzending van de core bewaart (Leads → Aanvragen). De
+     * afspraak in de toonzaal (AppointmentForm, agenda-blok) is een type zonder
+     * formulierblok.
      */
     protected function registerFormTypes(): void
     {
         Core::formTypes()
-            ->register('offerte', 'Offerteaanvraag', 'lead-form', self::leadFormParams(...), Aanvraag::TYPE_LABELS['offerte'])
-            ->register('contact', 'Contactformulier', 'lead-form', self::leadFormParams(...), Aanvraag::TYPE_LABELS['contact'])
-            ->register('beide', 'Beide (met keuzeschakelaar)', 'lead-form', self::leadFormParams(...));
+            ->register('offerte', 'Offerteaanvraag', 'lead-form', self::leadFormParams(...))
+            ->register('contact', 'Contactformulier', 'lead-form', self::leadFormParams(...))
+            ->register('beide', 'Beide (met keuzeschakelaar)', 'lead-form', self::leadFormParams(...))
+            ->category('afspraak', 'Toonzaalafspraak');
     }
 
     /**
@@ -92,52 +90,5 @@ class AppServiceProvider extends ServiceProvider
                 ->filter(fn ($value): bool => filled($value))
                 ->all(),
         ];
-    }
-
-    /**
-     * Leads → Aanvragen: het aanvragen-scherm van de core op App\Models\Aanvraag
-     * (model, labels en slug in config/core.php). Hier de kolommen, het
-     * typefilter en de bekijk-modal met adres, afspraak en bijlagen. Bijlagen
-     * gaan via de route admin.aanvragen.attachment (enkel admins) en verdwijnen
-     * mee bij het verwijderen (Aanvraag::booted()).
-     */
-    protected function registerAanvragenScreen(): void
-    {
-        Core::submissions(Aanvraag::class)
-            ->columns(fn (array $columns): array => [
-                FormSubmissionsTable::readColumn(),
-                TextColumn::make('type')
-                    ->label('Type')
-                    ->badge()
-                    ->formatStateUsing(fn (Aanvraag $record): string => $record->typeLabel()),
-                ...array_filter([FormSubmissionsTable::originColumn()]),
-                TextColumn::make('name')
-                    ->label('Van')
-                    ->searchable(),
-                TextColumn::make('email')
-                    ->label('E-mail')
-                    ->searchable()
-                    ->copyable(),
-                TextColumn::make('phone')
-                    ->label('Telefoon')
-                    ->toggleable(),
-                TextColumn::make('appointment_at')
-                    ->label('Afspraak')
-                    ->dateTime('d-m-Y H:i')
-                    ->placeholder('—')
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->label('Ontvangen')
-                    ->dateTime('d-m-Y H:i')
-                    ->sortable(),
-            ])
-            ->filters(fn (array $filters): array => [
-                ...$filters,
-                SelectFilter::make('type')
-                    ->label('Type')
-                    ->options(collect(Aanvraag::TYPE_LABELS)->sort()->all()),
-            ])
-            ->heading(fn (Aanvraag $record): string => $record->typeLabel().' — '.$record->name)
-            ->view('filament.aanvragen.view');
     }
 }

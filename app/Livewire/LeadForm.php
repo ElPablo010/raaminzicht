@@ -2,25 +2,25 @@
 
 namespace App\Livewire;
 
-use App\Mail\LeadReceived;
-use App\Models\Aanvraag;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Webgoeroe\Core\Core;
 use Webgoeroe\Core\Livewire\Concerns\GuardsAgainstSpam;
-use Webgoeroe\Core\Support\SiteFooter;
+use Webgoeroe\Core\Livewire\Concerns\RemembersSection;
+use Webgoeroe\Core\Livewire\Forms\ContactForm;
 
 /**
- * Lead-formulier (offerte / contact). Slaat de inzending op en mailt ze naar het
- * zaak-e-mailadres. Een mislukte mailverzending mag de gebruiker niet blokkeren:
- * de lead wordt altijd bewaard, een mailfout wordt enkel gelogd.
+ * Lead-formulier (offerte / contact). Bewaart de aanvraag als gewone inzending
+ * van de core (form_submissions, Leads → Aanvragen), zodat de opvolging, de
+ * leadmeting en de melding aan de eigenaar dezelfde zijn als op elke site. Een
+ * mislukte mail blokkeert de aanvraag nooit (de core logt enkel).
  */
 class LeadForm extends Component
 {
     use GuardsAgainstSpam;
+    use RemembersSection;
     use WithFileUploads;
 
     /** offerte | contact | beide */
@@ -156,7 +156,7 @@ class LeadForm extends Component
         $resolvedType = $this->type === 'beide' ? $this->mode : $this->type;
 
         // Bijlagen horen enkel bij een offerteaanvraag. Bewaren op de private
-        // 'local' disk; de paden gaan mee in de lead én als mail-bijlage.
+        // 'local' disk; de paden gaan mee in de aanvraag én als mail-bijlage.
         $storedAttachments = [];
         if ($resolvedType === 'offerte') {
             foreach ($this->attachments as $file) {
@@ -169,29 +169,25 @@ class LeadForm extends Component
 
         $isOfferte = $resolvedType === 'offerte';
 
-        $lead = Aanvraag::create([
+        $submission = Core::model('form_submission')::create([
             'type' => $resolvedType,
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'phone' => $data['phone'] ?: null,
-            'street' => $isOfferte ? (trim($data['street']) ?: null) : null,
-            'postal_code' => $isOfferte ? (trim($data['postalCode']) ?: null) : null,
-            'city' => $isOfferte ? (trim($data['city']) ?: null) : null,
-            'subject' => $resolvedType === 'offerte' ? (implode(', ', $data['selectedSubjects']) ?: null) : null,
-            'message' => $data['message'] ?: null,
-            'source_url' => url()->previous(),
-            'attachments' => $storedAttachments ?: null,
+            'data' => array_filter([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'phone' => $data['phone'] ?: null,
+                'street' => $isOfferte ? (trim($data['street']) ?: null) : null,
+                'postal_code' => $isOfferte ? (trim($data['postalCode']) ?: null) : null,
+                'city' => $isOfferte ? (trim($data['city']) ?: null) : null,
+                'subject' => $isOfferte ? (implode(', ', $data['selectedSubjects']) ?: null) : null,
+                'message' => $data['message'] ?: null,
+                'attachments' => $storedAttachments ?: null,
+            ], fn ($value): bool => $value !== null),
+            'page_url' => url()->previous(),
+            'ip' => request()->ip(),
+            ...$this->sectionAttributes(),
         ]);
 
-        $recipient = SiteFooter::current()['contact']['email'] ?? config('mail.from.address');
-
-        if ($recipient) {
-            try {
-                Mail::to($recipient)->send(new LeadReceived($lead));
-            } catch (\Throwable $e) {
-                Log::warning('Lead-mail kon niet verzonden worden: '.$e->getMessage(), ['lead_id' => $lead->id]);
-            }
-        }
+        ContactForm::notifyOwner($submission);
 
         $this->submitted = true;
         $this->reset(['name', 'email', 'phone', 'street', 'postalCode', 'city', 'selectedSubjects', 'message', 'consent', 'attachments']);

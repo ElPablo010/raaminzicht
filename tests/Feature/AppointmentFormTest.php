@@ -1,14 +1,12 @@
 <?php
 
 use App\Livewire\AppointmentForm;
-use App\Mail\LeadReceived;
-use App\Models\Aanvraag;
-use App\Models\Setting;
 use Database\Seeders\HomepageSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-use Webgoeroe\Core\Support\SiteFooter;
+use Webgoeroe\Core\Mail\FormSubmissionMail;
+use Webgoeroe\Core\Models\FormSubmission;
 
 /** Vensters voor elke weekdag, zodat een testdatum altijd beschikbaar is. */
 function allWeekWindows(): array
@@ -35,9 +33,9 @@ it('genereert datums en tijdslots uit de openingsvensters', function () {
     expect($component->instance()->slotsForDate($first))->toBe(['10:00', '10:30', '11:00', '11:30']);
 });
 
-it('bewaart een afspraak-lead en mailt ze bij een geldige inzending', function () {
+it('bewaart een afspraak als aanvraag en mailt ze bij een geldige inzending', function () {
     Mail::fake();
-    Setting::set(SiteFooter::KEY, ['contact' => ['email' => 'info@raaminzicht.be']]);
+    config(['mail.notify_to' => 'info@raaminzicht.be']);
 
     $component = Livewire::test(AppointmentForm::class, [
         'windows' => allWeekWindows(),
@@ -59,10 +57,13 @@ it('bewaart een afspraak-lead en mailt ze bij een geldige inzending', function (
         ->assertHasNoErrors()
         ->assertSet('submitted', true);
 
-    $lead = Aanvraag::where('email', 'eva@example.be')->first();
-    expect($lead->type)->toBe('afspraak');
-    expect($lead->appointment_at->format('Y-m-d H:i'))->toBe($date.' '.$time);
-    Mail::assertSent(LeadReceived::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
+    $submission = FormSubmission::sole();
+    $expected = Carbon::parse($date.' '.$time)->locale('nl')->translatedFormat('l j F Y \\o\\m H:i');
+    expect($submission->type)->toBe('afspraak')
+        ->and($submission->data['email'])->toBe('eva@example.be')
+        ->and($submission->data['appointment'])->toBe($expected)
+        ->and($submission->typeLabel())->toBe('Toonzaalafspraak');
+    Mail::assertSent(FormSubmissionMail::class, fn ($mail) => $mail->hasTo('info@raaminzicht.be'));
 });
 
 it('weigert een tijdstip dat buiten de vensters valt', function () {
@@ -86,7 +87,7 @@ it('weigert een tijdstip dat buiten de vensters valt', function () {
         ->call('submit')
         ->assertHasErrors(['time']);
 
-    expect(Aanvraag::count())->toBe(0);
+    expect(FormSubmission::count())->toBe(0);
 });
 
 it('toont de afspraakpagina met het formulier', function () {

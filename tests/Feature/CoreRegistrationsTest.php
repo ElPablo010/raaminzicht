@@ -2,20 +2,20 @@
 
 use App\Livewire\AppointmentForm;
 use App\Livewire\LeadForm;
-use App\Models\Aanvraag;
 use App\Models\Page;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Webgoeroe\Core\Core;
+use Webgoeroe\Core\Models\FormSubmission;
 use Webgoeroe\SeoGrowth\Models\Lead;
 
 /**
  * Wat Raaminzicht aan webgoeroe/core hangt (AppServiceProvider, config/core.php):
  * formuliertypes offerte/contact/beide → LeadForm, de eigen agenda als
- * booking-provider, de eigen blokken. Elke inzending wordt een Aanvraag én een
- * Lead (Groei-module).
+ * booking-provider, de eigen blokken. Elke inzending wordt een gewone
+ * inzending van de core (form_submissions) én een Lead (Groei-module).
  */
 it('registreert de formuliertypes offerte, contact en beide op LeadForm', function () {
     $types = Core::formTypes();
@@ -80,15 +80,16 @@ it('maakt van elke formulierinzending een aanvraag én een lead', function (stri
 
     $component->call('submit')->assertHasNoErrors()->assertSet('submitted', true);
 
-    $aanvraag = Aanvraag::where('email', $type.'@example.be')->sole();
+    $aanvraag = FormSubmission::where('data->email', $type.'@example.be')->sole();
+    $lead = Lead::where('source_type', $aanvraag->getMorphClass())->where('source_id', $aanvraag->id)->first();
 
     expect($aanvraag->type)->toBe($expected)
-        ->and($aanvraag->lead)->not->toBeNull()
-        ->and($aanvraag->lead->lead_type)->toBe($expected);
+        ->and($lead)->not->toBeNull()
+        ->and($lead->lead_type)->toBe($expected);
 
     if ($expected === 'offerte') {
-        expect($aanvraag->attachments)->toHaveCount(1);
-        Storage::disk('local')->assertExists($aanvraag->attachments[0]['path']);
+        expect($aanvraag->attachments())->toHaveCount(1);
+        Storage::disk('local')->assertExists($aanvraag->attachments()[0]['path']);
     }
 })->with([
     'offerte' => ['offerte', 'offerte', 'offerte'],
@@ -118,9 +119,9 @@ it('maakt van een afspraak via de eigen agenda een aanvraag én een lead', funct
         ->call('submit')
         ->assertHasNoErrors();
 
-    $aanvraag = Aanvraag::where('email', 'eva@example.be')->sole();
+    $aanvraag = FormSubmission::where('data->email', 'eva@example.be')->sole();
 
     expect($aanvraag->type)->toBe('afspraak')
         ->and(Lead::where('lead_type', 'afspraak')->count())->toBe(1)
-        ->and($aanvraag->lead->lead_type)->toBe('afspraak');
+        ->and(Lead::where('source_id', $aanvraag->id)->value('lead_type'))->toBe('afspraak');
 });
