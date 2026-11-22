@@ -21,8 +21,11 @@ it('shows the SEO admin pages to a Beheerder', function (string $path) {
     '/admin/seo-leads',
 ]);
 
-it('shows the settings pages only to the Websitebouwer', function (string $path) {
-    $this->actingAs(seoAdmin())->get($path)->assertForbidden();
+// Sinds seo-growth 0.11 horen de klantinstellingen (Vindbaarheid, Algemeen) ook
+// bij de Beheerder; de sleutels en koppelingen staan op Instellingen → Integraties
+// en blijven enkel voor de Websitebouwer.
+it('shows the settings pages to the Beheerder and the Websitebouwer', function (string $path) {
+    $this->actingAs(seoAdmin())->get($path)->assertOk();
     $this->actingAs(User::factory()->create(['role' => UserRole::SuperAdmin]))->get($path)->assertOk();
 })->with([
     '/admin/instellingen/vindbaarheid',

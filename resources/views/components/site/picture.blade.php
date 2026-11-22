@@ -44,6 +44,8 @@
 
     $imgSrc = $jpgUrl ?: $src;
     $dims = WebsiteMedia::dimensionsForUrl($src);
+    // Focuspunt uit de media-library (admin) gaat voor op een vaste positie.
+    $position = WebsiteMedia::objectPositionForUrl($src) ?? $position;
 @endphp
 
 @if ($imgSrc || $webpUrl)

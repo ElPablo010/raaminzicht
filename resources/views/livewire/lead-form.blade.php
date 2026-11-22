@@ -136,9 +136,9 @@
                 </div>
             </div>
 
-            <button type="submit" wire:loading.attr="disabled" wire:target="submit" class="group mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto">
-                <span wire:loading.remove wire:target="submit">{{ $mode === 'contact' ? $this->txt('submit_contact', 'Verstuur bericht') : $this->txt('submit_offerte', 'Vraag mijn offerte aan') }}</span>
-                <span wire:loading wire:target="submit">Even geduld…</span>
+            <button type="submit" wire:loading.attr="disabled" wire:target="submit" wire:loading.class="cursor-wait" class="group relative mt-7 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-primary-700 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto">
+                <x-core::busy-spinner target="submit" />
+                <span>{{ $mode === 'contact' ? $this->txt('submit_contact', 'Verstuur bericht') : $this->txt('submit_offerte', 'Vraag mijn offerte aan') }}</span>
                 <svg wire:loading.remove wire:target="submit" class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h12M11 5l5 5-5 5"/></svg>
             </button>
             <p class="mt-3 text-xs text-primary-900/50">{{ $this->txt('footnote', 'Gratis & vrijblijvend · antwoord binnen 2 werkdagen.') }}</p>
