@@ -45,6 +45,7 @@ it('toont de eigen types en in het menu het aantal te beantwoorden aanvragen', f
 
     Livewire::test(ListFormSubmissions::class)
         ->assertOk()
+        ->set('activeTab', 'status_new')
         ->assertCanSeeTableRecords([$nieuw])
         ->assertCanNotSeeTableRecords([$beantwoord])
         ->set('activeTab', 'all')
