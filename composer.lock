@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d95ae8e54614bced118be3d940e3f8c",
+    "content-hash": "a431135e9ba00d1cdfa1a0603d2f7ced",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -9010,16 +9010,16 @@
         },
         {
             "name": "webgoeroe/seo-growth",
-            "version": "v0.13.3",
+            "version": "v0.13.4",
             "source": {
                 "type": "git",
                 "url": "git@github.com:ElPablo010/seo-growth.git",
-                "reference": "682d7f8a69b7393660a8d1f71cc16dbe8527bd92"
+                "reference": "7d07a0f6c3d570d26fc16397f3cfdc7aed69e0b0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ElPablo010/seo-growth/zipball/682d7f8a69b7393660a8d1f71cc16dbe8527bd92",
-                "reference": "682d7f8a69b7393660a8d1f71cc16dbe8527bd92",
+                "url": "https://api.github.com/repos/ElPablo010/seo-growth/zipball/7d07a0f6c3d570d26fc16397f3cfdc7aed69e0b0",
+                "reference": "7d07a0f6c3d570d26fc16397f3cfdc7aed69e0b0",
                 "shasum": ""
             },
             "require": {
@@ -9045,10 +9045,10 @@
             ],
             "description": "Groei-module van De WebGoeroe: Search Console, Google Analytics 4, leads-attributie, DataForSEO, AI-briefing en goedkeuringsdashboard voor Laravel + Filament-sites.",
             "support": {
-                "source": "https://github.com/ElPablo010/seo-growth/tree/v0.13.3",
+                "source": "https://github.com/ElPablo010/seo-growth/tree/v0.13.4",
                 "issues": "https://github.com/ElPablo010/seo-growth/issues"
             },
-            "time": "2026-11-27T08:26:17+00:00"
+            "time": "2026-11-27T14:10:53+00:00"
         }
     ],
     "packages-dev": [
